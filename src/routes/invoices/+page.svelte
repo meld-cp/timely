@@ -1,52 +1,13 @@
 <script lang="ts">
     import { setTaskControllerContext, TaskController } from "$lib/TaskController.svelte";
     import { setTaskRepoContext, TaskRepo } from "$lib/TaskRepo.svelte";
-    import type { TaskModel } from "$lib/Types";
-    import { DateHelper } from "$lib/utils";
-
+    import { InvoiceModel, InvoiceLineModel, type TaskModel } from "$lib/Types.svelte";
+    
     const taskRepo = setTaskRepoContext( new TaskRepo() );
     const taskController = setTaskControllerContext( new TaskController( taskRepo ) );
 
-    class Invoice{
-        public number:string = $state("");
-        public date:string = $state( DateHelper.toInputDateValue( new Date()) );
-
-        public lines: InvoiceLine[] = $state([]);
-
-        private lineCounter = 0;
-
-        public addLine( line: InvoiceLine ){
-            this.removeLineWithRef(line.refId)
-
-            this.lineCounter++;
-            
-            line.number = this.lineCounter;
-
-            this.lines.push( line );
-        }
-
-        public removeLineWithRef(id: string) {
-            this.lines = this.lines.filter( l=>l.refId != id );
-        }
-
-        public containsLineWithRef(id: string) : boolean {
-            return this.lines.some( l=>l.refId == id );
-        }
-        public getSubtotal():number {
-            return 0;
-        }
-        
-        public getTaxTotal():number {
-            return 0;
-        }
-
-        public getGrandTotal():number {
-            return 0;
-        }
-    }
-
-    function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLine {
-        const newLine =  new InvoiceLine()
+    function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLineModel {
+        const newLine =  new InvoiceLineModel()
         //newLine.number = this.lineCounter;
         newLine.refId = timeLog.id;
         newLine.description = `${timeLog.date} - ${timeLog.name}`;
@@ -56,21 +17,35 @@
         return newLine;
     }
 
-    class InvoiceLine {
-        public number:number = $state(0)
-        public refId = $state(crypto.randomUUID().toString())
-        public description:string = $state("")
-        public units:string = $state("")
-        public quantity:number = $state(0)
-        public unitCost:number = $state(0)
+    const workingInvoice = new InvoiceModel();
+    $inspect(workingInvoice)
 
-        public getTotal():number {
-            return this.quantity * this.unitCost;
-        }
+    function addBlankLineToWorkingInvoice(){
+        workingInvoice.addLine( new InvoiceLineModel() )
     }
 
-    const workingInvoice = new Invoice();
-    $inspect(workingInvoice)
+    function sortWorkingInvoiceLines(){
+
+    }
+    
+    function generateWorkingInvoice(){
+        
+    }
+
+    function allUninvoicedTimeHasBeenAddedToWorkingInvoice() : boolean{
+        // todo: check each ref id
+        return workingInvoice.lines.length == taskController.fetchInactiveTasks().length;
+    }
+
+    function selectAllUninvoicedTime( select: boolean ){
+        for (const task of taskController.fetchInactiveTasks()) {
+            if (select){
+                workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
+            }else{
+                workingInvoice.removeLineWithRef(task.id);
+            }
+        }
+    }
 
 </script>
 
@@ -89,10 +64,10 @@
             <nav>
                 <ul>
                     <li>
-                        <button onclick="{() => workingInvoice.addLine( new InvoiceLine() )}">Add Line</button>
+                        <button onclick="{addBlankLineToWorkingInvoice}">Add Line</button>
                     </li>
                     <li>
-                        <button class="secondary">Sort Lines</button>
+                        <button class="secondary" onclick="{sortWorkingInvoiceLines}">Sort Lines</button>
                     </li>
                 </ul>
             </nav>
@@ -140,7 +115,7 @@
             </table>
             
             <footer>
-                <button>Generate Invoice</button>
+                <button onclick="{generateWorkingInvoice}">Generate Invoice</button>
             </footer>
 
         </article>
@@ -150,16 +125,8 @@
 
             <label>
                 <input id="untagged-select-all" type="checkbox" bind:checked={
-                    () => workingInvoice.lines.length == taskController.fetchInactiveTasks().length,
-                    (checked) =>{
-                        for (const task of taskController.fetchInactiveTasks()) {
-                            if (checked){
-                                workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
-                            }else{
-                                workingInvoice.removeLineWithRef(task.id);
-                            }
-                        }
-                    } 
+                    () => allUninvoicedTimeHasBeenAddedToWorkingInvoice(),
+                    (checked) => selectAllUninvoicedTime(checked)
                 }/>
                 Select All
             </label>
