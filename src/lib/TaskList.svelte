@@ -1,9 +1,9 @@
 <script lang="ts">
     import Task from "./Task.svelte";
     import { slide } from "svelte/transition";
-    import { TaskModel } from "./Types.svelte";
+    import { type TTask } from "./Types.svelte";
         
-    let { tasks } : { tasks: TaskModel[] } = $props();
+    let { tasks } : { tasks: TTask[] } = $props();
 
 </script>
 

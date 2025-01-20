@@ -13,20 +13,31 @@ export enum TaskState {
     Stopped,
     Archived
 }
-
-export class TaskModel {
-    id: string = crypto.randomUUID();
-    state: TaskState = $state(TaskState.Stopped);
-    date: string = $state( DateHelper.toInputDateValue( new Date() ) );
-    name: string = $state("");
-    duration: number = $state(0);
-    affectiveDurationHours: number = $state(0);
+export type TTask = {
+    id: string;
+    state: TaskState;
+    date: string;
+    name: string;
+    duration: number;
+    affectiveDurationHours: number;
+    timeRunStarted : number | undefined;
+    //timeRunPaused : number | undefined;
 }
 
+// export class TaskModel implements TTask {
+//     id: string = crypto.randomUUID();
+//     state: TaskState = $state(TaskState.Stopped);
+//     date: string = $state( DateHelper.toInputDateValue( new Date() ) );
+//     name: string = $state("");
+//     duration: number = $state(0);
+//     affectiveDurationHours: number = $state(0);
+//     runStartedTime : number = $state(0);
+// }
+
 export type TaskActionModel = {
-    icon: ( task: TaskModel ) => string | undefined;
-    hint: ( task: TaskModel ) => string | undefined;
-    execute: ( task: TaskModel ) => void;
+    icon: ( task: TTask ) => string | undefined;
+    hint: ( task: TTask ) => string | undefined;
+    execute: ( task: TTask ) => void;
 }
 
 export class InvoiceModel{

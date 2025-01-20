@@ -1,12 +1,12 @@
 <script lang="ts">
     import { setTaskControllerContext, TaskController } from "$lib/TaskController.svelte";
     import { setTaskRepoContext, TaskRepo } from "$lib/TaskRepo.svelte";
-    import { InvoiceModel, InvoiceLineModel, TaskModel, TaskState } from "$lib/Types.svelte";
+    import { InvoiceModel, InvoiceLineModel, type TTask, TaskState } from "$lib/Types.svelte";
     
     const taskRepo = setTaskRepoContext( new TaskRepo() );
     const taskController = setTaskControllerContext( new TaskController( taskRepo ) );
 
-    function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLineModel {
+    function buildTimeLogInvoiceLine( timeLog: TTask ): InvoiceLineModel {
         const newLine =  new InvoiceLineModel()
         //newLine.number = this.lineCounter;
         newLine.id = timeLog.id;

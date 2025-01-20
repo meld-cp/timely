@@ -1,6 +1,6 @@
 import { getContext, setContext } from "svelte";
 import type { ITaskRepo } from "./TaskRepo.svelte";
-import { TaskState, TaskModel } from "./Types.svelte";
+import { TaskState, type TTask } from "./Types.svelte";
 
 export class TaskController{
     repo: ITaskRepo;
@@ -12,7 +12,12 @@ export class TaskController{
     }
     
     public start() {
-        this.stop()
+        this.stop();
+
+        // catch up duration
+        for (const task of this.fetchTasksByState( [TaskState.Running] ) ) {
+            this.recalculateDurationFromRunningSession( task );
+        }
         this.intervalId = setInterval( () => this.incrementRunningTaskDuration(), 1000 )
     }
     
@@ -27,6 +32,8 @@ export class TaskController{
         const task = this.repo.createTask();
         task.name = taskName;
         task.state = TaskState.Running;
+        task.timeRunStarted = Date.now();
+        //task.timeRunPaused = undefined;
         this.repo.markAsChanged(task);
     }
 
@@ -36,6 +43,8 @@ export class TaskController{
             return;
         }
         task.state = TaskState.Paused;
+        task.timeRunStarted = undefined;
+        //task.timeRunPaused = Date.now();
         this.repo.markAsChanged(task);
     }
 
@@ -46,6 +55,8 @@ export class TaskController{
         }
         this.pauseAll();
         task.state = TaskState.Running;
+        task.timeRunStarted = Date.now();
+        //task.timeRunPaused = undefined;
         this.repo.markAsChanged(task);
     }
 
@@ -59,9 +70,13 @@ export class TaskController{
         if (task.state == TaskState.Paused){
             this.pauseAll();
             task.state = TaskState.Running;
+            task.timeRunStarted = Date.now();
+            //task.timeRunPaused = undefined;
             this.repo.markAsChanged(task);
         }else if( task.state == TaskState.Running ){
             task.state = TaskState.Paused;
+            task.timeRunStarted = undefined;
+            //task.timeRunPaused = Date.now();
             this.repo.markAsChanged(task);
         }
     }
@@ -81,6 +96,8 @@ export class TaskController{
         }
         this.pauseAll();
         task.state = TaskState.Running;
+        task.timeRunStarted = Date.now();
+        //task.timeRunPaused = undefined;
         this.repo.markAsChanged(task);
     }
 
@@ -90,11 +107,13 @@ export class TaskController{
         if (!task){
             return;
         }
-        task.state = TaskState.Stopped
+        task.state = TaskState.Stopped;
+        task.timeRunStarted = undefined;
+        //task.timeRunPaused = undefined;
         this.repo.markAsChanged(task);
     }
 
-    public activateAndStartCopy(id:string) : TaskModel | undefined {
+    public activateAndStartCopy(id:string) : TTask | undefined {
         const task = this.cloneTask(id);
         if (task){
             this.startTask(task.id);
@@ -107,15 +126,20 @@ export class TaskController{
         if (!task){
             return;
         }
-        if ( newDurationInSeconds >= 0 ){
-            task.duration = newDurationInSeconds;
-        }else{
-            task.duration = 0;
-        }
 
-        task.affectiveDurationHours = this.calculateAffectiveHours( task.duration, 0, 15 )
+        task.duration = Math.ceil( newDurationInSeconds );
+        task.affectiveDurationHours = this.calculateAffectiveHours( task.duration, 15 )
         
         this.repo.markAsChanged(task);
+    }
+
+    public recalculateDurationFromRunningSession( task:TTask) {
+        if ( task.state != TaskState.Running ){
+            return
+        }
+        const sessionStartTime = (task.timeRunStarted ?? Date.now());
+        const secs = ( Date.now() - sessionStartTime ) / 1000;
+        this.setDuration( task.id, secs );
     }
 
     public incrementTaskDuration( id:string, incrementMinutes: number ) : void {
@@ -123,20 +147,32 @@ export class TaskController{
         if (!task){
             return;
         }
-        this.setDuration( id, task.duration + incrementMinutes * 60 );
+        if ( task.state == TaskState.Running ){
+            // inc session start time
+            const currentSessionStartTime = (task.timeRunStarted ?? Date.now());
+            //const dt = new Date( currentSessionStartTime );
+            const incMs = incrementMinutes * 60 * 1000;
+            const newSessionTime = currentSessionStartTime - incMs; 
+            task.timeRunStarted = newSessionTime;
+            this.recalculateDurationFromRunningSession(task)
+        }else{
+            this.setDuration( id, task.duration + incrementMinutes * 60 );
+        }
     }
 
-    public fetchTasksByState( states : TaskState[] ) : TaskModel[]{
+    public fetchTasksByState( states : TaskState[] ) : TTask[]{
         return this.repo.fetch( t=>states.includes(t.state) );
     }
    
     private pauseAll(){
         for (const task of this.repo.fetch( t=>t.state == TaskState.Running)) {
             task.state = TaskState.Paused;
+            task.timeRunStarted = undefined;
+            //task.timeRunPaused = undefined;
         }
     }
     
-    private compareDateDescending( a:TaskModel, b:TaskModel) : number{
+    private compareDateDescending( a:TTask, b:TTask) : number{
         if (a.date === b.date){
             return 0;
         }
@@ -156,11 +192,11 @@ export class TaskController{
     //     return -1
     // }
 
-    private sortByDateDescending( tasks:TaskModel[]):TaskModel[]{
+    private sortByDateDescending( tasks:TTask[]):TTask[]{
         return tasks.toSorted( this.compareDateDescending )
     }
 
-    private cloneTask( id:string ): TaskModel | undefined {
+    private cloneTask( id:string ): TTask | undefined {
         const taskToClone = this.repo.getTask(id);
         if (!taskToClone){
             return undefined;
@@ -172,11 +208,8 @@ export class TaskController{
         return newTask;
     }
 
-    private calculateAffectiveHours( durationSeconds:number, minAffectiveMins:number, incrementMinutes: number ) : number {
+    private calculateAffectiveHours( durationSeconds:number, incrementMinutes: number ) : number {
         let mins = durationSeconds / 60;
-        if (mins < minAffectiveMins){
-            mins = minAffectiveMins;
-        }
         const increments = Math.ceil( mins / incrementMinutes )
         const affectiveMins = increments * incrementMinutes;
         const affectiveHours = affectiveMins / 60;

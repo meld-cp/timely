@@ -1,16 +1,17 @@
 import { getContext, setContext } from "svelte";
-import { TaskModel } from "./Types.svelte";
+import { TaskState, type TTask } from "./Types.svelte";
+import { DateHelper } from "./utils";
 
 export interface ITaskRepo{
-    fetch(predicate: (t: TaskModel) => boolean): TaskModel[];
-    createTask() : TaskModel;
-    getTask( id:string ) : TaskModel | undefined;
-    markAsChanged( task:TaskModel ) : void;
+    fetch(predicate: (t: TTask) => boolean): TTask[];
+    createTask() : TTask;
+    getTask( id:string ) : TTask | undefined;
+    markAsChanged( task:TTask ) : void;
 }
 
 export class TaskRepo implements ITaskRepo{
 
-    tasks = $state<TaskModel[]>([]);
+    tasks = $state<TTask[]>([]);
 
     store =  new TaskStoreLocalStorage();
 
@@ -18,22 +19,31 @@ export class TaskRepo implements ITaskRepo{
         this.tasks = this.store.loadTasks();
     }
 
-    public fetch(predicate: (t: TaskModel) => boolean): TaskModel[] {
+    public fetch(predicate: (t: TTask) => boolean): TTask[] {
         return this.tasks.filter(predicate);
     }
 
-    public createTask() : TaskModel{
-        const task = new TaskModel();
-        this.tasks.unshift(task);
+    public createTask() : TTask{
+        const task : TTask = {
+            id: crypto.randomUUID(),
+            state: TaskState.Stopped,
+            date: DateHelper.toInputDateValue( new Date() ),
+            name: "",
+            duration: 0,
+            affectiveDurationHours: 0,
+            timeRunStarted: 0,
+            //timeRunPaused: 0
+        };
         this.markAsChanged( task );
+        this.tasks.unshift(task);
         return task;
     }
 
-    public getTask( id:string ): TaskModel | undefined {
+    public getTask( id:string ): TTask | undefined {
         return this.tasks.find( x=>x.id === id );
     }
 
-    public markAsChanged( task:TaskModel ) {
+    public markAsChanged( task:TTask ) {
         this.store.saveTask( task );
     }
 
@@ -56,8 +66,8 @@ class TaskStoreLocalStorage{
         localStorage.setItem( "taskIds", taskIdsJson );
     }
 
-    public loadTasks() : TaskModel[]{
-        const tasks : TaskModel[] = [];
+    public loadTasks() : TTask[]{
+        const tasks : TTask[] = [];
         
         const taskIds = this.loadTaskIds();
         for (const taskId of taskIds) {
@@ -65,7 +75,7 @@ class TaskStoreLocalStorage{
             if (!taskJson){
                 continue;
             }
-            const task = JSON.parse( taskJson ) as TaskModel;
+            const task = JSON.parse( taskJson ) as TTask;
             if (!task){
                 continue;
             }
@@ -74,7 +84,7 @@ class TaskStoreLocalStorage{
         return tasks;
     }
     
-    public saveTask( task: TaskModel ) {
+    public saveTask( task: TTask ) {
         const ids = this.loadTaskIds().filter( id => id != task.id);
         ids.push( task.id );
         this.saveIds( ids );
