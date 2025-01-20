@@ -1,7 +1,7 @@
 <script lang="ts">
     import { setTaskControllerContext, TaskController } from "$lib/TaskController.svelte";
     import { setTaskRepoContext, TaskRepo } from "$lib/TaskRepo.svelte";
-    import { InvoiceModel, InvoiceLineModel, type TaskModel, TaskState } from "$lib/Types.svelte";
+    import { InvoiceModel, InvoiceLineModel, TaskModel, TaskState } from "$lib/Types.svelte";
     
     const taskRepo = setTaskRepoContext( new TaskRepo() );
     const taskController = setTaskControllerContext( new TaskController( taskRepo ) );
