@@ -2,10 +2,18 @@
     import { page } from '$app/state';
     import { invoiceController } from '$lib/InvoiceController.svelte';
     import { settingsController } from '$lib/SettingsController.svelte';
-
-    const inv = invoiceController.get(page.params.id);
-
-    const settings = $derived(settingsController.read());
+    import type { InvoiceModel } from '$lib/Types.svelte';
+    import { onMount } from 'svelte';
+    
+    let logoSrc :string|undefined = $state();
+    
+    let inv: InvoiceModel | undefined = $state();
+    
+    onMount(()=>{
+        let settings = settingsController.read();
+        inv = invoiceController.fetch(page.params.id);
+        logoSrc = settings.logoData;
+    })
 
 </script>
 
@@ -15,7 +23,7 @@
     <section id="c-header" class="row">
         <div id="c-logo">
             <!-- logo -->
-            <img src="{settings.logoData}" alt="" />
+            <img src="{logoSrc}" alt="" />
         </div>
 
         <div id="c-address">

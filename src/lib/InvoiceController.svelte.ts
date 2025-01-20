@@ -1,8 +1,11 @@
+import { LocalStorageController } from "./LocalStoragController";
 import { settingsController } from "./SettingsController.svelte";
 import { InvoiceLineModel, InvoiceModel } from "./Types.svelte";
 
 class InvoiceController{
     
+    private repo = new LocalStorageController("invoices");
+
     workingInvoice = this.build();
 
     commitWorkingInvoice(): InvoiceModel {
@@ -12,6 +15,8 @@ class InvoiceController{
         var newInv = this.workingInvoice;
 
         newInv.number = `${settings.nextInvoiceNumber}`
+
+        this.save(newInv);
 
         settings.nextInvoiceNumber++
         settingsController.write(settings);
@@ -33,7 +38,11 @@ class InvoiceController{
         return inv;
     }
 
-    get(id: string): InvoiceModel | undefined {
+    save( inv: InvoiceModel ){
+        this.repo.set(inv.id, inv);
+    }
+
+    fetch(id: string): InvoiceModel | undefined {
         
         const inv = this.build()
         inv.issueToLines = [
