@@ -1,7 +1,7 @@
 <script lang="ts">
     import Duration from "./Duration.svelte";
-    import { getTaskControllerContext } from "./TaskController.svelte";
-    import { getTaskRepoContext } from "./TaskRepo.svelte";
+    import { taskController } from "./TaskController.svelte";
+    import { taskRepo } from "./TaskRepo.svelte";
     import { Icons, type TaskActionModel, TaskState } from "./Types.svelte";
     
     let {
@@ -9,9 +9,6 @@
     }:{
         taskId:string,
     } = $props();
-
-    const taskRepo = getTaskRepoContext();
-    const taskController = getTaskControllerContext();
 
     let task = $derived( taskRepo.getTask( taskId ) );
 

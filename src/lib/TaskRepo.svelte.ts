@@ -1,4 +1,3 @@
-import { getContext, setContext } from "svelte";
 import { TaskState, type TTask } from "./Types.svelte";
 import { DateHelper } from "./utils";
 
@@ -95,12 +94,14 @@ class TaskStoreLocalStorage{
 
 }
 
-const taskRepoKey = Symbol("taskrepo");
+export const taskRepo = new TaskRepo();
 
-export function getTaskRepoContext() : TaskRepo{
-    return getContext(taskRepoKey) as TaskRepo;
-}
+// const taskRepoKey = Symbol("taskrepo");
 
-export function setTaskRepoContext( taskRepo:TaskRepo ) : TaskRepo{
-    return setContext( taskRepoKey, taskRepo );
-}
+// export function getTaskRepoContext() : TaskRepo{
+//     return getContext(taskRepoKey) as TaskRepo;
+// }
+
+// export function setTaskRepoContext( taskRepo:TaskRepo ) : TaskRepo{
+//     return setContext( taskRepoKey, taskRepo );
+// }

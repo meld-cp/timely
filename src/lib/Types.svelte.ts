@@ -42,8 +42,14 @@ export type TaskActionModel = {
 
 export class InvoiceModel{
     public id = $state(crypto.randomUUID().toString())
+    
     public number:string = $state("");
     public date:string = $state( DateHelper.toInputDateValue( new Date()) );
+    public orderRef:string = $state("");
+
+    public issueToLines: string[] = $state([]);
+    public footerLines: string[] = $state([]);
+
 
     public lines: InvoiceLineModel[] = $state([]);
 
@@ -55,7 +61,6 @@ export class InvoiceModel{
         this.lineCounter++;
         
         line.number = this.lineCounter;
-
         this.lines.push( line );
     }
 
@@ -67,15 +72,15 @@ export class InvoiceModel{
         return this.lines.some( l=>l.id == id );
     }
     public getSubtotal():number {
-        return 0;
+        return this.lines.reduce( (p,line) => p + line.getTotal(), 0 );
     }
     
     public getTaxTotal():number {
-        return 0;
+        return this.lines.reduce( (p,line) => p + line.getTax(), 0 );
     }
 
     public getGrandTotal():number {
-        return 0;
+        return this.getSubtotal() + this.getTaxTotal();
     }
 }
 
@@ -89,5 +94,8 @@ export class InvoiceLineModel {
 
     public getTotal():number {
         return this.quantity * this.unitCost;
+    }
+    public getTax():number {
+        return 0;
     }
 }

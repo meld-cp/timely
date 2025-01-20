@@ -1,8 +1,6 @@
 <script lang="ts">
-    import { getTaskControllerContext } from "./TaskController.svelte";
+    import { taskController } from "./TaskController.svelte";
     
-    let taskController = getTaskControllerContext();
-
     let taskName = $state("");
 
     function startTask( ev: SubmitEvent) : void {

@@ -1,11 +1,8 @@
 <script lang="ts">
-    import { setTaskControllerContext, TaskController } from "$lib/TaskController.svelte";
-    import { setTaskRepoContext, TaskRepo } from "$lib/TaskRepo.svelte";
-    import { InvoiceModel, InvoiceLineModel, type TTask, TaskState } from "$lib/Types.svelte";
+    import { invoiceController } from "$lib/InvoiceController.svelte";
+    import { taskController } from "$lib/TaskController.svelte";
+    import { InvoiceLineModel, type TTask, TaskState } from "$lib/Types.svelte";
     
-    const taskRepo = setTaskRepoContext( new TaskRepo() );
-    const taskController = setTaskControllerContext( new TaskController( taskRepo ) );
-
     function buildTimeLogInvoiceLine( timeLog: TTask ): InvoiceLineModel {
         const newLine =  new InvoiceLineModel()
         //newLine.number = this.lineCounter;
@@ -17,8 +14,7 @@
         return newLine;
     }
 
-    const workingInvoice = new InvoiceModel();
-    $inspect(workingInvoice)
+    const workingInvoice = invoiceController.build();
 
     function addBlankLineToWorkingInvoice(){
         workingInvoice.addLine( new InvoiceLineModel() )
