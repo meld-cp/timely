@@ -1,6 +1,6 @@
 import { getContext, setContext } from "svelte";
 import type { ITaskRepo } from "./TaskRepo.svelte";
-import type { TaskModel } from "./Types.svelte";
+import { TaskState, type TaskModel } from "./Types.svelte";
 
 export class TaskController{
     repo: ITaskRepo;
@@ -26,56 +26,78 @@ export class TaskController{
         this.pauseAll();
         const task = this.repo.createTask();
         task.name = taskName;
-        task.active = true;
-        task.paused = false;
+        task.state = TaskState.Running;
+        this.repo.markAsChanged(task);
+    }
+
+    public pauseTask( id:string ) : void {
+        const task = this.repo.getTask(id);
+        if (task?.state != TaskState.Running){
+            return;
+        }
+        task.state = TaskState.Paused;
+        this.repo.markAsChanged(task);
+    }
+
+    public resumeTask( id:string ) : void {
+        const task = this.repo.getTask(id);
+        if (task?.state != TaskState.Paused){
+            return;
+        }
+        this.pauseAll();
+        task.state = TaskState.Running;
         this.repo.markAsChanged(task);
     }
 
     public togglePaused( id:string ) : void {
         const task = this.repo.getTask(id);
+
         if (!task){
             return;
         }
-        if (task.paused){
+
+        if (task.state == TaskState.Paused){
             this.pauseAll();
-            task.active = true;
-            task.paused = false;
-        }else{
-            task.paused = true;
+            task.state = TaskState.Running;
+            this.repo.markAsChanged(task);
+        }else if( task.state == TaskState.Running ){
+            task.state = TaskState.Paused;
+            this.repo.markAsChanged(task);
         }
-        this.repo.markAsChanged(task);
     }
 
     public canPauseOrResume( id:string ) : boolean{
         const task = this.repo.getTask(id);
-        return task?.active === true;
+        if (!task){
+            return false;
+        }
+        return [TaskState.Paused || TaskState.Running || TaskState.Stopped].includes( task.state );
     }
 
-    public activateAndStart( id:string ) : void{
+    public startTask( id:string ) : void{
         const task = this.repo.getTask(id);
-        if (!task){
+        if (task?.state != TaskState.Stopped){
             return;
         }
         this.pauseAll();
-        task.active = true;
-        task.paused = false;
+        task.state = TaskState.Running;
         this.repo.markAsChanged(task);
     }
 
-    public deactivateTask( id:string ) : void {
+    public stopTask( id:string ) : void {
+        console.log('Stop')
         const task = this.repo.getTask(id);
         if (!task){
             return;
         }
-        task.active = false;
-        task.paused = true;
+        task.state = TaskState.Stopped
         this.repo.markAsChanged(task);
     }
 
     public activateAndStartCopy(id:string) : TaskModel | undefined {
         const task = this.cloneTask(id);
         if (task){
-            this.activateAndStart(task.id);
+            this.startTask(task.id);
         }
         return task;
     }
@@ -104,21 +126,13 @@ export class TaskController{
         this.setDuration( id, task.duration + incrementMinutes * 60 );
     }
 
-    public fetchFirstRunningTask() : TaskModel | undefined{
-        return this.repo.fetch( t=>t.active && !t.paused).at(0);
+    public fetchTasksByState( states : TaskState[] ) : TaskModel[]{
+        return this.repo.fetch( t=>states.includes(t.state) );
     }
-
-    public fetchActiveButPausedTasks() : TaskModel[]{
-        return this.sortByDateDescending( this.repo.fetch( t => t.active && t.paused ) );
-    }
-
-    public fetchInactiveTasks() : TaskModel[]{
-        return this.sortByDateDescending( this.repo.fetch( t=>!t.active) );
-    }
-    
+   
     private pauseAll(){
-        for (const task of this.repo.fetch( t=>!t.paused)) {
-            task.paused = true;
+        for (const task of this.repo.fetch( t=>t.state == TaskState.Running)) {
+            task.state = TaskState.Paused;
         }
     }
     
@@ -132,15 +146,15 @@ export class TaskController{
         return 1
     }
 
-    private comparePaused( a:TaskModel, b:TaskModel) : number{
-        if (a.paused === b.paused){
-            return 0;
-        }
-        if (a.paused > b.paused){
-            return 1;
-        }
-        return -1
-    }
+    //private comparePaused( a:TaskModel, b:TaskModel) : number{
+    //     if (a.paused === b.paused){
+    //         return 0;
+    //     }
+    //     if (a.paused > b.paused){
+    //         return 1;
+    //     }
+    //     return -1
+    // }
 
     private sortByDateDescending( tasks:TaskModel[]):TaskModel[]{
         return tasks.toSorted( this.compareDateDescending )
@@ -170,7 +184,7 @@ export class TaskController{
     }
 
     private incrementRunningTaskDuration(){
-        for (const t of this.repo.fetch( t=>!t.paused)) {
+        for (const t of this.fetchTasksByState([TaskState.Running])) {
             this.setDuration( t.id, t.duration + 1 );
         }
     }

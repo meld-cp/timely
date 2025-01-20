@@ -1,5 +1,5 @@
 import { getContext, setContext } from "svelte";
-import type { TaskModel } from "./Types.svelte";
+import { TaskState, type TaskModel } from "./Types.svelte";
 import { DateHelper } from "./utils";
 
 export interface ITaskRepo{
@@ -26,10 +26,9 @@ export class TaskRepo implements ITaskRepo{
     public createTask() : TaskModel{
         const newTask : TaskModel = {
             id: crypto.randomUUID(),
+            state: TaskState.Paused,
             date: DateHelper.toInputDateValue( new Date() ),
             name: "",
-            active: false,
-            paused: true,
             duration: 0,
             affectiveDurationHours: 0
         };

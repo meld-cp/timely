@@ -1,7 +1,7 @@
 <script lang="ts">
     import { setTaskControllerContext, TaskController } from "$lib/TaskController.svelte";
     import { setTaskRepoContext, TaskRepo } from "$lib/TaskRepo.svelte";
-    import { InvoiceModel, InvoiceLineModel, type TaskModel } from "$lib/Types.svelte";
+    import { InvoiceModel, InvoiceLineModel, type TaskModel, TaskState } from "$lib/Types.svelte";
     
     const taskRepo = setTaskRepoContext( new TaskRepo() );
     const taskController = setTaskControllerContext( new TaskController( taskRepo ) );
@@ -34,11 +34,11 @@
 
     function allUninvoicedTimeHasBeenAddedToWorkingInvoice() : boolean{
         // todo: check each ref id
-        return workingInvoice.lines.length == taskController.fetchInactiveTasks().length;
+        return workingInvoice.lines.length == taskController.fetchTasksByState([ TaskState.Stopped ]).length;
     }
 
     function selectAllUninvoicedTime( select: boolean ){
-        for (const task of taskController.fetchInactiveTasks()) {
+        for (const task of taskController.fetchTasksByState([ TaskState.Stopped ])) {
             if (select){
                 workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
             }else{
@@ -131,7 +131,7 @@
                 Select All
             </label>
             <hr/>
-            {#each taskController.fetchInactiveTasks() as task }
+            {#each taskController.fetchTasksByState([ TaskState.Stopped ]) as task }
             <div>
                 <label>
                     <input id="{task.id}" type="checkbox" bind:checked={
