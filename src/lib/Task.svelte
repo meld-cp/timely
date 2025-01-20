@@ -2,7 +2,7 @@
     import Duration from "./Duration.svelte";
     import { taskController } from "./TaskController.svelte";
     import { taskRepo } from "./TaskRepo.svelte";
-    import { Icons, type TaskActionModel, TaskState } from "./Types.svelte";
+    import { Icons, type TaskActionModel, TaskState } from "./Types";
     
     let {
         taskId,

@@ -2,7 +2,7 @@
     import { taskController } from "$lib/TaskController.svelte";
     import TaskList from "$lib/TaskList.svelte";
     import TimeLogger from "$lib/TimeLogger.svelte";
-    import { TaskState } from "$lib/Types.svelte";
+    import { TaskState } from "$lib/Types";
     import { onDestroy, onMount } from "svelte";
     
     onMount(()=>{
