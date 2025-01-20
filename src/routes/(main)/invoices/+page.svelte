@@ -9,7 +9,7 @@
     function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLineModel {
         const newLine =  new InvoiceLineModel()
         //newLine.number = this.lineCounter;
-        newLine.refId = timeLog.id;
+        newLine.id = timeLog.id;
         newLine.description = `${timeLog.date} - ${timeLog.name}`;
         newLine.units = "hr";
         newLine.quantity = timeLog.affectiveDurationHours;
@@ -28,8 +28,8 @@
 
     }
     
-    function generateWorkingInvoice(){
-        
+    function saveWorkingInvoice(){
+        window.open( `/invoice/${workingInvoice.id}`, )
     }
 
     function allUninvoicedTimeHasBeenAddedToWorkingInvoice() : boolean{
@@ -42,7 +42,7 @@
             if (select){
                 workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
             }else{
-                workingInvoice.removeLineWithRef(task.id);
+                workingInvoice.removeLineWithId(task.id);
             }
         }
     }
@@ -115,7 +115,7 @@
             </table>
             
             <footer>
-                <button onclick="{generateWorkingInvoice}">Generate Invoice</button>
+                <button onclick="{saveWorkingInvoice}">Save</button>
             </footer>
 
         </article>
@@ -135,12 +135,12 @@
             <div>
                 <label>
                     <input id="{task.id}" type="checkbox" bind:checked={
-                        () => workingInvoice.containsLineWithRef(task.id),
+                        () => workingInvoice.containsLineWithId(task.id),
                         (checked) =>{
                             if (checked){
                                 workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
                             }else{
-                                workingInvoice.removeLineWithRef(task.id);
+                                workingInvoice.removeLineWithId(task.id);
                             }
                         } 
                     }/>
