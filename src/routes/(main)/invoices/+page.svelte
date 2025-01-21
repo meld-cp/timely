@@ -3,7 +3,7 @@
     import InvoiceEditorView from "$lib/InvoiceEditor/InvoiceEditorView.svelte";
     import { settingsController } from "$lib/SettingsController.svelte";
     import { taskController } from "$lib/TaskController.svelte";
-    import { type TTask, TaskState } from "$lib/Models";
+    import { type TaskModel, TaskState } from "$lib/Models";
     import { onMount } from "svelte";
     import { InvoiceLineViewModel, InvoiceViewModel } from "$lib/ViewModels.svelte";
 
@@ -11,7 +11,7 @@
 
     let workingInvoice = $state( new InvoiceViewModel() );
 
-    let uninvoicedTasks:TTask[] = $state([]);
+    let uninvoicedTasks:TaskModel[] = $state([]);
     onMount(()=>{
         const settings = settingsController.read();
         workingInvoice.number = `${settings.nextInvoiceNumber}`;
@@ -19,7 +19,7 @@
         uninvoicedTasks = taskController.fetchTasksByState([ TaskState.Stopped ]);
     })
 
-    function buildTimeLogInvoiceLine( timeLog: TTask ): InvoiceLineViewModel {
+    function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLineViewModel {
         const newLine =  new InvoiceLineViewModel()
         newLine.number = wiNextLineNumber++;
         newLine.extRefId = timeLog.id;
