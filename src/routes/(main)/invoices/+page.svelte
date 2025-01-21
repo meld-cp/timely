@@ -2,22 +2,28 @@
     import { invoiceController } from "$lib/InvoiceController.svelte";
     import InvoiceEditorView from "$lib/InvoiceEditor/InvoiceEditorView.svelte";
     import { settingsController } from "$lib/SettingsController.svelte";
-    import { taskController } from "$lib/TaskController.svelte";
     import { type TaskModel, TaskState } from "$lib/Models";
     import { onMount } from "svelte";
-    import { InvoiceLineViewModel, InvoiceViewModel } from "$lib/ViewModels.svelte";
+    import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/ViewModels.svelte";
+    import { LocalStorageController } from "$lib/LocalStoragController";
 
     let wiNextLineNumber = $state(1);
 
     let workingInvoice = $state( new InvoiceViewModel() );
 
-    let uninvoicedTasks:TaskModel[] = $state([]);
+    const repo = new LocalStorageController<TaskModel>("tasks");//TODO: share with TimeLogPageViewModel
+
+    let uninvoicedTasks:TaskViewModel[] = $state([]);
     onMount(()=>{
         const settings = settingsController.read();
         workingInvoice.number = `${settings.nextInvoiceNumber}`;
         workingInvoice.footnoteAsText = settings.defaultInvoiceFooter ?? "";
-        uninvoicedTasks = taskController.fetchTasksByState([ TaskState.Stopped ]);
+        uninvoicedTasks = getUninvoicedTasks();
     })
+
+    function getUninvoicedTasks(): TaskViewModel[]{
+        return repo.getAll().filter( t=>t.state == TaskState.Stopped).map(t=> new TaskViewModel(t) );
+    }
 
     function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLineViewModel {
         const newLine =  new InvoiceLineViewModel()
@@ -45,7 +51,7 @@
     }
 
     function selectAllUninvoicedTime( select: boolean ){
-        for (const task of taskController.fetchTasksByState([ TaskState.Stopped ])) {
+        for (const task of uninvoicedTasks) {
             if (select){
                 workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
             }else{
