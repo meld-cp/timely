@@ -1,5 +1,5 @@
-import { TaskState, type TTask } from "./Types";
-import { DateHelper } from "./utils";
+import { TaskState, type TTask } from "./Models";
+import { DateFormat } from "./utils";
 
 export interface ITaskRepo{
     fetch(predicate: (t: TTask) => boolean): TTask[];
@@ -26,7 +26,7 @@ export class TaskRepo implements ITaskRepo{
         const task : TTask = {
             id: crypto.randomUUID(),
             state: TaskState.Stopped,
-            date: DateHelper.toInputDateValue( new Date() ),
+            date: DateFormat.toInputDateValue( new Date() ),
             name: "",
             duration: 0,
             affectiveDurationHours: 0,

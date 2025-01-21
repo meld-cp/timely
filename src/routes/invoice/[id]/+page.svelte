@@ -2,7 +2,8 @@
     import { page } from '$app/state';
     import { invoiceController } from '$lib/InvoiceController.svelte';
     import { settingsController } from '$lib/SettingsController.svelte';
-    import type { InvoiceModel } from '$lib/Types';
+    import type { InvoiceModel } from '$lib/Models';
+    import { NumberFormat } from '$lib/utils';
     import { onMount } from 'svelte';
     
     let logoSrc :string|undefined = $state();
@@ -94,7 +95,7 @@
                     <td class="tar">{line.quantity}</td>
                     <td class="tac">{line.units}</td>
                     <td class="tar">{line.unitCost}</td>
-                    <td class="tar">{invoiceController.getLineTotal(line).toFixed(2)}</td>
+                    <td class="tar">{NumberFormat.currency( invoiceController.getLineTotal(line), "NZD" )}</td>
                 </tr>
                 {/each}
             </tbody>
