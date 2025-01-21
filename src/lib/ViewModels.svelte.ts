@@ -285,7 +285,6 @@ export class TimeLogPageViewModel{
     }
 
     private incrementRunningTaskDuration(){
-        console.log("incrementRunningTaskDuration")
         for (const task of this.tasksRunning ) {
             task.setDuration( task.duration + 1 );
             this.saveTask(task);
