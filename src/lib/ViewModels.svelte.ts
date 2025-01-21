@@ -232,11 +232,18 @@ export class TimeLogPageViewModel{
     intervalId:number | undefined;
 
     constructor( ){
-        this.refresh();
+        
     }
     
     start() {
         this.stop();
+        
+        this.refresh();
+        // catch up duration
+        for (const task of this.tasksRunning ) {
+            task.recalculateDurationFromRunningSession();
+        }
+
         this.intervalId = setInterval( () => this.incrementRunningTaskDuration(), 1000 )
         
     }
