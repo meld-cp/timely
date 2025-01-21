@@ -3,33 +3,35 @@
     import InvoiceEditorView from "$lib/InvoiceEditor/InvoiceEditorView.svelte";
     import { settingsController } from "$lib/SettingsController.svelte";
     import { taskController } from "$lib/TaskController.svelte";
-    import { InvoiceLineModel, InvoiceModel, type TTask, TaskState } from "$lib/Models";
+    import { type InvoiceLineModel,  type InvoiceModel, type TTask, TaskState } from "$lib/Models";
     import { DateFormat, NumberFormat } from "$lib/utils";
     import { onMount } from "svelte";
-    import { InvoiceLineViewModel } from "$lib/ViewModels.svelte";
+    import { InvoiceLineViewModel, InvoiceViewModel } from "$lib/ViewModels.svelte";
 
     let wiNextLineNumber = $state(1);
 
-    let wiNumber: string = $state("");
-    let wiDate: string = $state( DateFormat.toInputDateValue( new Date() ));
+    let workingInvoice = $state( new InvoiceViewModel() );
+
+    // let wiNumber: string = $state("");
+    // let wiDate: string = $state( DateFormat.toInputDateValue( new Date() ));
     
-    let wiIssueTo:string = $state("");
+    // let wiIssueTo:string = $state("");
     
-    let wiLines: InvoiceLineViewModel[] = $state([]);
-    let wiFootnote:string = $state("");
+    // let wiLines: InvoiceLineViewModel[] = $state([]);
+    // let wiFootnote:string = $state("");
     
-    $inspect(wiLines)
+    $inspect(workingInvoice)
 
     let uninvoicedTasks:TTask[] = $state([]);
     onMount(()=>{
         const settings = settingsController.read();
-        wiNumber = `${settings.nextInvoiceNumber}`;
-        wiFootnote = settings.defaultInvoiceFooter ?? "";
+        workingInvoice.number = `${settings.nextInvoiceNumber}`;
+        workingInvoice.footnoteAsText = settings.defaultInvoiceFooter ?? "";
         uninvoicedTasks = taskController.fetchTasksByState([ TaskState.Stopped ]);
     })
 
-    function buildTimeLogInvoiceLine( timeLog: TTask ): InvoiceLineModel {
-        const newLine =  new InvoiceLineModel()
+    function buildTimeLogInvoiceLine( timeLog: TTask ): InvoiceLineViewModel {
+        const newLine =  new InvoiceLineViewModel()
         newLine.number = wiNextLineNumber++;
         newLine.extRefId = timeLog.id;
         newLine.description = `${timeLog.date} - ${timeLog.name}`;
@@ -39,21 +41,21 @@
         return newLine;
     }
 
-    function addBlankLineToWorkingInvoice(){
-        const line = new InvoiceLineModel();
-        line.number = wiNextLineNumber;
+    // function addBlankLineToWorkingInvoice(){
+    //     const line = new InvoiceLineModel();
+    //     line.number = wiNextLineNumber;
 
-        wiNextLineNumber++;
+    //     wiNextLineNumber++;
 
-        wiLines.push( new InvoiceLineViewModel( line ) );
-    }
+    //     wiLines.push( new InvoiceLineViewModel( line ) );
+    // }
 
-    function sortWorkingInvoiceLines(){
+    // function sortWorkingInvoiceLines(){
 
-    }
+    // }
     
-    function saveWorkingInvoice( inv: InvoiceModel ) : void{
-        invoiceController.save(inv);
+    function saveWorkingInvoice( inv: InvoiceViewModel ) : void{
+        invoiceController.save(inv.getModel());
         //workingInvoice = invoiceController.workingInvoice;
         window.open( `/invoice/${inv.id}`, )
     }
@@ -61,7 +63,7 @@
     function allUninvoicedTimeHasBeenAddedToWorkingInvoice() : boolean{
         // todo: check each ref id
         for (const task of uninvoicedTasks) {
-            if (!invoiceController.containsExtRefId( wiLines, task.id )){
+            if (workingInvoice.containsExtRefId( task.id )){
                 return false;
             }
         }
@@ -71,15 +73,11 @@
     function selectAllUninvoicedTime( select: boolean ){
         for (const task of taskController.fetchTasksByState([ TaskState.Stopped ])) {
             if (select){
-                wiLines.push( buildTimeLogInvoiceLine(task ) );
+                workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
             }else{
-                removeInvoiceLineWitnExtRefId( task.id );
+                workingInvoice.removeLineWithExtRefId( task.id );
             }
         }
-    }
-
-    function removeInvoiceLineWitnExtRefId( extRefId:string ){
-        wiLines = wiLines.filter( l=>l.extRefId != extRefId );
     }
 
 </script>
@@ -89,16 +87,7 @@
 <div id="container">
 
     <section id="row1">
-        <InvoiceEditorView
-            invoiceNumber={wiNumber}
-            invoiceDate={wiDate}
-            issueTo={wiIssueTo}
-            bind:lines={wiLines}
-            footnote={wiFootnote}
-            onAddBlankLine={addBlankLineToWorkingInvoice}
-            onSortLines={sortWorkingInvoiceLines}
-            onSaveInvoice={saveWorkingInvoice}
-        />
+        <InvoiceEditorView bind:vm={workingInvoice} onSaveInvoice={saveWorkingInvoice}/>
 
         <article id="uninvoiced-time-container">
             <header>Uninvoiced Time</header>
@@ -115,12 +104,12 @@
             <div>
                 <label>
                     <input id="{task.id}" type="checkbox" bind:checked={
-                        () => invoiceController.containsExtRefId( wiLines, task.id ),
+                        () => workingInvoice.containsExtRefId( task.id ),
                         (checked) =>{
                             if (checked){
-                                wiLines.push( buildTimeLogInvoiceLine(task ) );
+                                workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
                             }else{
-                                removeInvoiceLineWitnExtRefId( task.id );
+                                workingInvoice.removeLineWithExtRefId( task.id );
                             }
                         } 
                     }/>

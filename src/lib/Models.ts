@@ -41,27 +41,41 @@ export type TaskActionModel = {
     execute: ( task: TTask ) => void;
 }
 
-export class InvoiceModel{
-    public id = crypto.randomUUID().toString();
+// export class InvoiceModel{
+//     public id = crypto.randomUUID().toString();
     
-    public number:string = "";
-    public date:string = DateFormat.toInputDateValue( new Date());
-    public orderRef:string = "";
+//     public number:string = "";
+//     public date:string = DateFormat.toInputDateValue( new Date());
+//     public orderRef:string = "";
 
-    public issueToLines: string[] = [];
-    public footerLines: string[] = [];
+//     public issueToLines: string[] = [];
+//     public footerLines: string[] = [];
 
-    public lines: InvoiceLineModel[] = [];
+//     public lines: InvoiceLineModel[] = [];
 
+// }
+
+
+export type InvoiceModel = {
+    id:string;
+    
+    number:string;
+    date:string;
+    orderRef:string;
+
+    issueToLines: string[];
+    footerLines: string[];
+
+    lines: InvoiceLineModel[];
 }
 
-export class InvoiceLineModel {
-    public id = crypto.randomUUID().toString();
-    public extRefId:string|undefined;
-    public number:number = 0;
-    public description:string = "";
-    public units:string = "";
-    public quantity:number = 0;
-    public unitCost:number = 0;
+export type InvoiceLineModel = {
+    id:string;
+    extRefId:string|undefined;
+    number:number;
+    description:string;
+    units:string;
+    quantity:number;
+    unitCost:number;
 }
 
