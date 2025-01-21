@@ -160,7 +160,9 @@ export class InvoiceViewModel {
     }
     
     public containsExtRefId(extRefId: string): boolean {
-        return this.lines.some( l=>l.extRefId == extRefId);
+        const contains =  this.lines.some( l=>l.extRefId === extRefId);
+        //console.log(extRefId, contains)
+        return contains;
     }
     
     public removeLineWithExtRefId( extRefId:string ){
