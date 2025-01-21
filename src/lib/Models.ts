@@ -58,7 +58,7 @@ export type TaskActionModel = {
 
 export type InvoiceModel = {
     id:string;
-    
+    currencyCode:string;    
     number:string;
     date:string;
     orderRef:string;

@@ -1,6 +1,11 @@
 <svelte:head>
-    <link rel="stylesheet" href="/pico-main/css/pico.min.css">
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/pico-main/css/pico.css">
+    <style>
+        :root {
+            --pico-form-element-spacing-vertical: 0.25rem;
+            --pico-form-element-spacing-horizontal: 0.25rem;
+        }
+    </style>
 </svelte:head>
 
 <script>
@@ -21,3 +26,4 @@
 <div class="container">
     {@render children()}
 </div>
+
