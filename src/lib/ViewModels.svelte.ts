@@ -1,8 +1,9 @@
+import { LocalStorageController } from "./LocalStoragController";
 import { type InvoiceModel, type InvoiceLineModel, TaskState, type TaskModel } from "./Models";
 import { DateFormat } from "./utils";
 
 
-export class TaskViewModel implements TaskModel {
+export class TaskViewModel {
     id: string = $state( crypto.randomUUID() );
     state: TaskState = $state(TaskState.Stopped);
     date: string = $state( DateFormat.toInputDateValue( new Date() ) );
@@ -17,17 +18,9 @@ export class TaskViewModel implements TaskModel {
         }
     }
 
-    public pause(){
-        if (this.state != TaskState.Running){
-            return;
-        }
-        this.state = TaskState.Paused;
-        this.timeRunStarted = undefined;
-    }
-
-    getModel(): TaskModel {
+    getModel( withId?:string ): TaskModel {
         return {
-            id:this.id,
+            id: withId ?? this.id,
             state:this.state,
             date:this.date,
             name:this.name,
@@ -45,10 +38,64 @@ export class TaskViewModel implements TaskModel {
         this.duration = m.duration;
         this.affectiveDurationHours = m.affectiveDurationHours;
         this.timeRunStarted = m.timeRunStarted;
+    } 
+    
+    public pause(){
+        if (this.state != TaskState.Running){
+            return;
+        }
+        this.state = TaskState.Paused;
+        this.timeRunStarted = undefined;
+    }
+
+    public start(){
+        this.state = TaskState.Running;
+        this.timeRunStarted = Date.now();
+    }
+
+    public stop(){
+        this.state = TaskState.Stopped;
+        this.timeRunStarted = undefined;
+    }
+
+    public incrementDuration( incrementMinutes: number ) {
+        if ( this.state == TaskState.Running ){
+            // inc session start time
+            const currentSessionStartTime = (this.timeRunStarted ?? Date.now());
+            //const dt = new Date( currentSessionStartTime );
+            const incMs = incrementMinutes * 60 * 1000;
+            const newSessionTime = currentSessionStartTime - incMs; 
+            this.timeRunStarted = newSessionTime;
+            this.recalculateDurationFromRunningSession()
+        }else{
+            this.setDuration( this.duration + incrementMinutes * 60 );
+        }
+    }
+
+    public recalculateDurationFromRunningSession() {
+        if ( this.state != TaskState.Running ){
+            return
+        }
+        const sessionStartTime = (this.timeRunStarted ?? Date.now());
+        const secs = ( Date.now() - sessionStartTime ) / 1000;
+        this.setDuration( secs );
+    }
+
+    public setDuration( newDurationInSeconds:number ){
+        this.duration = Math.ceil( newDurationInSeconds );
+        this.affectiveDurationHours = this.calculateAffectiveHours( this.duration, 15 )
+    }
+
+    private calculateAffectiveHours( durationSeconds:number, incrementMinutes: number ) : number {
+        let mins = durationSeconds / 60;
+        const increments = Math.ceil( mins / incrementMinutes )
+        const affectiveMins = increments * incrementMinutes;
+        const affectiveHours = affectiveMins / 60;
+        return affectiveHours;
     }
 }
 
-export class InvoiceViewModel implements InvoiceModel {
+export class InvoiceViewModel {
    
     public id = $state( crypto.randomUUID().toString() );
     public currencyCode:string = $state("NZD");
@@ -131,7 +178,7 @@ export class InvoiceViewModel implements InvoiceModel {
     }
 }
 
-export class InvoiceLineViewModel implements InvoiceLineModel {
+export class InvoiceLineViewModel {
     public id = $state( crypto.randomUUID().toString() );
     public extRefId:string|undefined = $state();
     public number:number = $state(0);
@@ -170,4 +217,91 @@ export class InvoiceLineViewModel implements InvoiceLineModel {
         this.quantity = m.quantity;
         this.unitCost = m.unitCost;
     }
+}
+
+
+export class TimeLogPageViewModel{
+        
+    repo:LocalStorageController<TaskModel>;
+
+    tasksRunning:TaskViewModel[] = $state([]);
+    tasksPaused:TaskViewModel[] = $state([]);
+    tasksStopped:TaskViewModel[] = $state([]);
+    tasksArchived:TaskViewModel[] = $state([]);
+
+    intervalId:number | undefined;
+
+    constructor( ){
+        this.repo = new LocalStorageController<TaskModel>("tasks");
+        this.refresh();
+        this.intervalId = setInterval( () => this.incrementRunningTaskDuration(), 1000 )
+    }
+
+    private refresh(){
+        const allTasks = this.repo.getAll().map( t=> new TaskViewModel(t) );
+        this.tasksRunning = this.fetchTasksByState( allTasks, [TaskState.Running] );
+        this.tasksPaused = this.fetchTasksByState( allTasks, [TaskState.Paused] );
+        this.tasksStopped = this.fetchTasksByState( allTasks, [TaskState.Stopped] );
+        this.tasksArchived = this.fetchTasksByState( allTasks, [TaskState.Archived] );
+    }
+
+    private fetchTasksByState( tasks:TaskViewModel[], states:TaskState[] ) : TaskViewModel[]{
+        return tasks.filter( t=> states.includes(t.state));
+    }
+
+    public startNewTask( name: string ){
+        const task = new TaskViewModel();
+        task.name = name;
+        this.startTask( task );
+    }
+    
+    public saveTask( task:TaskViewModel ){
+        this.repo.set(task.id, task.getModel() );
+    }
+
+    public pauseAll() {
+        this.refresh();
+        for (const task of this.tasksRunning) {
+            task.pause();
+            this.saveTask( task);
+        }
+        this.refresh();
+    }
+
+    private incrementRunningTaskDuration(){
+        for (const task of this.tasksRunning ) {
+            task.setDuration( task.duration + 1 );
+            this.saveTask(task);
+        }
+    }
+
+    public pauseTask( task: TaskViewModel ){
+        task.pause();
+        this.saveTask( task);
+        this.refresh();
+    }
+
+    public startTask( task: TaskViewModel ){
+        this.pauseAll();
+        task.start();
+        this.saveTask( task);
+        this.refresh();
+    }
+
+    public stopTask( task: TaskViewModel ){
+        task.stop();
+        this.saveTask( task);
+        this.refresh();
+    }
+
+    public duplicateAndStartTask( task:TaskViewModel ){
+        const dup = new TaskViewModel( task.getModel( crypto.randomUUID() ) );
+        this.startTask(dup);
+    }
+
+    public increaseDuration( task:TaskViewModel, mins:number ){
+        task.incrementDuration( mins );
+        this.saveTask( task);
+    }
+
 }

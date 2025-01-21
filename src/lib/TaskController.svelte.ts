@@ -1,5 +1,6 @@
 import { taskRepo, type ITaskRepo } from "./TaskRepo.svelte";
 import { TaskState, type TaskModel } from "./Models";
+import { TaskViewModel } from "./ViewModels.svelte";
 
 export class TaskController{
     repo: ITaskRepo;
@@ -15,7 +16,7 @@ export class TaskController{
 
         // catch up duration
         for (const task of this.fetchTasksByState( [TaskState.Running] ) ) {
-            this.recalculateDurationFromRunningSession( task );
+            task.recalculateDurationFromRunningSession();
         }
         this.intervalId = setInterval( () => this.incrementRunningTaskDuration(), 1000 )
     }
@@ -36,26 +37,14 @@ export class TaskController{
         this.repo.markAsChanged(task);
     }
 
-    public pauseTask( id:string ) : void {
-        const task = this.repo.getTask(id);
-        if (task?.state != TaskState.Running){
-            return;
-        }
-        task.state = TaskState.Paused;
-        task.timeRunStarted = undefined;
-        //task.timeRunPaused = Date.now();
+    public pauseTask( task:TaskViewModel ) : void {
+        task.pause();
         this.repo.markAsChanged(task);
     }
 
-    public resumeTask( id:string ) : void {
-        const task = this.repo.getTask(id);
-        if (task?.state != TaskState.Paused){
-            return;
-        }
+    public resumeTask( task:TaskViewModel ) : void {
         this.pauseAll();
-        task.state = TaskState.Running;
-        task.timeRunStarted = Date.now();
-        //task.timeRunPaused = undefined;
+        task.resume();
         this.repo.markAsChanged(task);
     }
 
@@ -120,47 +109,47 @@ export class TaskController{
         return task;
     }
 
-    public setDuration(id:string, newDurationInSeconds:number){
-        const task = this.repo.getTask(id);
-        if (!task){
-            return;
-        }
+    // public setDuration(id:string, newDurationInSeconds:number){
+    //     const task = this.repo.getTask(id);
+    //     if (!task){
+    //         return;
+    //     }
 
-        task.duration = Math.ceil( newDurationInSeconds );
-        task.affectiveDurationHours = this.calculateAffectiveHours( task.duration, 15 )
+    //     task.duration = Math.ceil( newDurationInSeconds );
+    //     task.affectiveDurationHours = this.calculateAffectiveHours( task.duration, 15 )
         
-        this.repo.markAsChanged(task);
-    }
+    //     this.repo.markAsChanged(task);
+    // }
 
-    public recalculateDurationFromRunningSession( task:TaskModel) {
-        if ( task.state != TaskState.Running ){
-            return
-        }
-        const sessionStartTime = (task.timeRunStarted ?? Date.now());
-        const secs = ( Date.now() - sessionStartTime ) / 1000;
-        this.setDuration( task.id, secs );
-    }
+    // public recalculateDurationFromRunningSession( task:TaskModel) {
+    //     if ( task.state != TaskState.Running ){
+    //         return
+    //     }
+    //     const sessionStartTime = (task.timeRunStarted ?? Date.now());
+    //     const secs = ( Date.now() - sessionStartTime ) / 1000;
+    //     this.setDuration( task.id, secs );
+    // }
 
-    public incrementTaskDuration( id:string, incrementMinutes: number ) : void {
-        const task = this.repo.getTask(id);
-        if (!task){
-            return;
-        }
-        if ( task.state == TaskState.Running ){
-            // inc session start time
-            const currentSessionStartTime = (task.timeRunStarted ?? Date.now());
-            //const dt = new Date( currentSessionStartTime );
-            const incMs = incrementMinutes * 60 * 1000;
-            const newSessionTime = currentSessionStartTime - incMs; 
-            task.timeRunStarted = newSessionTime;
-            this.recalculateDurationFromRunningSession(task)
-        }else{
-            this.setDuration( id, task.duration + incrementMinutes * 60 );
-        }
-    }
+    // public incrementTaskDuration( id:string, incrementMinutes: number ) : void {
+    //     const task = this.repo.getTask(id);
+    //     if (!task){
+    //         return;
+    //     }
+    //     if ( task.state == TaskState.Running ){
+    //         // inc session start time
+    //         const currentSessionStartTime = (task.timeRunStarted ?? Date.now());
+    //         //const dt = new Date( currentSessionStartTime );
+    //         const incMs = incrementMinutes * 60 * 1000;
+    //         const newSessionTime = currentSessionStartTime - incMs; 
+    //         task.timeRunStarted = newSessionTime;
+    //         this.recalculateDurationFromRunningSession(task)
+    //     }else{
+    //         this.setDuration( id, task.duration + incrementMinutes * 60 );
+    //     }
+    // }
 
-    public fetchTasksByState( states : TaskState[] ) : TaskModel[]{
-        return this.repo.fetch( t=>states.includes(t.state) );
+    public fetchTasksByState( states : TaskState[] ) : TaskViewModel[]{
+        return this.repo.fetch( t=>states.includes(t.state) ).map( m=> new TaskViewModel(m));
     }
    
     private pauseAll(){
@@ -207,17 +196,17 @@ export class TaskController{
         return newTask;
     }
 
-    private calculateAffectiveHours( durationSeconds:number, incrementMinutes: number ) : number {
-        let mins = durationSeconds / 60;
-        const increments = Math.ceil( mins / incrementMinutes )
-        const affectiveMins = increments * incrementMinutes;
-        const affectiveHours = affectiveMins / 60;
-        return affectiveHours;
-    }
+    // private calculateAffectiveHours( durationSeconds:number, incrementMinutes: number ) : number {
+    //     let mins = durationSeconds / 60;
+    //     const increments = Math.ceil( mins / incrementMinutes )
+    //     const affectiveMins = increments * incrementMinutes;
+    //     const affectiveHours = affectiveMins / 60;
+    //     return affectiveHours;
+    // }
 
     private incrementRunningTaskDuration(){
         for (const t of this.fetchTasksByState([TaskState.Running])) {
-            this.setDuration( t.id, t.duration + 1 );
+            t.setDuration( t.duration + 1 );
         }
     }
 

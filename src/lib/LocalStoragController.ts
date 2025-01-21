@@ -18,14 +18,22 @@ export class LocalStorageController<T>{
         return [this.bucket,id].join("$");
     }
 
-    set( id:string, value: T){
+    private isBucketKey( key:string):boolean{
+        return key.startsWith( this.bucket + "$");
+    }
+
+    public set( id:string, value: T){
         const key = this.buildKey(id);
         const data = this.encode(value);
         localStorage.setItem( key, data );
     }
 
-    get(id:string ):T | null{
+    public get( id:string ):T | null{
         const key = this.buildKey(id);
+        return this.getWithKey(key)
+    }
+
+    public getWithKey( key:string ):T | null{
         const data = localStorage.getItem( key );
         if (data === null){
             return null;
@@ -33,7 +41,28 @@ export class LocalStorageController<T>{
         return this.dencode(data)
     }
 
-    remove(id:string){
+    public getAll():T[]{
+        const result:T[] = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+            
+            const key = localStorage.key(i);
+            if ( key == null ){
+                return result;
+            }
+            if (!this.isBucketKey(key)){
+                continue;
+            }
+            const item = this.getWithKey( key )
+            if (!item){
+                continue;
+            }
+            result.push( item );
+        }
+        return result;
+    }
+
+    public remove(id:string){
         const key = this.buildKey(id);
         localStorage.removeItem( key );
     }

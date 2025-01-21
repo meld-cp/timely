@@ -1,11 +1,16 @@
 <script lang="ts">
-    import { taskController } from "./TaskController.svelte";
-    
+
+    let{
+        onStartTask
+    }:{
+        onStartTask:( name:string ) => void
+    } = $props()
+
     let taskName = $state("");
 
     function startTask( ev: SubmitEvent) : void {
         ev.preventDefault();
-        taskController.addNewTaskAndStart(taskName);
+        onStartTask(taskName);
         taskName = "";
     }
 

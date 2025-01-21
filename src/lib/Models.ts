@@ -1,4 +1,5 @@
 import { DateFormat } from "./utils";
+import type { TaskViewModel } from "./ViewModels.svelte";
 
 export class Icons {
     static TaskPause = "⏸️";
@@ -25,9 +26,9 @@ export type TaskModel = {
 }
 
 export type TaskActionModel = {
-    icon: ( task: TaskModel ) => string | undefined;
-    hint: ( task: TaskModel ) => string | undefined;
-    execute: ( task: TaskModel ) => void;
+    icon: ( task: TaskViewModel ) => string | undefined;
+    hint: ( task: TaskViewModel ) => string | undefined;
+    execute: ( task: TaskViewModel ) => void;
 }
 
 export type InvoiceModel = {
