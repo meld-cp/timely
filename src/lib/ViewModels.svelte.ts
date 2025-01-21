@@ -233,9 +233,19 @@ export class TimeLogPageViewModel{
 
     constructor( ){
         this.refresh();
+    }
+    
+    start() {
+        this.stop();
         this.intervalId = setInterval( () => this.incrementRunningTaskDuration(), 1000 )
+        
     }
 
+    stop() {
+        if (this.intervalId){
+            clearInterval(this.intervalId);
+        }
+    }
     private refresh(){
         const allTasks = taskRepo.getAll().map( t=> new TaskViewModel(t) );
         this.tasksRunning = this.fetchTasksByState( allTasks, [TaskState.Running] );
@@ -268,6 +278,7 @@ export class TimeLogPageViewModel{
     }
 
     private incrementRunningTaskDuration(){
+        console.log("incrementRunningTaskDuration")
         for (const task of this.tasksRunning ) {
             task.setDuration( task.duration + 1 );
             this.saveTask(task);
