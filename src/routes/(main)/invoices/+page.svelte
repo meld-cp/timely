@@ -5,13 +5,11 @@
     import { type TaskModel, TaskState } from "$lib/Models";
     import { onMount } from "svelte";
     import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/ViewModels.svelte";
-    import { LocalStorageController } from "$lib/LocalStoragController";
+    import { taskRepo } from "$lib/Repos";
 
     let wiNextLineNumber = $state(1);
 
     let workingInvoice = $state( new InvoiceViewModel() );
-
-    const repo = new LocalStorageController<TaskModel>("tasks");//TODO: share with TimeLogPageViewModel
 
     let uninvoicedTasks:TaskViewModel[] = $state([]);
     onMount(()=>{
@@ -22,7 +20,7 @@
     })
 
     function getUninvoicedTasks(): TaskViewModel[]{
-        return repo.getAll().filter( t=>t.state == TaskState.Stopped).map(t=> new TaskViewModel(t) );
+        return taskRepo.getAll().filter( t=>t.state == TaskState.Stopped).map(t=> new TaskViewModel(t) );
     }
 
     function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLineViewModel {

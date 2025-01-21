@@ -1,5 +1,5 @@
-import { LocalStorageController } from "./LocalStoragController";
 import { type InvoiceModel, type InvoiceLineModel, TaskState, type TaskModel } from "./Models";
+import { taskRepo } from "./Repos";
 import { DateFormat } from "./utils";
 
 
@@ -222,8 +222,6 @@ export class InvoiceLineViewModel {
 
 export class TimeLogPageViewModel{
         
-    repo:LocalStorageController<TaskModel>;
-
     tasksRunning:TaskViewModel[] = $state([]);
     tasksPaused:TaskViewModel[] = $state([]);
     tasksStopped:TaskViewModel[] = $state([]);
@@ -232,13 +230,12 @@ export class TimeLogPageViewModel{
     intervalId:number | undefined;
 
     constructor( ){
-        this.repo = new LocalStorageController<TaskModel>("tasks");
         this.refresh();
         this.intervalId = setInterval( () => this.incrementRunningTaskDuration(), 1000 )
     }
 
     private refresh(){
-        const allTasks = this.repo.getAll().map( t=> new TaskViewModel(t) );
+        const allTasks = taskRepo.getAll().map( t=> new TaskViewModel(t) );
         this.tasksRunning = this.fetchTasksByState( allTasks, [TaskState.Running] );
         this.tasksPaused = this.fetchTasksByState( allTasks, [TaskState.Paused] );
         this.tasksStopped = this.fetchTasksByState( allTasks, [TaskState.Stopped] );
@@ -256,7 +253,7 @@ export class TimeLogPageViewModel{
     }
     
     public saveTask( task:TaskViewModel ){
-        this.repo.set(task.id, task.getModel() );
+        taskRepo.set(task.id, task.getModel() );
     }
 
     public pauseAll() {
