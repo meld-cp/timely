@@ -241,7 +241,9 @@ export class TimeLogPageViewModel{
 		this.refresh();
 		// catch up duration
 		for (const task of this.tasksRunning ) {
+			console.log("recalculateDurationFromRunningSession:before", task.getModel());
 			task.recalculateDurationFromRunningSession();
+			console.log("recalculateDurationFromRunningSession:after", task.getModel());
 		}
 
 		this.intervalId = setInterval( () => this.incrementRunningTaskDuration(), 1000 )
@@ -312,6 +314,8 @@ export class TimeLogPageViewModel{
 
 	public duplicateAndStartTask( task:TaskViewModel ){
 		const dup = new TaskViewModel( task.getModel( crypto.randomUUID() ) );
+		dup.setDuration(0);
+		dup.date = DateFormat.toInputDateValue( new Date() );
 		this.startTask(dup);
 	}
 
