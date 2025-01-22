@@ -1,6 +1,6 @@
-import { TaskState } from "../models/Models";
-import { taskRepo } from "../services/Repos";
-import { DateFormat } from "../services/utils";
+import { TaskState } from "$lib/models/TaskState";
+import { taskRepo } from "../services/Singletons";
+import { FormatDate } from "$lib/services/formatters/FormatDate";
 import { TaskViewModel } from "./ViewModels.svelte";
 
 export class TimeLogPageViewModel {
@@ -95,7 +95,7 @@ export class TimeLogPageViewModel {
 	public duplicateAndStartTask(task: TaskViewModel) {
 		const dup = new TaskViewModel(task.getModel(crypto.randomUUID()));
 		dup.setDuration(0);
-		dup.date = DateFormat.toInputDateValue(new Date());
+		dup.date = FormatDate.toInputDateValue(new Date());
 		this.startTask(dup);
 	}
 

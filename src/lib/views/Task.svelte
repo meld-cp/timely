@@ -1,6 +1,9 @@
 <script lang="ts">
 	import Duration from "./Duration.svelte";
-	import { Icons, type TaskActionModel, TaskState } from "../models/Models";
+	
+	import { type TaskActionModel } from "$lib/models/TaskActionModel";
+	import { TaskState } from "$lib/models/TaskState";
+	import { Icons } from "$lib/models/Icons";
 	import type { TaskViewModel } from "../view-models/ViewModels.svelte";
 	
 	let {
