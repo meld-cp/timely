@@ -12,7 +12,8 @@
 	let inv: InvoiceViewModel | null = $state( null );
 	
 	onMount(()=>{
-		const id = page.url.searchParams.get("id");
+		//const id = page.url.searchParams.get("id");
+		const id = page.params.id;
 		if (id){
 			const m = invRepo.get(id);
 			if (m){
