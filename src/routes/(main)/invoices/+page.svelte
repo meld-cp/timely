@@ -192,7 +192,7 @@
 		flex-direction: column;
 		flex: 4;
 		min-width: 200px;
-		background-color: aliceblue;
+		height: max-content;
 	}
 
 	.time-list{
@@ -210,7 +210,7 @@
 
 		textarea{
 			font-size: 80%;
-			height: 80%;
+			height: 13rem;
 			margin: 0;
 			box-sizing: border-box;
 		}

@@ -102,13 +102,15 @@
 <article class="c-task" class:s-running="{vm.state == TaskState.Running}">
 	<div class="c-task-fields">
 		<input class="date" name="task-date" type="date" title="Date" bind:value={vm.date} oninput="{saveTask}"/>
-		<input class="name" name="task-name" type="text" title="Description" bind:value={vm.name} oninput="{saveTask}"/>
+		<input class="name" name="task-name" type="text" title="Description" placeholder="Description" bind:value={vm.name} oninput="{saveTask}"/>
 		<div class="c-task-fields-row-2">
 			<details>
 				<summary>Other</summary>
+				{#if vm.invoiceRefId.length>0}
 				<span style="flex: content;" class="inv" title="Invoice">Attached to Invoice Id: {vm.invoiceRefId}</span>
+				{/if}
 				<div style="display: flex; flex-direction: row; gap:1rem; flex-wrap: wrap;">
-					<input style="flex: 10;" class="tags" name="task-tags" type="text" title="Tags" bind:value={vm.tagsAsText} oninput="{()=>taskController?.saveTask(vm)}"/>
+					<input style="flex: 10;" class="tags" name="task-tags" type="text" placeholder="Tags" title="Tags" bind:value={vm.tagsAsText} oninput="{()=>taskController?.saveTask(vm)}"/>
 					<button style="flex: content;" onclick="{() => taskController.deleteTask(vm)}">Delete</button>
 				</div>		
 			</details>
@@ -137,6 +139,7 @@
 	.c-task{
 		display: flex;
 		flex-direction: row;
+		flex-wrap: wrap-reverse;
 		align-items: flex-start;
 		gap: 0.5rem;
 		padding: 0.5rem;
