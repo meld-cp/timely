@@ -1,5 +1,5 @@
-import { LocalStorageController } from "./LocalStoragController";
-import type { InvoiceModel, TaskModel } from "./Models";
+import { LocalStorageController } from "./LocalStorageController";
+import type { InvoiceModel, TaskModel } from "../models/Models";
 
 export const taskRepo = new LocalStorageController<TaskModel>("tasks");
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { settingsController } from "$lib/SettingsController.svelte";
+    import { settingsController } from "$lib/services/SettingsController.svelte";
 
     const settings = settingsController.read();
 
