@@ -3,8 +3,11 @@ interface ScratchPadsDictionary{
 };
 
 export type SettingsModel = {
-	logoData?: string | undefined;
+	localeCode?:string;
+	address:string;
+	logoData?: string;
 	nextInvoiceNumber: number;
-	defaultInvoiceFooter?: string | undefined;
+	invoiceHeader:string;
+	defaultInvoiceFooter?: string;
 	scratchPads:ScratchPadsDictionary;
 };

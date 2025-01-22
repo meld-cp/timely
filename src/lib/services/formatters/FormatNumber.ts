@@ -1,7 +1,7 @@
 export class FormatNumber {
-	static currency(n: number, currency: string): string {
+	static currency( n: number, currency: string, locale?:string ): string {
 		const f = new Intl.NumberFormat(
-			undefined,
+			locale,
 			{
 				style: "currency",
 				currency: currency,

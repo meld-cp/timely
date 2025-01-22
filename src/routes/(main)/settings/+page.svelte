@@ -13,6 +13,28 @@
 
 <form>
 	<label>
+		Locale
+		<select name="locale" bind:value={settings.localeCode}  onchange="{handleSettingsChanged}">
+			<option value="" selected={""==( settings.localeCode ?? "")}></option>
+			<option value="en-NZ" selected={"en-NZ"==settings.localeCode}>New Zealand</option>
+			<option value="en-US" selected={"en-US"==settings.localeCode}>US</option>
+		</select>
+	</label>
+	<label>
+		Address
+		<textarea
+			name="address"
+			bind:value={settings.address} oninput="{handleSettingsChanged}"
+		></textarea>
+	</label>
+	<label>
+		Invoice Header
+		<textarea
+			name="inv-header"
+			bind:value={settings.invoiceHeader} oninput="{handleSettingsChanged}"
+		></textarea>
+	</label>
+	<label>
 		Logo Data
 		<div class="grid">
 			<textarea
@@ -40,3 +62,9 @@
 		></textarea>
 	</label>
 </form>
+
+<style>
+	textarea{
+		height: 10rem;
+	}
+</style>

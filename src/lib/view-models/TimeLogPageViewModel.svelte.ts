@@ -97,6 +97,7 @@ export class TimeLogPageViewModel implements ITaskController {
 		const dup = new TaskViewModel(task.getModel(crypto.randomUUID()));
 		dup.setDuration(0);
 		dup.date = FormatDate.toInputDateValue(new Date());
+		dup.invoiceRefId = "";
 		this.startTask(dup);
 	}
 

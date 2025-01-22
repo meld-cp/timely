@@ -12,4 +12,18 @@ export class FormatDate {
 		return result;
 	}
 
+	static toLocalDatefromString(dateString: string, locale?: string): string {
+		const date = new Date(dateString);
+		return FormatDate.toLocalDate(date, locale)
+	}
+
+	static toLocalDate(n: Date, locale?: string): string {
+		const f = new Intl.DateTimeFormat(
+			locale,
+			{
+
+			}
+		);
+		return f.format(n);
+	}
 }
