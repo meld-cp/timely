@@ -2,8 +2,9 @@ import { TaskState } from "$lib/models/TaskState";
 import { taskRepo } from "../services/Singletons";
 import { FormatDate } from "$lib/services/formatters/FormatDate";
 import { TaskViewModel } from "./ViewModels.svelte";
+import type { ITaskController } from "$lib/ITaskController";
 
-export class TimeLogPageViewModel {
+export class TimeLogPageViewModel implements ITaskController {
 
 	tasksRunning: TaskViewModel[] = $state([]);
 	tasksPaused: TaskViewModel[] = $state([]);

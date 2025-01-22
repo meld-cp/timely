@@ -4,7 +4,7 @@
 	const settings = settingsController.read();
 
 	function handleSettingsChanged(){
-		settingsController.write(settings)
+		settingsController.write(settings);
 	}
 
 </script>

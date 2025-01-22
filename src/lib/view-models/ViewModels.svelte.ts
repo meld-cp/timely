@@ -3,6 +3,7 @@ import { type InvoiceModel } from "$lib/models/InvoiceModel";
 import { type TaskModel } from "$lib/models/TaskModel";
 import { TaskState } from "$lib/models/TaskState";
 import { FormatDate } from "$lib/services/formatters/FormatDate";
+import { taskRepo } from "$lib/services/Singletons";
 
 
 export class TaskViewModel {
@@ -13,6 +14,15 @@ export class TaskViewModel {
 	duration: number = $state(0);
 	affectiveDurationHours: number = $state(0);
 	timeRunStarted : number | undefined = $state();
+	invoiceRefId: string = $state("");
+	tags:string[] = $state([]);
+
+	get tagsAsText():string {
+		return this.tags.join(" ");
+	}
+	set tagsAsText( txt:string ){
+		this.tags = txt.trim().split(" ");
+	}
 
 	constructor( m?:TaskModel ){
 		if (m){
@@ -29,6 +39,8 @@ export class TaskViewModel {
 			duration:this.duration,
 			affectiveDurationHours:this.affectiveDurationHours,
 			timeRunStarted:this.timeRunStarted,
+			invoiceRefId:this.invoiceRefId,
+			tags: this.tags,
 		}
 	}
 
@@ -40,7 +52,13 @@ export class TaskViewModel {
 		this.duration = m.duration;
 		this.affectiveDurationHours = m.affectiveDurationHours;
 		this.timeRunStarted = m.timeRunStarted;
-	} 
+		this.invoiceRefId = m.invoiceRefId;
+		this.tags = m.tags;
+	}
+
+	public save(){
+		taskRepo.set(this.id, this.getModel());
+	}
 	
 	public pause(){
 		if (this.state != TaskState.Running){

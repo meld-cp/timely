@@ -8,6 +8,12 @@ export class SettingsController{
 	};
 
 
+	public modify( fn: (settings:SettingsModel) => void ){
+		const settings = this.read();
+		fn(settings);
+		this.write(settings);
+	}
+
 	public read() : SettingsModel{
 		
 		const json = localStorage.getItem("settings");
@@ -19,7 +25,7 @@ export class SettingsController{
 		return JSON.parse( json ) as SettingsModel || this.defaultSettings;
 	}
 
-	public write( settings: SettingsModel){
+	public write(settings: SettingsModel){
 		const json = JSON.stringify( settings );
 		console.log(json)
 		localStorage.setItem("settings", json);
@@ -35,12 +41,12 @@ export class SettingsController{
     }
 
 	public setScratchPad(name: string, text:string){
-		const settings = this.read();
-		if (!settings.scratchPads){
-			settings.scratchPads = {};
-		}
-		settings.scratchPads[name] = text;
-		this.write(settings);
+		this.modify(( settings ) =>{
+			if (!settings.scratchPads){
+				settings.scratchPads = {};
+			}
+			settings.scratchPads[name] = text;
+		})
 	}
 
 }

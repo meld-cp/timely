@@ -1,34 +1,44 @@
 <script lang="ts">
 	import InvoiceEditorView from "$lib/views/invoice-editor/InvoiceEditorView.svelte";
-	
 	import { type TaskModel } from "$lib/models/TaskModel";
 	import { TaskState } from "$lib/models/TaskState";
 	import { onMount } from "svelte";
 	import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/view-models/ViewModels.svelte";
 	import { invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
-
+    
 	let wiNextLineNumber = $state(1);
 	let workingInvoice = $state( new InvoiceViewModel() );
 	let uninvoicedTasks:TaskViewModel[] = $state([]);
 	let scratchPad:string = $state("");
 
+	let closedInvoices:InvoiceViewModel[] = $state([]);
 	
 	onMount(()=>{
-		const settings = settingsController.read();
-		workingInvoice.number = `${settings.nextInvoiceNumber}`;
-		workingInvoice.footnoteAsText = settings.defaultInvoiceFooter ?? "";
+		resetWorkingInvoice();
 		
 		scratchPad = settingsController.getScratchPad("page-invoice-builder");
 		
-		uninvoicedTasks = getUninvoicedTasks();
+		uninvoicedTasks = fetchUninvoicedTasks();
+		closedInvoices = fetchInvoices();
 	})
+    
+	function fetchInvoices(): InvoiceViewModel[] {
+        return invRepo.getAll().map( m=> new InvoiceViewModel(m) );
+    }
+
+	function resetWorkingInvoice(){
+		const settings = settingsController.read();
+		workingInvoice = new InvoiceViewModel();
+		workingInvoice.number = `${settings.nextInvoiceNumber}`;
+		workingInvoice.footnoteAsText = settings.defaultInvoiceFooter ?? "";
+	}
 
 	function saveScratchPad(){
 		settingsController.setScratchPad("page-invoice-builder", scratchPad);
 	}
 
-	function getUninvoicedTasks(): TaskViewModel[]{
-		return taskRepo.getAll().filter( t=>t.state == TaskState.Stopped).map(t=> new TaskViewModel(t) );
+	function fetchUninvoicedTasks(): TaskViewModel[]{
+		return taskRepo.getAll().filter( t=> t.invoiceRefId.length == 0 && t.state == TaskState.Stopped).map(m=> new TaskViewModel(m) );
 	}
 
 	function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLineViewModel {
@@ -44,10 +54,32 @@
    
 	function saveWorkingInvoice( inv: InvoiceViewModel ) : void{
 		invRepo.set( inv.id, inv.getModel());
-		window.open( `/invoice/${inv.id}`, )
+
+		//TODO: tag all tasks in invoice lines with invoice number
+		const attachedTaskIds = workingInvoice.lines.map( l=>l.extRefId ).filter( id=>id && id.length > 0);
+		const attachedTasks = uninvoicedTasks.filter( t=> attachedTaskIds.includes( t.id ));
+		for (const task of attachedTasks) {
+			task.invoiceRefId = workingInvoice.id;
+			taskRepo.set( task.id, task.getModel() );
+		}
+
+
+		settingsController.modify(settings =>{
+			settings.nextInvoiceNumber++;
+		});
+		closedInvoices = fetchInvoices();
+		
+		uninvoicedTasks = fetchUninvoicedTasks();
+		resetWorkingInvoice();
+
+		viewInvoice( inv.id );
+	}
+	
+	function viewInvoice( id: string ){
+		window.open( `/invoice/${id}`, `inv-${id}` );
 	}
 
-	function allUninvoicedTimeHasBeenAddedToWorkingInvoice() : boolean{
+	function allUninvoicedTimeHaveBeenAddedToWorkingInvoice() : boolean{
 
 		if (uninvoicedTasks.length == 0){
 			return false;
@@ -72,7 +104,6 @@
 	}
 
 
-
 </script>
 
 <h1>Invoice Builder</h1>
@@ -91,7 +122,7 @@
 					{#if uninvoicedTasks.length > 1}
 						<label>
 							<input id="untagged-select-all" type="checkbox" bind:checked={
-								() => allUninvoicedTimeHasBeenAddedToWorkingInvoice(),
+								() => allUninvoicedTimeHaveBeenAddedToWorkingInvoice(),
 								(checked) => selectAllUninvoicedTime(checked)
 							}/>
 							Select All
@@ -132,8 +163,13 @@
 	<section id="row2">
 		<article>
 			<details>
-				<summary>Closed Invoices</summary>
-				...
+				<summary>Closed Invoices ({closedInvoices.length})</summary>
+				{#each closedInvoices as inv}
+				<article>
+					{inv.number}
+					<a href="##" onclick="{(ev) => { ev.preventDefault(); viewInvoice(inv.id);}}">View</a>
+				</article>
+				{/each}
 			</details>
 		</article>
 	</section>
