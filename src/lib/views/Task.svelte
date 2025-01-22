@@ -183,7 +183,6 @@
 	}
 	.c-task-fields input[name=task-date]{
 		flex: 1;
-		background-color: antiquewhite;
 	}
 	
 	.c-task-fields input[name=task-name]{
