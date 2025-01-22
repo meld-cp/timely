@@ -16,6 +16,7 @@
         Logo Data
         <div class="grid">
             <textarea
+                name="logo-data"
                 bind:value={settings.logoData} oninput="{handleSettingsChanged}"
                 style="font-size: small; height: 10em;"
             ></textarea>
@@ -25,6 +26,7 @@
     <label>
         Next Invoice Number
         <input
+            name="next-inv-num"
             type="number"
             min="1"
             bind:value={settings.nextInvoiceNumber} oninput="{handleSettingsChanged}"
@@ -33,6 +35,7 @@
     <label>
         Default Invoice Footer
         <textarea
+            name="default-inv-footnote"
             bind:value={settings.defaultInvoiceFooter} oninput="{handleSettingsChanged}"
         ></textarea>
     </label>

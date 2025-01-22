@@ -28,12 +28,12 @@
 <article id="working-invoice-container" >
     <header>Working Invoice</header>
     <fieldset class="grid">
-        <input type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{vm.number}"/>
-        <input type="date" title="Invoice Date" bind:value="{vm.date}"/>
+        <input name="inv-num" type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{vm.number}"/>
+        <input name="inv-date" type="date" title="Invoice Date" bind:value="{vm.date}"/>
     </fieldset>
     <label>
         Issue to
-        <textarea bind:value={vm.issueToAsText}></textarea>
+        <textarea name="inv-issue-to" bind:value={vm.issueToAsText}></textarea>
     </label>
 
 
@@ -85,7 +85,7 @@
     
     <label>
         Footnote
-        <textarea bind:value={vm.footnoteAsText}></textarea>
+        <textarea name="inv-footnote" bind:value={vm.footnoteAsText}></textarea>
     </label>
 
     <footer>
