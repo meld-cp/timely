@@ -99,9 +99,9 @@
 						<hr/>
 					{/if}
 					{#each uninvoicedTasks as task }
-					<div>
+					<div class="c-task-line">
 						<label>
-							<input id="{task.id}" type="checkbox" bind:checked={
+							<input name="task-line" type="checkbox" bind:checked={
 								() => workingInvoice.containsExtRefId( task.id ),
 								(checked) =>{
 									if (checked){
@@ -111,7 +111,7 @@
 									}
 								} 
 							}/>
-							[{task.date}, {task.affectiveDurationHours.toFixed(2)} hrs] {task.name}
+							{task.date} ({task.affectiveDurationHours.toFixed(2)} hrs) - {task.name}
 						</label>
 					</div>
 					{/each}
@@ -160,6 +160,10 @@
 	.time-list{
 		flex: 2;
 		overflow-y: auto;
+		
+		.c-task-line{
+			font-size: 80%;
+		}
 	}
 
 	.scratch-pad{

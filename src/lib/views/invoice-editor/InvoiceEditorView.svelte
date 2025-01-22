@@ -121,6 +121,7 @@
 			th{
 				font-size: 80%;
 				white-space: nowrap;
+				padding: 0.1rem 0.3rem;
 			}
 		}
 
