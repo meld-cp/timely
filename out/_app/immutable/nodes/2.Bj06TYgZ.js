@@ -1,4 +1,0 @@
-import{a as r,t as s}from"../chunks/disclose-version.DXveyqe2.js";import{p as m,s as c,f as p,a as f,n as h,c as v,r as d}from"../chunks/runtime.BCBvpcPx.js";import{h as g}from"../chunks/svelte-head.Cxpb77Vn.js";import{s as u}from"../chunks/snippet.Bfn7_Ljc.js";var y=s(`<link rel="stylesheet" href="/pico-main/css/pico.css"> <link rel="stylesheet" href="/pico-main/css/pico.colors.min.css"> <style>:root {
-			--pico-form-element-spacing-vertical: 0.25rem;
-			--pico-form-element-spacing-horizontal: 0.25rem;
-		}</style>`,1),_=s('<nav class="container"><ul><li><a href="/">Home</a></li> <li><a href="/timelog/">Time Log</a></li> <li><a href="/invoices/">Invoice Builder</a></li></ul> <ul><li><a href="/settings/">Settings</a></li> <li><a href="/admin/roadmap">Roadmap</a></li></ul></nav> <div class="container"><!></div>',1);function B(o,a){m(a,!0);var e=_();g(l=>{var n=y();h(4),r(l,n)});var i=c(p(e),2),t=v(i);u(t,()=>a.children),d(i),r(o,e),f()}export{B as component};
