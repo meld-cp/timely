@@ -6,6 +6,8 @@
 	<li>Task description suggestions
 		<br>- datalist (https://developer.mozilla.org/en-US/docs/Web/HTML/Element/datalist)
 	</li>
+	<li>Ability to edit Invoices
+	</li>
 </ul>
 
 
