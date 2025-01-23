@@ -178,7 +178,6 @@
 
 	.s-running{
 		color: var(--pico-color);
-		background-color: var(--pico-color-green-100);
 		border: 2px solid var(--pico-primary-border);
 	}
 
@@ -192,6 +191,32 @@
 	.c-task-fields input[name=task-name]{
 		flex: 10;
 		min-width: 20ch;
+	}
+
+	/* Light color scheme (Default) */
+	/* Can be forced with data-theme="light" */
+	:root[data-theme="light"],
+	:root:not([data-theme="dark"]) {
+		.s-running{
+			background-color: var(--pico-color-green-100);
+		}
+	}
+	/* Dark color scheme (Auto) */
+	/* Automatically enabled if user has Dark mode enabled */
+	@media only screen and (prefers-color-scheme: dark) {
+		:root:not([data-theme]) {
+			.s-running{
+				background-color: var(--pico-color-green-600);
+			}
+		}
+	}
+
+	/* Dark color scheme (Forced) */
+	/* Enabled if forced with data-theme="dark" */
+	:root[data-theme="dark"] {
+		.s-running{
+			background-color: var(--pico-color-green-600);
+		}
 	}
 
 </style>
