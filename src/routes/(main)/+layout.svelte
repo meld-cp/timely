@@ -1,12 +1,6 @@
 <svelte:head>
 	<link rel="stylesheet" href="/pico-main/css/pico.css">
 	<link rel="stylesheet" href="/pico-main/css/pico.colors.min.css">
-	<style>
-		:root {
-			/* --pico-form-element-spacing-vertical: 0.25rem;
-			--pico-form-element-spacing-horizontal: 0.25rem; */
-		}
-	</style>
 </svelte:head>
 
 <script lang="ts">

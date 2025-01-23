@@ -3,7 +3,8 @@
 	import { FormatNumber } from "$lib/services/formatters/FormatNumber";
 	import { onMount } from 'svelte';
 	import { InvoiceViewModel } from '$lib/view-models/ViewModels.svelte';
-	import { invRepo, settingsController } from '$lib/services/Singletons';
+	import { invPreviewsRepo, invRepo, settingsController } from '$lib/services/Singletons';
+    import { type InvoiceModel } from '$lib/models/InvoiceModel';
     	
 	const settings = settingsController.read();
 
@@ -12,10 +13,17 @@
 	let inv: InvoiceViewModel | null = $state( null );
 	
 	onMount(()=>{
-		//const id = page.url.searchParams.get("id");
+		//const isPreview = page.url.searchParams.get("preview");
+		console.log(page.params)
 		const id = page.params.id;
 		if (id){
-			const m = invRepo.get(id);
+			const preview = page.params.preview;
+			let m:InvoiceModel | null;
+			if (preview){
+				m = invPreviewsRepo.get(id);
+			}else{
+				m = invRepo.get(id);
+			}
 			if (m){
 				inv = new InvoiceViewModel(m);
 			}
