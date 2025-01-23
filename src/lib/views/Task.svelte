@@ -3,10 +3,10 @@
 	
 	import { type TaskActionModel } from "$lib/models/TaskActionModel";
 	import { TaskState } from "$lib/models/TaskState";
-	import { Icons } from "$lib/models/Icons";
 	import type { TaskViewModel } from "../view-models/ViewModels.svelte";
     import type { ITaskController } from "$lib/ITaskController";
-	
+    import { Icons } from "$lib/models/Icons";
+    
 	let {
 		vm,
 		taskController,
@@ -144,7 +144,7 @@
 		gap: 0.5rem;
 		padding: 0.5rem;
 		overflow: hidden;
-		border: 2px solid hsl(0, 0%, 80%);
+		border: 2px solid var(--pico-muted-border-color);
 	}
 
 	.c-task-fields{
@@ -158,7 +158,7 @@
 		display: flex;
 		flex-direction: row;
 	}
-
+	
 	.c-task-fields-row-2 details{
 		margin-bottom: 0;
 		font-size: 80%;
@@ -177,8 +177,9 @@
 	}
 
 	.s-running{
-		background-color: hsl(100, 50%, 60%);
-		border: 2px solid hsl(0, 0%, 30%);
+		color: var(--pico-color);
+		background-color: var(--pico-color-green-100);
+		border: 2px solid var(--pico-primary-border);
 	}
 
 	.c-task-fields input{

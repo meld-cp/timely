@@ -6,7 +6,7 @@
 	import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/view-models/ViewModels.svelte";
 	import { invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
     import { FormatDate } from "$lib/services/formatters/FormatDate";
-    
+        
 	let wiNextLineNumber = $state(1);
 	let workingInvoice = $state( new InvoiceViewModel() );
 	let uninvoicedTasks:TaskViewModel[] = $state([]);

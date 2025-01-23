@@ -1,6 +1,9 @@
 {
   "version": "4",
   "specifiers": {
+    "npm:@fortawesome/fontawesome-svg-core@^6.7.2": "6.7.2",
+    "npm:@fortawesome/free-solid-svg-icons@^6.7.2": "6.7.2",
+    "npm:@fortawesome/svelte-fontawesome@~0.2.3": "0.2.3_@fortawesome+fontawesome-svg-core@6.7.2_svelte@5.18.0__acorn@8.14.0",
     "npm:@sveltejs/adapter-static@^3.0.8": "3.0.8_@sveltejs+kit@2.15.3__@sveltejs+vite-plugin-svelte@4.0.4___svelte@5.18.0____acorn@8.14.0___vite@5.4.11__svelte@5.18.0___acorn@8.14.0__vite@5.4.11_@sveltejs+vite-plugin-svelte@4.0.4__svelte@5.18.0___acorn@8.14.0__vite@5.4.11_svelte@5.18.0__acorn@8.14.0_vite@5.4.11",
     "npm:@sveltejs/kit@2": "2.15.3_@sveltejs+vite-plugin-svelte@4.0.4__svelte@5.18.0___acorn@8.14.0__vite@5.4.11_svelte@5.18.0__acorn@8.14.0_vite@5.4.11",
     "npm:@sveltejs/vite-plugin-svelte@4": "4.0.4_svelte@5.18.0__acorn@8.14.0_vite@5.4.11",
@@ -85,6 +88,28 @@
     },
     "@esbuild/win32-x64@0.21.5": {
       "integrity": "sha512-tQd/1efJuzPC6rCFwEvLtci/xNFcTZknmXs98FYDfGE4wP9ClFV98nyKrzJKVPMhdDnjzLhdUyMX4PsQAPjwIw=="
+    },
+    "@fortawesome/fontawesome-common-types@6.7.2": {
+      "integrity": "sha512-Zs+YeHUC5fkt7Mg1l6XTniei3k4bwG/yo3iFUtZWd/pMx9g3fdvkSK9E0FOC+++phXOka78uJcYb8JaFkW52Xg=="
+    },
+    "@fortawesome/fontawesome-svg-core@6.7.2": {
+      "integrity": "sha512-yxtOBWDrdi5DD5o1pmVdq3WMCvnobT0LU6R8RyyVXPvFRd2o79/0NCuQoCjNTeZz9EzA9xS3JxNWfv54RIHFEA==",
+      "dependencies": [
+        "@fortawesome/fontawesome-common-types"
+      ]
+    },
+    "@fortawesome/free-solid-svg-icons@6.7.2": {
+      "integrity": "sha512-GsBrnOzU8uj0LECDfD5zomZJIjrPhIlWU82AHwa2s40FKH+kcxQaBvBo3Z4TxyZHIyX8XTDxsyA33/Vx9eFuQA==",
+      "dependencies": [
+        "@fortawesome/fontawesome-common-types"
+      ]
+    },
+    "@fortawesome/svelte-fontawesome@0.2.3_@fortawesome+fontawesome-svg-core@6.7.2_svelte@5.18.0__acorn@8.14.0": {
+      "integrity": "sha512-jWjTfZK3QqhjtKDEnexhrUWO/uPFeNVU0T71ssUCVrJD/172rk8MVqTiOJwF95sHlTMMOryXD5tcn6JLT6eAKA==",
+      "dependencies": [
+        "@fortawesome/fontawesome-svg-core",
+        "svelte"
+      ]
     },
     "@jridgewell/gen-mapping@0.3.8": {
       "integrity": "sha512-imAbBGkb+ebQyxKgzv5Hu2nmROxoDOXHh80evxdoXNOrvAnVx7zimzc1Oo5h9RlfV4vPXaE2iM5pOFbvOCClWA==",
@@ -471,6 +496,9 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
+        "npm:@fortawesome/fontawesome-svg-core@^6.7.2",
+        "npm:@fortawesome/free-solid-svg-icons@^6.7.2",
+        "npm:@fortawesome/svelte-fontawesome@~0.2.3",
         "npm:@sveltejs/adapter-static@^3.0.8",
         "npm:@sveltejs/kit@2",
         "npm:@sveltejs/vite-plugin-svelte@4",
