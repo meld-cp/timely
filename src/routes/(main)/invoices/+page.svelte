@@ -108,7 +108,7 @@
 
 </script>
 
-<h1>Invoice Builder</h1>
+<h2>Invoice Builder</h2>
 
 <div id="container">
 

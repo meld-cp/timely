@@ -1,6 +1,6 @@
-<h1>Roadmap</h1>
+<h2>Roadmap</h2>
 
-<h2>To Do</h2>
+<h3>To Do</h3>
 <ul>
 	<li>
 		Backup & Restore
@@ -14,7 +14,7 @@
 </ul>
 
 
-<h2>Completed</h2>
+<h3>Completed</h3>
 <ul>
 	<li>
 		2025-01-23
@@ -24,7 +24,7 @@
 </ul>
 
 <style>
-	h2{
+	h3{
 		font-size: 110%;
 	}
 </style>

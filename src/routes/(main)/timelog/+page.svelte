@@ -17,7 +17,7 @@
 
 </script>
 
-<h1>Time Log</h1>
+<h2>Time Log</h2>
 
 <TimeLogger onStartTask={(name)=>vm.startNewTask(name)}/>
 
