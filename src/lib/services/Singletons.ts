@@ -6,6 +6,5 @@ import { SettingsController } from "./SettingsController";
 export const taskRepo = new LocalStorageController<TaskModel>("tasks");
 
 export const invRepo = new LocalStorageController<InvoiceModel>("invoices");
-export const invPreviewsRepo = new LocalStorageController<InvoiceModel>("invoice-previews");
 
 export const settingsController = new SettingsController();

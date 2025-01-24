@@ -116,7 +116,7 @@ export class TaskViewModel {
 }
 
 export class InvoiceViewModel {
-	
+
 	public id = $state( crypto.randomUUID().toString() );
 	public currencyCode:string = $state("USD");
 	
@@ -185,6 +185,10 @@ export class InvoiceViewModel {
 		return contains;
 	}
 	
+    public removeLineWithId(id: string): void {
+		this.lines = this.lines.filter( l=>l.id != id );
+    }
+
 	public removeLineWithExtRefId( extRefId:string ){
 		this.lines = this.lines.filter( l=>l.extRefId != extRefId );
 	}
@@ -199,8 +203,19 @@ export class InvoiceViewModel {
 		return m.id;
 	}
 
-	public sortLines(){
+	public sortAndRenumberLines(){
 		this.lines.sort( (a,b) => a.number - b.number );
+		this.renumberLines();
+	}
+
+	public renumberLines(){
+		let lineNumber = 10;
+		for (let i = 0; i < this.lines.length; i++) {
+			const line = this.lines[i];
+			line.number = lineNumber;
+			lineNumber += 10;
+		}
+		this.nextLineNumber = lineNumber;
 	}
 }
 
