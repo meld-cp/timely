@@ -6,15 +6,14 @@ import type { ITaskController } from "$lib/ITaskController";
 
 export class TimeLogPageViewModel implements ITaskController {
 
-	tasksRunning: TaskViewModel[] = $state([]);
-	tasksPaused: TaskViewModel[] = $state([]);
-	tasksStopped: TaskViewModel[] = $state([]);
-	tasksArchived: TaskViewModel[] = $state([]);
+	public previouslyUsedTasks:TaskViewModel[] = $state([]);
 
-	intervalId: number | undefined;
+	public tasksRunning: TaskViewModel[] = $state([]);
+	public tasksPaused: TaskViewModel[] = $state([]);
+	public tasksStopped: TaskViewModel[] = $state([]);
+	public tasksArchived: TaskViewModel[] = $state([]);
 
-	constructor() {
-	}
+	private intervalId: number | undefined;
 
 	start() {
 		this.stop();
@@ -36,8 +35,14 @@ export class TimeLogPageViewModel implements ITaskController {
 			clearInterval(this.intervalId);
 		}
 	}
+
 	private refresh() {
 		const allTasks = taskRepo.getAll().map(t => new TaskViewModel(t));
+
+		// sort by date and take top 20
+		this.previouslyUsedTasks = allTasks.sort( (a, b) => a.date > b.date ? -1 : 1 ).slice(0, 20);
+
+		// split by state
 		this.tasksRunning = this.fetchTasksByState(allTasks, [TaskState.Running]);
 		this.tasksPaused = this.fetchTasksByState(allTasks, [TaskState.Paused]);
 		this.tasksStopped = this.fetchTasksByState(allTasks, [TaskState.Stopped]);

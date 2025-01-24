@@ -14,7 +14,7 @@
 </script>
 <tr class="c-line">
 	<td><input name="line-num" type="number" min="1" bind:value="{vm.number}"/></td>
-	<td><input name="line-desc" type="text" bind:value="{vm.description}"/></td>
+	<td><input name="line-desc" type="text" bind:value="{vm.description}" spellcheck="true"/></td>
 	<td><input name="line-qty" type="number" step="0.25" bind:value="{vm.quantity}"/></td>
 	<td><input name="line-units" type="text" bind:value="{vm.units}"/></td>
 	<td><input name="line-unit-cost" type="number" bind:value="{vm.unitCost}"/></td>

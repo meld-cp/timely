@@ -2,7 +2,6 @@
 	import TaskList from "$lib/views/TaskList.svelte";
 	import TimeLogger from "$lib/views/TimeLogger.svelte";
 	import { onDestroy, onMount } from "svelte";
-	import { TaskViewModel } from "$lib/view-models/ViewModels.svelte";
 	import { TimeLogPageViewModel } from "$lib/view-models/TimeLogPageViewModel.svelte";
 		
 	let vm = $state(new TimeLogPageViewModel())
@@ -19,7 +18,7 @@
 
 <h2>Time Log</h2>
 
-<TimeLogger onStartTask={(name)=>vm.startNewTask(name)}/>
+<TimeLogger onStartTask={(name)=>vm.startNewTask(name)} previousTasksList={vm.previouslyUsedTasks}/>
 
 <section>
 	<summary>In Progress ({vm.tasksRunning.length})</summary>
