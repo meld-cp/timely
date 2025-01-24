@@ -104,11 +104,15 @@
 			<tbody>
 				{#each inv.lines as line}
 				<tr>
+					{#if line.isDescriptionOnlyLine}
+					<td class="tal" colspan="5">{line.description}</td>
+					{:else}
 					<td class="tal">{line.description}</td>
 					<td class="tar">{line.quantity}</td>
 					<td class="tac">{line.units}</td>
 					<td class="tar">{FormatNumber.currency( line.unitCost, inv.currencyCode, settings.localeCode )}</td>
 					<td class="tar">{FormatNumber.currency( line.total, inv.currencyCode, settings.localeCode )}</td>
+					{/if}
 				</tr>
 				{/each}
 			</tbody>
