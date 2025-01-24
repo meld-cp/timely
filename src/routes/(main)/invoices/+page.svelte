@@ -6,8 +6,7 @@
 	import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/view-models/ViewModels.svelte";
 	import { invPreviewsRepo, invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
     import { FormatDate } from "$lib/services/formatters/FormatDate";
-            
-	let wiNextLineNumber = $state(1);
+                
 	let workingInvoice = $state( new InvoiceViewModel() );
 	let uninvoicedTasks:TaskViewModel[] = $state([]);
 	let scratchPad:string = $state("");
@@ -45,7 +44,6 @@
 
 	function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLineViewModel {
 		const newLine =  new InvoiceLineViewModel()
-		newLine.number = wiNextLineNumber++;
 		newLine.extRefId = timeLog.id;
 		newLine.description = `${timeLog.date} - ${timeLog.name}`;
 		newLine.units = "hr";
