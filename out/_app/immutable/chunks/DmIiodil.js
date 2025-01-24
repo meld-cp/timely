@@ -1,0 +1,1 @@
+class n{static decimalPlaces(r,t,c){return new Intl.NumberFormat(c,{style:"decimal",minimumFractionDigits:t}).format(r)}static currency(r,t,c){return new Intl.NumberFormat(c,{style:"currency",currency:t,currencyDisplay:"narrowSymbol"}).format(r)}}export{n as F};
