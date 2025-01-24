@@ -12,11 +12,8 @@
 	let inv: InvoiceViewModel | null = $state( null );
 	
 	onMount(()=>{
-		//const isPreview = page.url.searchParams.get("preview");
-		//console.log(page.params)
 		const id = page.params.id;
 		if (id){
-			//const preview = page.params.preview;
 			let m = invRepo.get(id);
 			if (m){
 				inv = new InvoiceViewModel(m);
@@ -43,8 +40,8 @@
 		<section id="c-title" class="col">
 			<!-- title and tax no -->
 			<header>Tax Invoice</header>
-			{#each (settings.invoiceHeader ?? "")?.split("\n") as line }
-				<div>{line}</div>
+			{#each inv.headerLines as line }
+				{line}<br/>
 			{/each}
 		</section>
 	</section>

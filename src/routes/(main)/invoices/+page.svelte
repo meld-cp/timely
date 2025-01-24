@@ -9,7 +9,7 @@
 	
 	const draftInvoiceId = "draft";
 
-	let workingInvoice:InvoiceViewModel = $state( buildNewDraftInvoice() );
+	let workingInvoice:InvoiceViewModel = $state( loadDraftInvoice());
 	let uninvoicedTasks:TaskViewModel[] = $state([]);
 	let scratchPad:string = $state("");
 
@@ -22,6 +22,14 @@
 		closedInvoices = fetchInvoices();
 	})
     
+	function loadDraftInvoice() : InvoiceViewModel{
+		var m = invRepo.get(draftInvoiceId)
+		if (m){
+			 return new InvoiceViewModel(m);
+		}
+		return buildNewDraftInvoice();
+	}
+
 	function fetchInvoices(): InvoiceViewModel[] {
 		// fetch all invoices and sort by date desc and then number desc
         return invRepo
@@ -57,6 +65,8 @@
 		const result = new InvoiceViewModel();
 		result.id = draftInvoiceId;
 
+		result.headerLinesAsText = settings.defaultInvoiceHeader ?? "";
+
 		result.currencyCode = settings.defaultInvoiceCurrencyCode;
 		result.number = `${settings.nextInvoiceNumber}`;
 		result.footnoteAsText = settings.defaultInvoiceFooter ?? "";
@@ -82,10 +92,16 @@
 		return newLine;
 	}
    
-	function onPreviewInvoice() {
-		// save preview invoice
-		invRepo.set( workingInvoice.id, workingInvoice.getModel() );
+	function onViewDraftInvoice() {
+		// save draft invoice
+		saveDraftInvoice();
+		// show invoice
 		viewInvoice( workingInvoice.id);
+	}
+
+	function saveDraftInvoice() {
+		// save invoice
+		invRepo.set( workingInvoice.id, workingInvoice.getModel() );
 	}
 
 	/**
@@ -114,6 +130,7 @@
 		
 		uninvoicedTasks = fetchUninvoicedTasks();
 		workingInvoice = buildNewDraftInvoice();
+		saveDraftInvoice();
 
 		viewInvoice( model.id );
 	}
@@ -146,6 +163,21 @@
 		}
 	}
 
+	function onDraftInvoiceAddLine(){
+		workingInvoice.addLine();
+		saveDraftInvoice();
+	}
+
+	function onDraftInvoiceRemoveLine( line : InvoiceLineViewModel){
+		workingInvoice.removeLineWithId( line.id );
+		saveDraftInvoice();
+	}
+
+	function onDraftInvoiceSortLines(){
+		workingInvoice.sortAndRenumberLines();
+		saveDraftInvoice();
+	}
+
 
 </script>
 
@@ -154,7 +186,15 @@
 <div id="container">
 
 	<section id="row1">
-		<InvoiceEditorView vm={workingInvoice} {onBuildInvoice} {onPreviewInvoice}/>
+		<InvoiceEditorView
+			vm={workingInvoice}
+			onChange={saveDraftInvoice}
+			onAddLine={onDraftInvoiceAddLine}
+			onRemoveLine={onDraftInvoiceRemoveLine}
+			onSortLines={onDraftInvoiceSortLines}
+			{onBuildInvoice}
+			onPreviewInvoice={onViewDraftInvoice}
+		/>
 
 		<div class="c-col-2">
 		

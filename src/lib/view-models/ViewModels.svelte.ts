@@ -124,6 +124,7 @@ export class InvoiceViewModel {
 	public date:string = $state(FormatDate.toInputDateValue( new Date()));
 	public orderRef:string = $state("");
 	
+	public headerLines: string[] = $state([]);
 	public issueToLines: string[] = $state([]);
 	public footerLines: string[] = $state([]);
 	
@@ -147,6 +148,7 @@ export class InvoiceViewModel {
 			number:this.number,
 			date:this.date,
 			orderRef:this.orderRef,
+			headerLines:this.headerLines,
 			issueToLines:this.issueToLines,
 			lines:this.lines.map( l=>l.getModel() ),
 			footerLines:this.footerLines,
@@ -159,9 +161,18 @@ export class InvoiceViewModel {
 		this.number = m.number;
 		this.date = m.date;
 		this.orderRef = m.orderRef;
+		this.headerLines = m.headerLines ?? [];
 		this.issueToLines = m.issueToLines;
 		this.lines = m.lines.map( l => new InvoiceLineViewModel(l) );
-		this.footerLines = m.footerLines;
+		this.footerLines = m.footerLines ?? [];
+	}
+
+	get headerLinesAsText() {
+		return this.headerLines.join("\n")
+	}
+	
+	set headerLinesAsText( v:string ){
+		this.headerLines = v.split("\n");
 	}
 
 	get issueToAsText() {

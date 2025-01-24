@@ -97,10 +97,10 @@
 				></textarea>
 			</label>
 			<label>
-				Invoice Header Lines
+				Default Invoice Header Lines
 				<textarea
 					name="inv-header"
-					bind:value={settings.invoiceHeader} oninput="{onSettingsChanged}"
+					bind:value={settings.defaultInvoiceHeader} oninput="{onSettingsChanged}"
 				></textarea>
 			</label>
 

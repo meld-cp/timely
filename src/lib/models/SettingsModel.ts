@@ -7,7 +7,7 @@ export type SettingsModel = {
 	address?:string;
 	logoData?: string;
 	nextInvoiceNumber?: number;
-	invoiceHeader?:string;
+	defaultInvoiceHeader?:string;
 	defaultInvoiceCurrencyCode?: string;
 	defaultInvoiceFooter?: string;
 	scratchPads?:ScratchPadsDictionary;
