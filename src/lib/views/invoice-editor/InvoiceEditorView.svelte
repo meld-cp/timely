@@ -12,6 +12,7 @@
 		onSortLines,
 		onPreviewInvoice,
 		onBuildInvoice,
+		onResetInvoice,
 	}:{
 		vm:InvoiceViewModel,
 		onChange:()=>void,
@@ -20,6 +21,7 @@
 		onSortLines:()=>void,
 		onPreviewInvoice:()=>void,
 		onBuildInvoice:()=>void,
+		onResetInvoice:()=>void
 	} = $props();
 
 	
@@ -114,9 +116,10 @@
 		></textarea>
 	</label>
 
-	<footer>
+	<footer style="display: flex; justify-content: space-between;">
 		<button class="secondary" onclick="{onPreviewInvoice}">Preview</button>
 		<button onclick="{onBuildInvoice}">Build</button>
+		<button class="secondary" onclick="{onResetInvoice}">Reset</button>
 	</footer>
 
 </article>
