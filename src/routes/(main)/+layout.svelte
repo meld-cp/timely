@@ -1,6 +1,23 @@
 <svelte:head>
-	<link rel="stylesheet" href="/pico-main/css/pico.css">
+	<link rel="stylesheet" href="/pico-main/css/pico.min.css">
 	<link rel="stylesheet" href="/pico-main/css/pico.colors.min.css">
+	<style>
+		* {
+			scrollbar-width: auto;
+		}
+
+		::-webkit-scrollbar {
+			width: 0.80rem;
+		}
+		::-webkit-scrollbar-thumb {
+			background: var(--pico-form-element-active-border-color);
+		}
+		
+		::-webkit-scrollbar-track {
+			background: var(--pico-form-element-border-color);
+			/* background: var(--pico-form-element-selected-background-color); */
+		}
+	</style>
 </svelte:head>
 
 <script lang="ts">
