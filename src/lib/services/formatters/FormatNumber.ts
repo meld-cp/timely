@@ -6,6 +6,7 @@ export class FormatNumber {
 			{
 				style: "decimal",
 				minimumFractionDigits: decimalPlaces,
+				maximumFractionDigits: decimalPlaces,
 			}
 		);
 		return f.format(n);

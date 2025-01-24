@@ -14,7 +14,7 @@
 	
 	onMount(()=>{
 		//const isPreview = page.url.searchParams.get("preview");
-		console.log(page.params)
+		//console.log(page.params)
 		const id = page.params.id;
 		if (id){
 			const preview = page.params.preview;

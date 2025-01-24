@@ -6,7 +6,7 @@
 	import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/view-models/ViewModels.svelte";
 	import { invPreviewsRepo, invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
     import { FormatDate } from "$lib/services/formatters/FormatDate";
-        
+            
 	let wiNextLineNumber = $state(1);
 	let workingInvoice = $state( new InvoiceViewModel() );
 	let uninvoicedTasks:TaskViewModel[] = $state([]);
@@ -30,6 +30,7 @@
 	function resetWorkingInvoice(){
 		const settings = settingsController.read();
 		workingInvoice = new InvoiceViewModel();
+		workingInvoice.currencyCode = settings.defaultInvoiceCurrencyCode;
 		workingInvoice.number = `${settings.nextInvoiceNumber}`;
 		workingInvoice.footnoteAsText = settings.defaultInvoiceFooter ?? "";
 	}
@@ -70,10 +71,7 @@
 			taskRepo.set( task.id, task.getModel() );
 		}
 
-
-		settingsController.modify(settings =>{
-			settings.nextInvoiceNumber++;
-		});
+		settingsController.incrementNextInvoiceNumber();
 		closedInvoices = fetchInvoices();
 		
 		uninvoicedTasks = fetchUninvoicedTasks();
