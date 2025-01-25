@@ -12,18 +12,15 @@ export class KvStorClient {
 
 	public async getItem( key: string ):Promise<string> {
 		const url = this.buildUrl(key);
-		const res = await fetch(url,{
-			mode: "no-cors"
-		});
+		const res = await fetch(url);
 		return await res.text();
 	}
 
 	public async setItem( key: string, value: string ):Promise<void> {
 		const url = this.buildUrl(key);
 		const res = await fetch(url, {
-			method: "PUT",
+			method: "POST",
 			body: value,
-			// mode: "no-cors"
 		});
 	}
 }

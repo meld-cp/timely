@@ -70,7 +70,27 @@
 			</label>
 		</details>
 	</article>
-	
+	<article>
+		<details open>
+			<summary>Cloud Backup Settings</summary>
+			<label>
+				Host
+				<input
+					name="cloud-host"
+					type="text"
+					bind:value={settings.cloudSyncHost} oninput="{onSettingsChanged}"
+				/>
+			</label>
+			<label>
+				User Token
+				<input
+					name="cloud-user"
+					type="text"
+					bind:value={settings.cloudSyncUserId} oninput="{onSettingsChanged}"
+				/>
+			</label>
+		</details>
+	</article>
 	<article>
 		<details open>
 			<summary>Invoice Settings</summary>

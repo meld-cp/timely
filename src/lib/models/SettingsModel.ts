@@ -11,4 +11,7 @@ export type SettingsModel = {
 	defaultInvoiceCurrencyCode?: string;
 	defaultInvoiceFooter?: string;
 	scratchPads?:ScratchPadsDictionary;
+	
+	cloudSyncHost?:string;
+	cloudSyncUserId?:string;
 };

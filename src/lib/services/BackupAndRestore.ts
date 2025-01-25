@@ -1,3 +1,5 @@
+import { KvStorClient } from "./kvstor-client";
+
 export class BackupService{
 
 	public encodeDataToBackup() : string {
@@ -50,5 +52,64 @@ export class RestoreService{
 		this.restoreFromBase64(dataBase64);
 	}
 
+	
 }
 
+export class CloudBackupService{
+
+	constructor(
+		public host:string,
+		public userId:string,
+		public appId:string,
+		public bucketId:string
+	){}
+
+	public static build(
+		host?:string,
+		userId?:string,
+		appId?:string,
+		bucketId?:string
+	) : CloudBackupService | null{
+		if (
+			host != undefined
+			&& (
+				host.startsWith("https://")
+				|| host.startsWith("http://")
+			)
+			&& userId != undefined
+			&& userId.length > 0
+			&& appId != undefined
+			&& appId.length > 0
+			&& bucketId != undefined
+			&& bucketId.length > 0
+		){
+			return new CloudBackupService(
+				host,
+				userId,
+				appId,
+				bucketId
+			)
+		};
+		return null;
+	}
+
+	public async put( key:string, value:string ){
+		const kv = new KvStorClient(
+			this.host,
+			this.userId,
+			this.appId,
+			this.bucketId
+		);
+		await kv.setItem( key, value );
+	}
+
+	public async get( key:string ) : Promise<string> {
+		const kv = new KvStorClient(
+			this.host,
+			this.userId,
+			this.appId,
+			this.bucketId
+		);
+		return await kv.getItem(key);
+	}
+}
