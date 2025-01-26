@@ -38,20 +38,22 @@
 <div class="c-main">
 	{#if onIncreaseDuration}
 	<div class="c-buttons">
-		<button class="outline" title="Add Time" onclick="{(ev) => onIncreaseDuration( true, ev.ctrlKey )}"><Icon icon={faPlus}/></button>
-		<button class="outline" title="Remove Time" onclick="{(ev) => onIncreaseDuration( false, ev.ctrlKey )}"><Icon icon={faMinus}/></button>
+		{#if onIncreaseDuration}
+			<button class="outline" title="Add Time" onclick="{(ev) => onIncreaseDuration( true, ev.ctrlKey )}"><Icon icon={faPlus}/></button>
+			<button class="outline" title="Remove Time" onclick="{(ev) => onIncreaseDuration( false, ev.ctrlKey )}"><Icon icon={faMinus}/></button>
+		{/if}
 	</div>
 	{/if}
 	<div class="affective">{affectiveDurationHours?.toFixed(2)}</div>
 	<div class="counter">{formattedDurationHMS}</div>
 	{#if icon1 || onAction1Click || icon2 || onAction2Click }
 	<div class="c-buttons">
-		{#if onAction1Click}
+		{#if onAction1Click && icon1}
 		<button class="outline" title="{action1Hint}" onclick="{() => onAction1Click()}"><Icon icon={icon1}/></button>
 		{:else if icon1}
 		<div class="icon"><Icon icon={icon1}/></div>
 		{/if}
-		{#if onAction2Click}
+		{#if onAction2Click && icon2}
 		<button class="outline secondary" title="{action2Hint}" onclick="{() => onAction2Click()}"><Icon icon={icon2}/></button>
 		{:else if icon2}
 		<div class="icon secondary"><Icon icon={icon2}/></div>
