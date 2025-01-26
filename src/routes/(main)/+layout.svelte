@@ -21,6 +21,8 @@
 </svelte:head>
 
 <script lang="ts">
+    import { appController } from '$lib/services/Singletons';
+
    
 	let { children } = $props();
 
@@ -71,7 +73,29 @@
 	{@render children()}
 </div>
 
+<footer class="footer">
+	<hr>
+	<section>
+		Data Version: {appController.dataModifiedTimestamp}
+	</section>
+</footer>
+
 <style>
+	.footer{
+		z-index: -10000;
+		font-size: small;
+		width: 100%;
+		position: fixed;
+		bottom: 0;
+
+		hr{
+			margin: 0;
+		}
+		section{
+			margin: 0;
+			padding: 0.2rem 0.5rem;
+		}
+	}
 	.app-name-link:hover{
 		text-decoration: none;
 	}
