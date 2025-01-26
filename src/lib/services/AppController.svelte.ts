@@ -13,12 +13,6 @@ export class ApplicationController {
 	public invRepo = new LocalStorageController<InvoiceModel>(APP_LOCALSTORE_INVOICES_NAME);
 	public settingsController = new SettingsController();
 
-	public settings:SettingsViewModel = $state( this.settingsController.read() )
-
-	// public async getSettings():Promise<SettingsViewModel>{
-	// 	return this.settingsController.read();
-	// }
-
 	public async getTasks():Promise<TaskViewModel[]>{
 		return this.taskRepo.getAll().map(t => new TaskViewModel(t));
 	}

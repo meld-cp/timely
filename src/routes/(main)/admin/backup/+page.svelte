@@ -4,19 +4,14 @@
     import { KvStorBackupService } from "$lib/services/backup-services/KvStorBackupService";
     import { LocalBackupService } from "$lib/services/backup-services/LocalBackupService";
     import { appController } from "$lib/services/Singletons";
-    import { onMount } from "svelte";
 	
-	//let settings:SettingsViewModel | undefined = $state();
-
-	onMount(async()=>{
-		//settings = await appController.getSettings();
-	})
 	let appDataToBackup = $state( appController.getAppData() );
+	const settings = appController.settingsController.read();
 
 	//TODO: move this to app controller
 	let cloudService = $state( KvStorBackupService.build(
-		appController.settings.cloudSyncHost,
-		appController.settings.cloudSyncUserId,
+		settings.cloudSyncHost,
+		settings.cloudSyncUserId,
 		KV_STORE_APP_ID,
 	));
 

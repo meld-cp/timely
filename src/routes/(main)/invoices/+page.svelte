@@ -12,8 +12,6 @@
 	
 	const draftInvoiceId = "draft";
 
-	const settings = appController.settings;
-
 	let workingInvoice:InvoiceViewModel = $state( loadDraftInvoice());
 	let uninvoicedTasks:TaskViewModel[] = $state([]);
 	let scratchPad:string = $state("");
@@ -65,7 +63,7 @@
     }
 
 	function buildNewDraftInvoice() : InvoiceViewModel{
-		const settings = appController.settings;
+		const settings = appController.settingsController.read();
 
 		const result = new InvoiceViewModel();
 		result.id = draftInvoiceId;
