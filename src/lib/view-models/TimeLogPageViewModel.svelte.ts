@@ -1,8 +1,8 @@
 import { TaskState } from "$lib/models/TaskState";
-import { taskRepo } from "../services/Singletons";
 import { FormatDate } from "$lib/services/formatters/FormatDate";
-import { TaskViewModel } from "./ViewModels.svelte";
+import { TaskViewModel } from "./TaskViewModel.svelte";
 import type { ITaskController } from "$lib/ITaskController";
+import { appController } from "$lib/services/Singletons";
 
 export class TimeLogPageViewModel implements ITaskController {
 
@@ -37,7 +37,7 @@ export class TimeLogPageViewModel implements ITaskController {
 	}
 
 	private refresh() {
-		const allTasks = taskRepo.getAll().map(t => new TaskViewModel(t));
+		const allTasks = appController.taskRepo.getAll().map(t => new TaskViewModel(t));
 
 		// sort by date and take top 20
 		this.previouslyUsedTasks = allTasks.sort( (a, b) => a.date > b.date ? -1 : 1 ).slice(0, 20);
@@ -60,7 +60,7 @@ export class TimeLogPageViewModel implements ITaskController {
 	}
 
 	public saveTask(task: TaskViewModel) {
-		taskRepo.set(task.id, task.getModel());
+		appController.taskRepo.set(task.id, task.getModel());
 	}
 
 	public pauseAll() {
@@ -112,7 +112,7 @@ export class TimeLogPageViewModel implements ITaskController {
 	}
 
 	public deleteTask(task: TaskViewModel) {
-		taskRepo.remove(task.id);
+		appController.taskRepo.remove(task.id);
 		this.refresh();
 	}
 

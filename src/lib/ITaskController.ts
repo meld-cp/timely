@@ -1,4 +1,4 @@
-import type { TaskViewModel } from "./view-models/ViewModels.svelte"
+import type { TaskViewModel } from "./view-models/TaskViewModel.svelte";
 
 export interface ITaskController{
 	pauseTask( task: TaskViewModel ):void;

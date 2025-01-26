@@ -2,19 +2,20 @@
 	import { page } from '$app/state';
 	import { FormatNumber } from "$lib/services/formatters/FormatNumber";
 	import { onMount } from 'svelte';
-	import { InvoiceViewModel } from '$lib/view-models/ViewModels.svelte';
-	import { invRepo, settingsController } from '$lib/services/Singletons';
-        	
-	const settings = settingsController.read();
+	
+	import { InvoiceViewModel } from "$lib/view-models/InvoiceViewModel.svelte";
+    import { appController } from '$lib/services/Singletons';
+	        	
+	const settings = appController.settings;
 
-	let logoSrc :string|undefined = $state(settings.logoData);
+	let logoSrc :string|undefined = settings.logoData;
 	
 	let inv: InvoiceViewModel | null = $state( null );
 	
 	onMount(()=>{
 		const id = page.params.id;
 		if (id){
-			let m = invRepo.get(id);
+			let m = appController.invRepo.get(id);
 			if (m){
 				inv = new InvoiceViewModel(m);
 			}

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { FormatDate } from "$lib/services/formatters/FormatDate";
     import { FormatNumber } from "$lib/services/formatters/FormatNumber";
-	import { settingsController } from "$lib/services/Singletons";
+    import { appController } from "$lib/services/Singletons";
     import { Utils } from "$lib/services/Utils";
 
 	const selectableLocales = [
@@ -16,10 +16,9 @@
 		{"code":"EUR", "name":"Euro"},
 	]
 
-
-	let settings = $state(settingsController.read());
-
 	let eInputInvoiceLogoFile:HTMLInputElement;
+
+	let settings = appController.settings;
 
 	let localeExamples = $derived( [
 		`Date: ${FormatDate.toLocalDate(new Date(), settings.localeCode )}`,
@@ -33,7 +32,7 @@
 	}
 
 	function saveSettings(){
-		settingsController.write(settings);
+		appController.settingsController.write(settings);
 	}
 
 	async function onInvoiceLogoFileSelected(){
