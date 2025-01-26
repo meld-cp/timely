@@ -89,14 +89,14 @@
 					bind:value={settings.cloudSyncUserId} oninput="{onSettingsChanged}"
 				/>
 			</label>
-			<label>
+			<!-- <label>
 				Timestamp
 				<input
 					name="cloud-timestamp"
 					type="number"
 					bind:value={settings.cloudSyncTimestamp} oninput="{onSettingsChanged}"
 				/>
-			</label>
+			</label> -->
 		</details>
 	</article>
 	<article>
