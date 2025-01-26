@@ -16,8 +16,10 @@
 		return `${inv?.issueToLines.at(0)} - Invoice ${inv?.number}`;
 	});
 
+	const id = page.params.id;
+	const watermark = page.params.watermark;
+
 	onMount(()=>{
-		const id = page.params.id;
 		if (id){
 			let m = appController.invRepo.get(id);
 			if (m){
@@ -33,6 +35,9 @@
 </svelte:head>
 
 {#if inv}
+{#if watermark}
+	<div class="watermark">{watermark}</div>
+{/if}
 <div id="c-inv">
 
 	<section id="c-header" class="row">
@@ -147,6 +152,24 @@
 {/if}
 
 <style>
+
+	.watermark{
+		font-size: 10rem;
+		text-align: center;
+		opacity: 0.05;
+		overflow: hidden;
+		position: fixed;
+		top: 0rem;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		justify-content: center;
+		align-self: center;
+		transform: rotate(-30deg);
+		z-index:10000;
+	}
+
 
 	header{
 		font-weight: bold;

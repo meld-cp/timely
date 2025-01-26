@@ -99,7 +99,7 @@
 		// save draft invoice
 		saveDraftInvoice();
 		// show invoice
-		viewInvoice( workingInvoice.id);
+		viewInvoice( workingInvoice.id, { wattermark: "DRAFT" } );
 	}
 
 	function saveDraftInvoice() {
@@ -138,8 +138,12 @@
 		viewInvoice( newInvModel.id );
 	}
 	
-	function viewInvoice( id: string ){
-		window.open( `/view-invoice/${id}`, `inv-${id}` );
+	function viewInvoice( id: string, options?:{wattermark?:string} ){
+		let url = `/view-invoice/${id}`;
+		if (options?.wattermark){
+			url += `/${options.wattermark}`;
+		}
+		window.open( url, `inv-${id}` );
 	}
 
 	function allUninvoicedTimeHaveBeenAddedToWorkingInvoice() : boolean{
