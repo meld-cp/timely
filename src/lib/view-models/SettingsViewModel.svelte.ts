@@ -10,6 +10,7 @@ export class SettingsViewModel{
 	public defaultInvoiceHeader?:string = $state();
 	public defaultInvoiceCurrencyCode:string = $state("USD");
 	public defaultInvoiceFooter?:string = $state();
+	
 	public cloudSyncHost?:string = $state();
 	public cloudSyncUserId?:string = $state();
 
