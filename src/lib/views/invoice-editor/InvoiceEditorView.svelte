@@ -1,7 +1,9 @@
 <script lang="ts">
 	
 	import { FormatNumber } from "$lib/services/formatters/FormatNumber";
-	import type { InvoiceLineViewModel, InvoiceViewModel } from "$lib/view-models/ViewModels.svelte";
+	
+	import type { InvoiceLineViewModel } from "$lib/view-models/InvoiceLineViewModel.svelte";
+	import type { InvoiceViewModel } from "$lib/view-models/InvoiceViewModel.svelte";
 	import InvoiceEditorLineView from "./InvoiceEditorLineView.svelte";
 
 	let {
