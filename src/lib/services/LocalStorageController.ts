@@ -1,8 +1,9 @@
 export class LocalStorageController<T>{
 
-	private bucket:string;
-
-	constructor( bucket:string ){
+	constructor(
+		private bucket:string,
+		public options?:{ onModifiedCallback?: () => void }
+	){
 		this.bucket = bucket;
 	}
 
@@ -18,17 +19,26 @@ export class LocalStorageController<T>{
 		return [this.bucket, id].join("$");
 	}
 
-	private matchesBucketKey( key:string):boolean{
-		return key.startsWith( this.bucket + "$" );
+	private matchesBucketItemKey( key:string):boolean{
+		return (
+			key.startsWith( this.bucket + "$" )
+		);
+	}
+	
+	private setChangedTimestamp(){
+		if (this.options?.onModifiedCallback != undefined){
+			this.options.onModifiedCallback();
+		}
 	}
 	
 	public set( id:string, value: T ){
 		const key = this.buildBucketKey(id);
 		const data = this.encode(value);
 		localStorage.setItem( key, data );
+		this.setChangedTimestamp();
 	}
 
-	public get( id:string, variant?:string ):T | null{
+	public get( id:string ):T | null{
 		const key = this.buildBucketKey(id);
 		return this.getWithKey(key)
 	}
@@ -50,7 +60,7 @@ export class LocalStorageController<T>{
 			if ( key == null ){
 				return result;
 			}
-			if (!this.matchesBucketKey(key)){
+			if (!this.matchesBucketItemKey(key)){
 				continue;
 			}
 			const item = this.getWithKey( key )
@@ -65,6 +75,7 @@ export class LocalStorageController<T>{
 	public remove(id:string){
 		const key = this.buildBucketKey(id);
 		localStorage.removeItem( key );
+		this.setChangedTimestamp();
 	}
 
 	removeAll() {
@@ -74,15 +85,21 @@ export class LocalStorageController<T>{
 			if ( key == null ){
 				break;
 			}
-			if (!this.matchesBucketKey(key)){
+			if (!this.matchesBucketItemKey(key)){
 				continue;
 			}
 			keysToRemove.push(key)
 		}
 		
+		if (keysToRemove.length == 0){
+			return;
+		}
+
 		for (const key of keysToRemove) {
 			localStorage.removeItem( key );
 		}
+		
+		this.setChangedTimestamp();
 	}
 
 }

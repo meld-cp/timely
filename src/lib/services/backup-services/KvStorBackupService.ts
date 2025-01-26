@@ -7,6 +7,7 @@ import { KvStorClient } from "../kvstor-client";
 
 export class KvStorBackupService implements IBackupService {
 
+	public static readonly BUCKET_ID_META = "meta";
 	public static readonly BUCKET_ID_SETTINGS = "settings";
 	public static readonly BUCKET_ID_TASKS = "tasks";
 	public static readonly BUCKET_ID_INVOICES = "invoices";
@@ -118,6 +119,14 @@ export class KvStorBackupService implements IBackupService {
 			this.appId
 		);
 
+		// get last modified
+		const lastModified = await this.getStoredValueOrDefault<number>(
+			kv,
+			KvStorBackupService.BUCKET_ID_META,
+			"dataTimestamp",
+			0
+		);
+
 		// get settings
 		let settings:SettingsModel = await this.getStoredValueOrThrow<SettingsModel>(
 			kv,
@@ -160,9 +169,10 @@ export class KvStorBackupService implements IBackupService {
 		}
 
 		return {
-			settings,
-			tasks,
-			invoices
+			modified: lastModified,
+			settings: settings,
+			tasks: tasks,
+			invoices: invoices
 		};
 
 	}

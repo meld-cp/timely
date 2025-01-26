@@ -69,6 +69,7 @@
 			</label>
 		</details>
 	</article>
+
 	<article>
 		<details open>
 			<summary>Cloud Backup Settings</summary>
@@ -86,6 +87,14 @@
 					name="cloud-user"
 					type="text"
 					bind:value={settings.cloudSyncUserId} oninput="{onSettingsChanged}"
+				/>
+			</label>
+			<label>
+				Timestamp
+				<input
+					name="cloud-timestamp"
+					type="number"
+					bind:value={settings.cloudSyncTimestamp} oninput="{onSettingsChanged}"
 				/>
 			</label>
 		</details>
