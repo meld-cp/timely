@@ -11,7 +11,14 @@
 		KV_STORE_APP_ID,
 		KV_STORE_BUCKET_ID
 	);
+
+	let writingToCloudData = $state( false );
+	let canWriteToCloudData = $derived( cloudService !== undefined && !writingToCloudData );
+
+	let readingFromCloudData = $state( false );
+	let canReadFromCloudData = $derived( cloudService !== undefined && !readingFromCloudData );
 	
+
 	const backupSvr = new BackupService();
 	let dataToBackup = $state( backupSvr.encodeDataToBackup() );
 	
@@ -20,22 +27,9 @@
 
 	let eInputRestoreFile:HTMLInputElement;
 
+	// local backup
 	function onBackupDataLocal(){
 		backupSvr.downloadBackupFile();
-	}
-
-	async function onBackupDataCloud(){
-		if (!cloudService){
-			return;
-		}
-		await cloudService.put(KV_STORE_BACKUP_KEY, dataToBackup);
-	}
-
-	async function onReadFromCloudData(){
-		if (!cloudService){
-			return;
-		}
-		dataToRestore = await cloudService.get(KV_STORE_BACKUP_KEY);
 	}
 
 	async function onRestoreFileSelected(){
@@ -48,6 +42,32 @@
 		dataToRestore = await file.text();
 
 	}
+
+	// cloud backup
+	async function onBackupDataCloud(){
+		writingToCloudData = true;
+		try{
+			if (!cloudService){
+				return;
+			}
+			await cloudService.put(KV_STORE_BACKUP_KEY, dataToBackup);
+		}finally{
+			writingToCloudData = false;
+		}
+	}
+
+	async function onReadFromCloudData(){
+		readingFromCloudData = true;
+		try{
+			if (!cloudService){
+				return;
+			}
+			dataToRestore = await cloudService.get(KV_STORE_BACKUP_KEY);
+		}finally{
+			readingFromCloudData = false;
+		}
+	}
+
 
 	function onRestoreData(){
 		try {
@@ -74,24 +94,26 @@
 </script>
 
 
-<h2>Backup & Restore</h2>
+<h2>Backup</h2>
 
 <section>
 	<article>
 		<textarea name="backup-text" bind:value={dataToBackup}></textarea>
 		<button onclick={onBackupDataLocal}>Local Backup</button>
-		<button onclick={onBackupDataCloud} disabled={!cloudService}>Cloud Backup</button>
+		<button
+			onclick={onBackupDataCloud}
+			disabled={!canWriteToCloudData}
+			aria-busy="{writingToCloudData}"
+		>Cloud Backup</button>
 	</article>
 </section>
 
+<h2>Restore</h2>
 <section>
 	<article>
 		<div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
-
-			<button style="flex-shrink: 1;" onclick={onReadFromCloudData} disabled={!cloudService}>Read From Cloud</button>
-			or
 			<input
-				style:flex="1"
+				style:flex-shrink="1"
 				style:margin-bottom="0"
 				bind:this={eInputRestoreFile}
 				name="restore-file"
@@ -100,10 +122,18 @@
 				bind:files={restoreFiles}
 				onchange="{onRestoreFileSelected}"
 			>
+			or
+			<button
+				style="flex-shrink: 0;"
+				onclick={onReadFromCloudData}
+				disabled={!canReadFromCloudData}
+				aria-busy="{readingFromCloudData}"
+			>Read From Cloud</button>
 		</div>
 		<textarea name="restore-text" bind:value={dataToRestore}></textarea>
 		<button onclick={onRestoreData}>Restore</button>
 	</article>
+
 </section>
 
 <style>
