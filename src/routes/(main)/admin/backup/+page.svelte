@@ -53,7 +53,7 @@
 			if (!cloudService){
 				return;
 			}
-
+			
 			// check cloud data timestamp
 			const cloudData = await cloudService.getData();
 			if ( cloudData ) {
