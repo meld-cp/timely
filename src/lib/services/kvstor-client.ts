@@ -1,25 +1,39 @@
 export class KvStorClient {
+	
+	private remoteUrl: URL;
+	private userAndAppPathSegments: string[];
+	
 	constructor(
-		public remote: string,
-		public userId: string,
-		public appId: string,
-	) {}
+		remote: string,
+		userId: string,
+		appId: string,
+	) {
+		const url = URL.parse(remote);
+		if (!url) {
+			throw new Error(`Invalid remote URL: ${remote}`);
+		}
+		this.userAndAppPathSegments = [userId,appId];
+		this.remoteUrl = url;
+	}
 
-	private buildItemUrl( bucketId: string, key: string ):URL {
-		return new URL(`${this.remote}/${this.userId}/${this.appId}/${bucketId}/${key}`);
+	private buildFullRemoteUrl( paths:string[] ):URL {
+		const url = new URL(this.remoteUrl);
+		url.pathname = paths.join("/");
+		return url;
 	}
 
 	private buildListUrl( bucketId: string ):URL {
-		return new URL(`${this.remote}/${this.userId}/${this.appId}/${bucketId}/`);
+		return this.buildFullRemoteUrl([...this.userAndAppPathSegments, bucketId]);
+	}
+
+	private buildItemUrl( bucketId: string, key: string ):URL {
+		return this.buildFullRemoteUrl([...this.userAndAppPathSegments, bucketId, key]);
 	}
 
 	public async getItemList( bucketId: string ):Promise<{ key:string, value:string }[]> {
 		const url = this.buildListUrl( bucketId);
-		//console.debug(url);
 		const res = await fetch(url);
 		const json = await res.json();
-		
-		
 		return json as { key:string, value:string }[];
 	}
 

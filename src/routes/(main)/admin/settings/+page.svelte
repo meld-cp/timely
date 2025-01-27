@@ -3,7 +3,7 @@
     import { FormatNumber } from "$lib/services/formatters/FormatNumber";
     import { appController } from "$lib/services/Singletons";
     import { Utils } from "$lib/services/Utils";
-
+    
 	const selectableLocales = [
 		{"code":"en-NZ", "name":"English (New Zealand)"},
 		{"code":"en-US", "name":"English (United States)"},
@@ -18,7 +18,7 @@
 
 	let eInputInvoiceLogoFile:HTMLInputElement;
 
-	let settings = appController.settingsController.read();
+	let settings = $state( appController.settingsController.read() );
 
 	let localeExamples = $derived( [
 		`Date: ${FormatDate.toLocalDate(new Date(), settings.localeCode )}`,
