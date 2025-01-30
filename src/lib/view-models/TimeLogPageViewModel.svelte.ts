@@ -18,21 +18,23 @@ export class TimeLogPageViewModel implements ITaskController {
 	start() {
 		this.stop();
 
-		this.refresh();
-		// catch up duration
-		for (const task of this.tasksRunning) {
-			//console.log("recalculateDurationFromRunningSession:before", task.getModel());
-			task.recalculateDurationFromRunningSession();
-			//console.log("recalculateDurationFromRunningSession:after", task.getModel());
-		}
+		this.refreshAndCatchUpRunningTaskDurations();
 
 		this.intervalId = setInterval(() => this.incrementRunningTaskDuration(), 1000);
-
 	}
 
 	stop() {
 		if (this.intervalId) {
 			clearInterval(this.intervalId);
+		}
+	}
+
+	public refreshAndCatchUpRunningTaskDurations(){
+		console.debug("refreshAndCatchUpRunningTaskDurations");
+		this.refresh();
+		// catch up duration
+		for (const task of this.tasksRunning) {
+			task.recalculateDurationFromRunningSession();
 		}
 	}
 

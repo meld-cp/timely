@@ -3,6 +3,7 @@
 	import TimeLogger from "$lib/views/TimeLogger.svelte";
 	import { onDestroy, onMount } from "svelte";
 	import { TimeLogPageViewModel } from "$lib/view-models/TimeLogPageViewModel.svelte";
+    import VisibilityDetector from "$lib/views/VisibilityDetector.svelte";
 		
 	let vm = $state(new TimeLogPageViewModel())
 
@@ -14,7 +15,16 @@
 		vm.stop()
 	})
 
+	function onPageVisibilityChanged(visible: boolean) {
+		console.debug("onPageVisibilityChanged", visible);
+		if (visible) {
+			vm.refreshAndCatchUpRunningTaskDurations();
+		}
+	}
+
 </script>
+
+<VisibilityDetector {onPageVisibilityChanged} />
 
 <h2>Time Log</h2>
 
