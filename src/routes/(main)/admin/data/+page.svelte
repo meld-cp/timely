@@ -11,7 +11,7 @@
 	let cloudTaskData:{ key:string, value:string }[] = $state( [] );
 	let cloudInvoiceData:{ key:string, value:string }[] = $state( [] );
 	
-	const settings = appController.settingsController.read();
+	const settings = appController.settings;
 
 	const kv = (
 		settings.cloudSyncHost
@@ -33,16 +33,6 @@
         
     }
 
-	async function onDeleteCloudData( bucketId:string, key:string ) {
-		if (!kv){
-			return;
-		}
-
-		await kv.delItem( bucketId, key );
-
-		onFetchCloudData();
-	}
-
 </script>
 
 {#snippet dataTableDetails(
@@ -58,7 +48,6 @@
 				<tr>
 					<th>Key</th>
 					<th>Value</th>
-					<th></th>
 				</tr>
 			</thead>
 		
@@ -67,12 +56,6 @@
 				<tr out:fade>
 					<td style="vertical-align: top;"><pre>{item.key}</pre></td>
 					<td style:overflow-wrap="anywhere"><code>{item.value}</code></td>
-					<td style="vertical-align: top;">
-						<Icon icon={faTrash} onClick={async () => {
-							await onDeleteCloudData( bucketId, item.key );
-							data.filter( i => i.key !== item.key );
-						}}/>
-					</td>
 				</tr>
 					{/each}
 			</tbody>

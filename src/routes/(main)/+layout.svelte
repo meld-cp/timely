@@ -52,14 +52,16 @@
 		}
 	}
 
-	//const backupSvr = new BackupService();
 </script>
 
 <nav class="container">
 	<ul>
 		<li>
 			<strong style="letter-spacing: 0.3rem;">
-				<a class="app-name-link" href="/">[Timely]</a>
+				<a class="app-name-link" href="/">[Timely]</a><br/>
+				{#if appController.settings.label}
+					<small><strong>{appController.settings.label}</strong></small>
+				{/if}
 			</strong> 
 		</li>
 	</ul>
