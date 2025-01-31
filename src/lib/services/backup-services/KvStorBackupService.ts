@@ -44,6 +44,9 @@ export class KvStorBackupService implements IBackupService {
 	}
 
 	async backup(data: ApplicationData): Promise<void> {
+		
+		//console.debug("KvStorBackupService.backup", data);
+
 		const kv = new KvStorClient(
 			this.host,
 			this.userId,
@@ -140,12 +143,16 @@ export class KvStorBackupService implements IBackupService {
 			0
 		);
 
+		if (lastModified == 0) {
+			return null;
+		}
+
 		// get settings
 		let settings:SettingsModel = await this.getStoredValueOrDefault<SettingsModel>(
 			kv,
 			KvStorBackupService.BUCKET_ID_SETTINGS,
 			KEY_SETTINGS_DEFAULT,
-			( new SettingsViewModel() ).getModel()
+			new SettingsViewModel().getModel()
 		);
 
 		// get tasks

@@ -25,7 +25,7 @@
 	
 	//TODO: move this to app controller
 	const localBackupSvr = new LocalBackupService();
-	let dataToBackup = $state( localBackupSvr.encode( appDataToBackup ) );
+	let dataToBackupAsText = $state( localBackupSvr.encode( appDataToBackup ) );
 	
 	let restoreFiles:FileList | undefined = $state();
 	let dataAsTextToRestore:string | undefined = $state();
@@ -34,7 +34,7 @@
 
 	// local backup
 	function onBackupDataLocal(){
-		localBackupSvr.downloadAsFile( dataToBackup );
+		localBackupSvr.downloadAsFile( dataToBackupAsText );
 	}
 
 	async function onRestoreFileSelected(){
@@ -55,22 +55,29 @@
 			if (!cloudService){
 				return;
 			}
+
+			const dataToBackup = localBackupSvr.decodeFromJson( dataToBackupAsText );
+			if (!dataToBackup){
+				alert( "Data to backup is invalid" );
+				return;
+			}
 			
 			// check cloud data timestamp
 			const cloudData = await cloudService.getData();
 			if ( cloudData ) {
-				if ( cloudData.modified == appDataToBackup.modified ) {
+				if ( cloudData.modified == dataToBackup.modified ) {
 					alert( "Cloud data is same as app data, skipping backup" );
 					return;
 				}
-				if ( cloudData.modified > appDataToBackup.modified ) {
+				if ( cloudData.modified > dataToBackup.modified ) {
 					alert( "Cloud data is newer than app data, skipping backup" );
 					return;
 				}
 			}
 
 			// send to cloud
-			await cloudService.backup( appDataToBackup);
+			await cloudService.backup( dataToBackup );
+			
 		}finally{
 			writingToCloudData = false;
 		}
@@ -117,7 +124,7 @@
 			if ( eInputRestoreFile ) eInputRestoreFile.value = '';
 			
 			// refresh data to backup
-			dataToBackup = localBackupSvr.encode( dataToRestore )
+			dataToBackupAsText = localBackupSvr.encode( dataToRestore )
 
 			alert('Restored successfully!');
 
@@ -133,7 +140,7 @@
 
 <section>
 	<article>
-		<textarea name="backup-text" bind:value={dataToBackup}></textarea>
+		<textarea name="backup-text" bind:value={dataToBackupAsText}></textarea>
 		<button onclick={onBackupDataLocal}>Local Backup</button>
 		<button
 			onclick={onBackupDataCloud}
