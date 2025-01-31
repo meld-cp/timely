@@ -135,7 +135,8 @@ export class ApplicationController {
 		this.setChangedTimestamp( data.modified );
 
 		// restore settings
-		this.settingsController.write( new SettingsViewModel( data.settings ) );
+		this.settings = new SettingsViewModel( data.settings );
+		this.saveSettings();
 
 		// restore tasks
 		for (const task of data.tasks) {

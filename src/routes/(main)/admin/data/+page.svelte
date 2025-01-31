@@ -3,8 +3,6 @@
     import { KvStorBackupService } from "$lib/services/backup-services/KvStorBackupService";
     import { KvStorClient } from "$lib/services/kvstor-client";
     import { appController } from "$lib/services/Singletons";
-    import Icon from "$lib/views/Icon.svelte";
-    import { faTrash } from "@fortawesome/free-solid-svg-icons";
     import { fade } from "svelte/transition";
 
 	let cloudSettingsData:{ key:string, value:string }[] = $state( [] );
@@ -36,7 +34,6 @@
 </script>
 
 {#snippet dataTableDetails(
-	bucketId:string,
 	header:string,
 	data:{ key:string, value:string }[]
 )}
@@ -70,9 +67,9 @@
 	<section>
 		<button onclick="{onFetchCloudData}">Fetch Cloud Data</button>
 	</section>
-	{@render dataTableDetails( KvStorBackupService.BUCKET_ID_SETTINGS, 'Settings Data', cloudSettingsData )}
-	{@render dataTableDetails( KvStorBackupService.BUCKET_ID_TASKS, 'Task Data', cloudTaskData )}
-	{@render dataTableDetails(KvStorBackupService.BUCKET_ID_INVOICES, 'Invoice Data', cloudInvoiceData )}
+	{@render dataTableDetails( 'Settings Data', cloudSettingsData )}
+	{@render dataTableDetails( 'Task Data', cloudTaskData )}
+	{@render dataTableDetails( 'Invoice Data', cloudInvoiceData )}
 </section>
 
 
