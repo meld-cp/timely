@@ -3,10 +3,11 @@ import { FormatDate } from "$lib/services/formatters/FormatDate";
 import { TaskViewModel } from "./TaskViewModel.svelte";
 import type { ITaskController } from "$lib/ITaskController";
 import { appController } from "$lib/services/Singletons";
+import { Utils } from "$lib/services/Utils";
 
 export class TimeLogPageViewModel implements ITaskController {
 
-	public previouslyUsedTasks:TaskViewModel[] = $state([]);
+	public previouslyUsedTasks:string[] = $state([]);
 
 	public tasksRunning: TaskViewModel[] = $state([]);
 	public tasksPaused: TaskViewModel[] = $state([]);
@@ -41,14 +42,21 @@ export class TimeLogPageViewModel implements ITaskController {
 	private refresh() {
 		const allTasks = appController.taskRepo.getAll().map(t => new TaskViewModel(t));
 
-		// sort by date and take top 20
-		this.previouslyUsedTasks = allTasks.sort( (a, b) => a.date > b.date ? -1 : 1 ).slice(0, 20);
+		// sort by date and take unique top 20
+		this.previouslyUsedTasks = this.buildPreviouslyUsedTasks(allTasks, 20);
 
 		// split by state
 		this.tasksRunning = this.fetchTasksByState(allTasks, [TaskState.Running]);
 		this.tasksPaused = this.fetchTasksByState(allTasks, [TaskState.Paused]);
 		this.tasksStopped = this.fetchTasksByState(allTasks, [TaskState.Stopped]);
 		this.tasksArchived = this.fetchTasksByState(allTasks, [TaskState.Archived]);
+	}
+
+	private buildPreviouslyUsedTasks( tasks: TaskViewModel[], limit:number = 20 ): string[] {
+		const sortedTasks = Utils.sortByProperties(tasks, ["date:desc", "name:asc"]).slice(0, limit);
+		const names = sortedTasks.map(t => t.name);
+		const uniqueNames = [...new Set(names)];
+		return uniqueNames;
 	}
 
 	private fetchTasksByState(tasks: TaskViewModel[], states: TaskState[]): TaskViewModel[] {

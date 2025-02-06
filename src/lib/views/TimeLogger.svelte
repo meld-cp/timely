@@ -1,13 +1,11 @@
 <script lang="ts">
-    import type { TaskViewModel } from "$lib/view-models/ViewModels.svelte";
-
-
+    
 	let{
 		onStartTask,
 		previousTasksList,
 	}:{
 		onStartTask:( name:string ) => void,
-		previousTasksList?:TaskViewModel[]
+		previousTasksList?:string[]
 	} = $props()
 
 	let taskName = $state("");
@@ -35,7 +33,7 @@
 		{#if previousTasksList}
 		<datalist id="list-task-names" >
 			{#each previousTasksList as task}
-			<option value="{task.name}"></option>
+			<option value="{task}"></option>
 			{/each}
 		</datalist>
 		{/if}
