@@ -7,5 +7,6 @@ export interface ITaskController{
 	duplicateAndStartTask( task: TaskViewModel ):void,
 	increaseDuration( task: TaskViewModel, mins:number ):void,
 	deleteTask( task: TaskViewModel ):void
+	archiveTask( task: TaskViewModel ):void
 	saveTask( task: TaskViewModel ):void
 }

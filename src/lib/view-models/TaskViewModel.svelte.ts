@@ -75,6 +75,11 @@ export class TaskViewModel {
 		this.timeRunStarted = undefined;
 	}
 
+	public archive(){
+		this.state = TaskState.Archived;
+		this.timeRunStarted = undefined;
+	}
+
 	public incrementDuration(incrementMinutes: number) {
 		if (this.state == TaskState.Running) {
 			// inc session start time

@@ -126,4 +126,9 @@ export class TimeLogPageViewModel implements ITaskController {
 		this.refresh();
 	}
 
+	public archiveTask(task: TaskViewModel) {
+		task.archive();
+		this.saveTask(task);
+		this.refresh();
+	}
 }
