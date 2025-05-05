@@ -4,18 +4,18 @@
 	import { onMount } from 'svelte';
 	import { InvoiceViewModel } from '$lib/view-models/ViewModels.svelte';
 	import { invRepo, settingsController } from '$lib/services/Singletons';
-	
-	let logoSrc :string|undefined = $state();
+    	
+	const settings = settingsController.read();
+
+	let logoSrc :string|undefined = $state(settings.logoData);
 	
 	let inv: InvoiceViewModel | null = $state( null );
 	
 	onMount(()=>{
-		let settings = settingsController.read();
 		const m = invRepo.get(page.params.id);
 		if (m){
 			inv = new InvoiceViewModel(m);
 		}
-		logoSrc = settings.logoData;
 	})
 
 </script>
@@ -25,24 +25,21 @@
 
 	<section id="c-header" class="row">
 		<div id="c-logo">
-			<!-- logo -->
 			<img src="{logoSrc}" alt="" />
 		</div>
 
 		<div id="c-address">
-			<!-- address -->
-			Cleon Pinto<br/>
-			88 Oak St<br/>
-			Gisborne, 4010<br/>
-			New Zealand<br/>
-			p: +64 27 6000 841<br/>
-			e: capinto@gmail.com
+			{#each (settings.address ?? "")?.split("\n") as line }
+				{line}<br/>
+			{/each}
 		</div>
 
 		<section id="c-title" class="col">
 			<!-- title and tax no -->
 			<header>Tax Invoice</header>
-			<div>IRD No: XXXXXXXXXX</div>
+			{#each (settings.invoiceHeader ?? "")?.split("\n") as line }
+				<div>{line}</div>
+			{/each}
 		</section>
 	</section>
 
@@ -97,22 +94,22 @@
 					<td class="tar">{line.quantity}</td>
 					<td class="tac">{line.units}</td>
 					<td class="tar">{line.unitCost}</td>
-					<td class="tar">{FormatNumber.currency( line.total, "NZD" )}</td>
+					<td class="tar">{FormatNumber.currency( line.total, inv.currencyCode, settings.localeCode )}</td>
 				</tr>
 				{/each}
 			</tbody>
 			<tfoot>
 				<tr>
 					<th class="tar" colspan="4">Subtotal</th>
-					<th class="tar">{inv.subtotal.toFixed(2)}</th>
+					<th class="tar">{FormatNumber.currency( inv.subtotal, inv.currencyCode, settings.localeCode )}</th>
 				</tr>
 				<tr>
 					<th class="tar" colspan="4">GST</th>
-					<th class="tar">{inv.taxTotal.toFixed(2)}</th>
+					<th class="tar">{FormatNumber.currency( inv.taxTotal, inv.currencyCode, settings.localeCode )}</th>
 				</tr>
 				<tr>
 					<th class="tar" colspan="4">Grand Total</th>
-					<th class="tar">{inv.grandTotal.toFixed(2)}</th>
+					<th class="tar">{FormatNumber.currency( inv.grandTotal, inv.currencyCode, settings.localeCode )}</th>
 				</tr>
 			</tfoot>
 		</table>

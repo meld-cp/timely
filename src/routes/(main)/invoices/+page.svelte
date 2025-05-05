@@ -5,6 +5,7 @@
 	import { onMount } from "svelte";
 	import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/view-models/ViewModels.svelte";
 	import { invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
+    import { FormatDate } from "$lib/services/formatters/FormatDate";
     
 	let wiNextLineNumber = $state(1);
 	let workingInvoice = $state( new InvoiceViewModel() );
@@ -142,7 +143,7 @@
 									}
 								} 
 							}/>
-							{task.date} ({task.affectiveDurationHours.toFixed(2)} hrs) - {task.name}
+							{FormatDate.toLocalDatefromString( task.date, "en-NZ" )} ({task.affectiveDurationHours.toFixed(2)} hrs) - {task.name}
 						</label>
 					</div>
 					{/each}
@@ -154,7 +155,7 @@
 
 			<article class="scratch-pad">
 				<header>Scratch Pad</header>
-				<textarea bind:value={scratchPad} oninput={(ev) => saveScratchPad() }></textarea>
+				<textarea name="scratch-pad" bind:value={scratchPad} oninput={(ev) => saveScratchPad() }></textarea>
 			</article>
 
 		</div>
