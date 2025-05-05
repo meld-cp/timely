@@ -1,5 +1,4 @@
-import { getContext, setContext } from "svelte";
-import type { ITaskRepo } from "./TaskRepo.svelte";
+import { taskRepo, type ITaskRepo } from "./TaskRepo.svelte";
 import { TaskState, type TTask } from "./Types.svelte";
 
 export class TaskController{
@@ -224,12 +223,4 @@ export class TaskController{
 
 }
 
-const taskControllerKey = Symbol("taskcontroller");
-
-export function getTaskControllerContext() : TaskController{
-    return getContext(taskControllerKey) as TaskController;
-}
-
-export function setTaskControllerContext( taskController:TaskController ) : TaskController{
-    return setContext( taskControllerKey, taskController );
-}
+export const taskController = new TaskController( taskRepo );
