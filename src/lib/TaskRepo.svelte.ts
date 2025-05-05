@@ -1,4 +1,4 @@
-import { TaskState, type TTask } from "./Types.svelte";
+import { TaskState, type TTask } from "./Types";
 import { DateHelper } from "./utils";
 
 export interface ITaskRepo{

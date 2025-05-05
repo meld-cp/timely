@@ -1,5 +1,5 @@
 import { taskRepo, type ITaskRepo } from "./TaskRepo.svelte";
-import { TaskState, type TTask } from "./Types.svelte";
+import { TaskState, type TTask } from "./Types";
 
 export class TaskController{
     repo: ITaskRepo;

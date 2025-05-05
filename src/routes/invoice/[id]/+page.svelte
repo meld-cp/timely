@@ -2,12 +2,12 @@
     import { page } from '$app/state';
     import { invoiceController } from '$lib/InvoiceController.svelte';
     import { settingsController } from '$lib/SettingsController.svelte';
-    import type { InvoiceModel } from '$lib/Types.svelte';
+    import type { InvoiceModel } from '$lib/Types';
     import { onMount } from 'svelte';
     
     let logoSrc :string|undefined = $state();
     
-    let inv: InvoiceModel | undefined = $state();
+    let inv: InvoiceModel | null = $state( null );
     
     onMount(()=>{
         let settings = settingsController.read();
@@ -94,22 +94,22 @@
                     <td class="tar">{line.quantity}</td>
                     <td class="tac">{line.units}</td>
                     <td class="tar">{line.unitCost}</td>
-                    <td class="tar">{line.getTotal().toFixed(2)}</td>
+                    <td class="tar">{invoiceController.getLineTotal(line).toFixed(2)}</td>
                 </tr>
                 {/each}
             </tbody>
             <tfoot>
                 <tr>
                     <th class="tar" colspan="4">Subtotal</th>
-                    <th class="tar">{inv.getSubtotal().toFixed(2)}</th>
+                    <th class="tar">{invoiceController.getSubtotal( inv.lines ).toFixed(2)}</th>
                 </tr>
                 <tr>
                     <th class="tar" colspan="4">GST</th>
-                    <th class="tar">{inv.getTaxTotal().toFixed(2)}</th>
+                    <th class="tar">{invoiceController.getTaxTotal(inv.lines).toFixed(2)}</th>
                 </tr>
                 <tr>
                     <th class="tar" colspan="4">Grand Total</th>
-                    <th class="tar">{inv.getGrandTotal().toFixed(2)}</th>
+                    <th class="tar">{invoiceController.getGrandTotal(inv.lines).toFixed(2)}</th>
                 </tr>
             </tfoot>
         </table>

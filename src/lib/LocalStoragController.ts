@@ -1,4 +1,4 @@
-export class LocalStorageController{
+export class LocalStorageController<T>{
 
     private bucket:string;
 
@@ -6,11 +6,11 @@ export class LocalStorageController{
         this.bucket = bucket;
     }
 
-    private encode<T>( value:T) : string {
+    private encode( value:T) : string {
         return JSON.stringify(value);
     }
 
-    private dencode<T>( data:string ) : T | null {
+    private dencode( data:string ) : T | null {
         return JSON.parse(data) as T;
     }
 
@@ -18,19 +18,19 @@ export class LocalStorageController{
         return [this.bucket,id].join("$");
     }
 
-    set<T>( id:string, value: T){
+    set( id:string, value: T){
         const key = this.buildKey(id);
         const data = this.encode(value);
         localStorage.setItem( key, data );
     }
 
-    get<T>(id:string ):T | null{
+    get(id:string ):T | null{
         const key = this.buildKey(id);
         const data = localStorage.getItem( key );
         if (data === null){
             return null;
         }
-        return this.dencode<T>(data)
+        return this.dencode(data)
     }
 
     remove(id:string){

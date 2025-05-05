@@ -1,15 +1,34 @@
 <script lang="ts">
     import { invoiceController } from "$lib/InvoiceController.svelte";
+    import { settingsController } from "$lib/SettingsController.svelte";
     import { taskController } from "$lib/TaskController.svelte";
-    import { InvoiceLineModel, type TTask, TaskState } from "$lib/Types.svelte";
-    
+    import { InvoiceLineModel, InvoiceModel, type TTask, TaskState } from "$lib/Types";
+    import { DateHelper } from "$lib/utils";
+    import { onMount } from "svelte";
 
-    let workingInvoice = $state( invoiceController.workingInvoice );
+    let wiNumber: string = $state("");
+    let wiDate: string = $state( DateHelper.toInputDateValue( new Date() ));
+
+    let wiIssueTo:string = $state("");
+
+    let wiNextLineNumber = $state(1);
+    let wiLines: InvoiceLineModel[] = $state([]);
+    let wiFootnote:string = $state("");
+
+
+    let uninvoicedTasks:TTask[] = $state([]);
+
+    onMount(()=>{
+        const settings = settingsController.read();
+        wiNumber = `${settings.nextInvoiceNumber}`;
+        wiFootnote = settings.defaultInvoiceFooter ?? "";
+        uninvoicedTasks = taskController.fetchTasksByState([ TaskState.Stopped ]);
+    })
 
     function buildTimeLogInvoiceLine( timeLog: TTask ): InvoiceLineModel {
         const newLine =  new InvoiceLineModel()
-        //newLine.number = this.lineCounter;
-        newLine.id = timeLog.id;
+        newLine.number = wiNextLineNumber++;
+        newLine.extRefId = timeLog.id;
         newLine.description = `${timeLog.date} - ${timeLog.name}`;
         newLine.units = "hr";
         newLine.quantity = timeLog.affectiveDurationHours;
@@ -18,7 +37,12 @@
     }
 
     function addBlankLineToWorkingInvoice(){
-        workingInvoice.addLine( new InvoiceLineModel() )
+        const line = new InvoiceLineModel();
+        line.number = wiNextLineNumber;
+
+        wiNextLineNumber++;
+
+        wiLines.push( line );
     }
 
     function sortWorkingInvoiceLines(){
@@ -26,24 +50,41 @@
     }
     
     function saveWorkingInvoice(){
-        const newInv = invoiceController.commitWorkingInvoice();
-        workingInvoice = invoiceController.workingInvoice;
-        window.open( `/invoice/${newInv.id}`, )
+        const inv = new InvoiceModel();
+        inv.number = wiNumber;
+        inv.date = wiDate;
+        inv.issueToLines = wiIssueTo.split("\n");
+        inv.lines = wiLines;
+        inv.footerLines = wiFootnote.split("\n");
+
+        invoiceController.save(inv);
+
+        //workingInvoice = invoiceController.workingInvoice;
+        window.open( `/invoice/${inv.id}`, )
     }
 
     function allUninvoicedTimeHasBeenAddedToWorkingInvoice() : boolean{
         // todo: check each ref id
-        return workingInvoice.lines.length == taskController.fetchTasksByState([ TaskState.Stopped ]).length;
+        for (const task of uninvoicedTasks) {
+            if (!invoiceController.containsExtRefId( wiLines, task.id )){
+                return false;
+            }
+        }
+        return true;
     }
 
     function selectAllUninvoicedTime( select: boolean ){
         for (const task of taskController.fetchTasksByState([ TaskState.Stopped ])) {
             if (select){
-                workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
+                wiLines.push( buildTimeLogInvoiceLine(task ) );
             }else{
-                workingInvoice.removeLineWithId(task.id);
+                removeInvoiceLineWitnExtRefId( task.id );
             }
         }
+    }
+
+    function removeInvoiceLineWitnExtRefId( extRefId:string ){
+        wiLines = wiLines.filter( l=>l.extRefId != extRefId );
     }
 
 </script>
@@ -56,9 +97,14 @@
         <article id="working-invoice-container" >
             <header>Working Invoice</header>
             <fieldset class="grid">
-                <input type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{workingInvoice.number}"/>
-                <input type="date" title="Invoice Date" bind:value="{workingInvoice.date}"/>
+                <input type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{wiNumber}"/>
+                <input type="date" title="Invoice Date" bind:value="{wiDate}"/>
             </fieldset>
+            <label>
+                Issue to
+                <textarea bind:value={wiIssueTo}></textarea>
+            </label>
+
 
             <nav>
                 <ul>
@@ -83,14 +129,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#each workingInvoice.lines as line}
+                    {#each wiLines as line}
                     <tr>
                         <td><input type="number" bind:value={line.number}/></td>
                         <td><input type="text" bind:value={line.description}/></td>
                         <td><input type="number" step="0.25" bind:value={line.quantity}/></td>
                         <td><input type="text" bind:value={line.units}/></td>
                         <td><input type="number" bind:value={line.unitCost}/></td>
-                        <td>{line.getTotal()}</td>
+                        <td>{invoiceController.getLineTotal( line )}</td>
                     </tr>
                     {/each}
                 </tbody>
@@ -100,19 +146,24 @@
                             
                         </th>
                         <th colspan="2" style="text-align: right;">Subtotal:</th>
-                        <th>{workingInvoice.getSubtotal()}</th>
+                        <th>{invoiceController.getSubtotal( wiLines )}</th>
                     </tr>
                     <tr>
                         <th colspan="2" style="text-align: right;">GST:</th>
-                        <th>{workingInvoice.getTaxTotal()}</th>
+                        <th>{invoiceController.getTaxTotal(wiLines)}</th>
                     </tr>
                     <tr>
                         <th colspan="2" style="text-align: right;">Grand Total:</th>
-                        <th>{workingInvoice.getGrandTotal()}</th>
+                        <th>{invoiceController.getGrandTotal(wiLines)}</th>
                     </tr>
                 </tfoot>
             </table>
             
+            <label>
+                Footnote
+                <textarea bind:value={wiFootnote}></textarea>
+            </label>
+
             <footer>
                 <button onclick="{saveWorkingInvoice}">Save</button>
             </footer>
@@ -130,16 +181,16 @@
                 Select All
             </label>
             <hr/>
-            {#each taskController.fetchTasksByState([ TaskState.Stopped ]) as task }
+            {#each uninvoicedTasks as task }
             <div>
                 <label>
                     <input id="{task.id}" type="checkbox" bind:checked={
-                        () => workingInvoice.containsLineWithId(task.id),
+                        () => invoiceController.containsExtRefId( wiLines, task.id ),
                         (checked) =>{
                             if (checked){
-                                workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
+                                wiLines.push( buildTimeLogInvoiceLine(task ) );
                             }else{
-                                workingInvoice.removeLineWithId(task.id);
+                                removeInvoiceLineWitnExtRefId( task.id );
                             }
                         } 
                     }/>

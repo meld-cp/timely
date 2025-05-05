@@ -1,30 +1,30 @@
 import { LocalStorageController } from "./LocalStoragController";
 import { settingsController } from "./SettingsController.svelte";
-import { InvoiceLineModel, InvoiceModel } from "./Types.svelte";
+import { InvoiceLineModel, InvoiceModel } from "./Types";
 
 class InvoiceController{
+
     
-    private repo = new LocalStorageController("invoices");
+    private repo = new LocalStorageController<InvoiceModel>("invoices");
 
-    workingInvoice = this.build();
+    //workingInvoice = this.build();
 
-    commitWorkingInvoice(): InvoiceModel {
-        //TODO: save working invoice, update next invoice number
+    // commitWorkingInvoice( inv: InvoiceModel ) {
+    //     //TODO: save working invoice, update next invoice number
 
-        const settings = settingsController.read();
-        var newInv = this.workingInvoice;
+    //     const settings = settingsController.read();
 
-        newInv.number = `${settings.nextInvoiceNumber}`
+    //     //newInv.number = `${settings.nextInvoiceNumber}`
 
-        this.save(newInv);
+    //     this.save(inv);
 
-        settings.nextInvoiceNumber++
-        settingsController.write(settings);
+    //     settings.nextInvoiceNumber++
+    //     settingsController.write(settings);
 
-        this.workingInvoice = this.build();
+    //     //this.workingInvoice = this.build();
 
-        return newInv;
-    }
+    //     //return newInv;
+    // }
 
     build():InvoiceModel{
         
@@ -42,24 +42,45 @@ class InvoiceController{
         this.repo.set(inv.id, inv);
     }
 
-    fetch(id: string): InvoiceModel | undefined {
+    fetch(id: string): InvoiceModel | null {
+        const inv = this.repo.get( id );
         
-        const inv = this.build()
-        inv.issueToLines = [
-            "Cedenco Foods NZ Ltd.",
-            "40 Innes Street",
-            "Gisborne 4040",
-            "New Zealand",
-        ];
-        for (let i = 0; i < 20; i++) {
-            const line = new InvoiceLineModel();
-            line.description = `Line ${i+1} description`
-            line.quantity = Math.ceil( Math.random() * 10 )
-            line.units = "pc"
-            line.unitCost = 123.45
-            inv.addLine(line)
+        if (!inv){
+            return null;
         }
+
+        // for (let i = 0; i < 20; i++) {
+        //     const line = new InvoiceLineModel();
+        //     line.description = `Line ${i+1} description`
+        //     line.quantity = Math.ceil( Math.random() * 10 )
+        //     line.units = "pc"
+        //     line.unitCost = 123.45
+        //     inv.addLine(line)
+        // }
         return inv;
+    }
+
+    public containsExtRefId(lines: InvoiceLineModel[], extRefId: string): boolean {
+        return lines.some( l=>l.extRefId == extRefId);
+    }
+
+    public getLineTotal( line:InvoiceLineModel):number {
+        return line.quantity * line.unitCost;
+    }
+    
+    public getLineTax(line:InvoiceLineModel):number {
+        return 0;
+    }
+    public getSubtotal( lines: InvoiceLineModel[] ):number {
+        return lines.reduce( (p,line) => p + this.getLineTotal(line), 0 );
+    }
+    
+    public getTaxTotal( lines: InvoiceLineModel[]):number {
+        return lines.reduce( (p,line) => p + this.getLineTax(line), 0 );
+    }
+
+    public getGrandTotal( lines: InvoiceLineModel[]):number {
+        return this.getSubtotal(lines) + this.getTaxTotal(lines);
     }
 
 }
