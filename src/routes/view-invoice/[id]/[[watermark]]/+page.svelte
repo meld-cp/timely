@@ -6,7 +6,7 @@
 	import { InvoiceViewModel } from "$lib/view-models/InvoiceViewModel.svelte";
     import { appController } from '$lib/services/Singletons';
 	        	
-	const settings = appController.settingsController.read();
+	const settings = appController.settings;
 
 	let logoSrc :string|undefined = settings.logoData;
 	

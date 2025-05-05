@@ -3,16 +3,19 @@ export interface ScratchPadsDictionary{
 };
 
 export type SettingsModel = {
+	label?:string;
 	localeCode?:string;
 	address?:string;
 	logoData?: string;
+	
+	scratchPads?:ScratchPadsDictionary;
+
 	nextInvoiceNumber?: number;
 	defaultInvoiceHeader?:string;
 	defaultInvoiceCurrencyCode?: string;
 	defaultInvoiceFooter?: string;
-	scratchPads?:ScratchPadsDictionary;
 	
 	cloudSyncHost?:string;
 	cloudSyncUserId?:string;
-	//cloudSyncTimestamp?:number;
+	
 };

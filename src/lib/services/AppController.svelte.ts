@@ -15,9 +15,11 @@ export class ApplicationController {
 	private settingsRepo: LocalStorageController<SettingsModel>;
 	public taskRepo:LocalStorageController<TaskModel>;
 	public invRepo:LocalStorageController<InvoiceModel>;
-	public settingsController:SettingsController;
+	private settingsController:SettingsController;
 	
 	public dataModifiedTimestamp:number = $state(0);
+	public settings:SettingsViewModel = $state( new SettingsViewModel() );
+
 
 	constructor(){
 		const localStorageOptions = {
@@ -28,8 +30,28 @@ export class ApplicationController {
 		this.invRepo = new LocalStorageController<InvoiceModel>(APP_LOCALSTORE_INVOICES_NAME, localStorageOptions);
 		this.settingsController = new SettingsController( this.settingsRepo);
 
+		this.settings = this.settingsController.read();
+
 		this.dataModifiedTimestamp = this.readDataModifiedTimestamp() ?? 0;
 	}
+	
+	public saveSettings(){
+		this.settingsController.write(this.settings);
+	}
+	
+	public getScratchPad(name: string): string {
+		return this.settings.scratchPads[name] ?? "";
+    }
+
+	public setScratchPad(name: string, text:string){
+		this.settings.scratchPads[name] = text;
+		this.saveSettings();
+	}
+
+	public incrementNextInvoiceNumber() {
+		this.settings.nextInvoiceNumber++;
+		this.saveSettings();
+    }
 
 	public async getTasks():Promise<TaskViewModel[]>{
 		return this.taskRepo.getAll().map(t => new TaskViewModel(t));

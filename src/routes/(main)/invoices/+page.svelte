@@ -19,7 +19,7 @@
 	let closedInvoices:InvoiceViewModel[] = $state([]);
 	
 	onMount(()=>{
-		scratchPad = appController.settingsController.getScratchPad("page-invoice-builder");
+		scratchPad = appController.getScratchPad("page-invoice-builder");
 		
 		uninvoicedTasks = fetchUninvoicedTasks();
 		closedInvoices = fetchInvoices();
@@ -63,7 +63,7 @@
     }
 
 	function buildNewDraftInvoice() : InvoiceViewModel{
-		const settings = appController.settingsController.read();
+		const settings = appController.settings;
 
 		const result = new InvoiceViewModel();
 		result.id = draftInvoiceId;
@@ -78,7 +78,7 @@
 	}
 
 	function saveScratchPad(){
-		appController.settingsController.setScratchPad("page-invoice-builder", scratchPad);
+		appController.setScratchPad("page-invoice-builder", scratchPad);
 	}
 
 	function fetchUninvoicedTasks(): TaskViewModel[]{
@@ -129,7 +129,7 @@
 			appController.taskRepo.set( task.id, task.getModel() );
 		}
 
-		appController.settingsController.incrementNextInvoiceNumber();
+		appController.incrementNextInvoiceNumber();
 		closedInvoices = fetchInvoices();
 		
 		uninvoicedTasks = fetchUninvoicedTasks();

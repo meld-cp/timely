@@ -6,7 +6,7 @@
     import { appController } from "$lib/services/Singletons";
 	
 	let appDataToBackup = $state( appController.getAppData() );
-	const settings = appController.settingsController.read();
+	const settings = appController.settings;
 
 	//TODO: move this to app controller
 	let cloudService = $state( KvStorBackupService.build(

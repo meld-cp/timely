@@ -18,7 +18,7 @@
 
 	let eInputInvoiceLogoFile:HTMLInputElement;
 
-	let settings = $state( appController.settingsController.read() );
+	let settings = appController.settings;
 
 	let localeExamples = $derived( [
 		`Date: ${FormatDate.toLocalDate(new Date(), settings.localeCode )}`,
@@ -28,18 +28,16 @@
 	let currencyExample = $derived( FormatNumber.currency( 123456.789, settings.defaultInvoiceCurrencyCode, settings.localeCode ) );
 
 	function onSettingsChanged(){
-		saveSettings();
+		appController.saveSettings();
 	}
 
-	function saveSettings(){
-		appController.settingsController.write(settings);
-	}
+
 
 	async function onInvoiceLogoFileSelected(){
 		if ( eInputInvoiceLogoFile && eInputInvoiceLogoFile.files && eInputInvoiceLogoFile.files.length > 0 ){
 			const dataurl = await Utils.convertFileToDataURL( eInputInvoiceLogoFile.files[0] );
 			settings.logoData = dataurl;
-			saveSettings();
+			appController.saveSettings();
 		}
 	}
 
@@ -52,6 +50,14 @@
 	<article>
 		<details open>
 			<summary>General Settings</summary>
+			<label>
+				Label
+				<input
+					name="label"
+					type="text"
+					bind:value={settings.label} oninput="{onSettingsChanged}"
+				/>
+			</label>
 			<label>
 				Locale
 				<select name="locale" bind:value={settings.localeCode}  onchange="{onSettingsChanged}">
