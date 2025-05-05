@@ -2,17 +2,20 @@
     import { page } from '$app/state';
     import { invoiceController } from '$lib/InvoiceController.svelte';
     import { settingsController } from '$lib/SettingsController.svelte';
-    import type { InvoiceModel } from '$lib/Models';
     import { NumberFormat } from '$lib/utils';
     import { onMount } from 'svelte';
+    import { InvoiceViewModel } from '$lib/ViewModels.svelte';
     
     let logoSrc :string|undefined = $state();
     
-    let inv: InvoiceModel | null = $state( null );
+    let inv: InvoiceViewModel | null = $state( null );
     
     onMount(()=>{
         let settings = settingsController.read();
-        inv = invoiceController.fetch(page.params.id);
+        const m = invoiceController.fetch(page.params.id);
+        if (m){
+            inv = new InvoiceViewModel(m);
+        }
         logoSrc = settings.logoData;
     })
 
@@ -95,22 +98,22 @@
                     <td class="tar">{line.quantity}</td>
                     <td class="tac">{line.units}</td>
                     <td class="tar">{line.unitCost}</td>
-                    <td class="tar">{NumberFormat.currency( invoiceController.getLineTotal(line), "NZD" )}</td>
+                    <td class="tar">{NumberFormat.currency( line.total, "NZD" )}</td>
                 </tr>
                 {/each}
             </tbody>
             <tfoot>
                 <tr>
                     <th class="tar" colspan="4">Subtotal</th>
-                    <th class="tar">{invoiceController.getSubtotal( inv.lines ).toFixed(2)}</th>
+                    <th class="tar">{inv.subtotal.toFixed(2)}</th>
                 </tr>
                 <tr>
                     <th class="tar" colspan="4">GST</th>
-                    <th class="tar">{invoiceController.getTaxTotal(inv.lines).toFixed(2)}</th>
+                    <th class="tar">{inv.taxTotal.toFixed(2)}</th>
                 </tr>
                 <tr>
                     <th class="tar" colspan="4">Grand Total</th>
-                    <th class="tar">{invoiceController.getGrandTotal(inv.lines).toFixed(2)}</th>
+                    <th class="tar">{inv.grandTotal.toFixed(2)}</th>
                 </tr>
             </tfoot>
         </table>

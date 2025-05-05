@@ -1,62 +1,48 @@
 <script lang="ts">
-    import type { InvoiceLineViewModel } from "$lib/ViewModels.svelte";
-    import { invoiceController } from "../InvoiceController.svelte";
-    import { InvoiceModel } from "../Models";
+    import type { InvoiceViewModel } from "$lib/ViewModels.svelte";
     import InvoiceEditorLineView from "./InvoiceEditorLineView.svelte";
 
 
     let {
-        invoiceNumber,
-        invoiceDate,
-        issueTo,
-        lines = $bindable(),
-        footnote,
-        onAddBlankLine,
-        onSortLines,
-        onSaveInvoice,
+        vm = $bindable(),
+        onSaveInvoice
     }:{
-        invoiceNumber:string,
-        invoiceDate:string,
-        issueTo:string,
-        lines:InvoiceLineViewModel[]
-        footnote:string,
-        onAddBlankLine: () => void
-        onSortLines: () => void
-        onSaveInvoice: (inv:InvoiceModel) => void
+        vm:InvoiceViewModel,
+        onSaveInvoice:(vm:InvoiceViewModel)=>void
     } = $props();
 
 
 
-    function buildInvoice():InvoiceModel{
-        const inv = new InvoiceModel();
-        inv.number = invoiceNumber;
-        inv.date = invoiceDate;
-        inv.issueToLines = issueTo.split("\n");
-        inv.lines = lines.map( vm=>vm.model );
-        inv.footerLines = footnote.split("\n");
-        return inv;
-    }
+    // function buildInvoice():InvoiceModel{
+    //     const inv = new InvoiceModel();
+    //     inv.number = invoiceNumber;
+    //     inv.date = invoiceDate;
+    //     inv.issueToLines = issueTo.split("\n");
+    //     inv.lines = lines.map( vm=>vm.model );
+    //     inv.footerLines = footnote.split("\n");
+    //     return inv;
+    // }
 </script>
 
 <article id="working-invoice-container" >
     <header>Working Invoice</header>
     <fieldset class="grid">
-        <input type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{invoiceNumber}"/>
-        <input type="date" title="Invoice Date" bind:value="{invoiceDate}"/>
+        <input type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{vm.number}"/>
+        <input type="date" title="Invoice Date" bind:value="{vm.date}"/>
     </fieldset>
     <label>
         Issue to
-        <textarea bind:value={issueTo}></textarea>
+        <textarea bind:value={vm.issueToAsText}></textarea>
     </label>
 
 
     <nav>
         <ul>
             <li>
-                <button onclick="{onAddBlankLine}">Add Line</button>
+                <button onclick="{() => vm.addLine()}">Add Line</button>
             </li>
             <li>
-                <button class="secondary" onclick="{onSortLines}">Sort Lines</button>
+                <button class="secondary" onclick="{() => vm.sortLines()}">Sort Lines</button>
             </li>
         </ul>
     </nav>
@@ -73,10 +59,8 @@
             </tr>
         </thead>
         <tbody>
-            {#each lines as line}
-            <InvoiceEditorLineView
-                vm={line}
-            />
+            {#each vm.lines as line}
+            <InvoiceEditorLineView vm={line} />
             {/each}
         </tbody>
         <tfoot>
@@ -85,26 +69,26 @@
                     
                 </th>
                 <th colspan="2" style="text-align: right;">Subtotal:</th>
-                <th>{invoiceController.getSubtotal( lines )}</th>
+                <th>{vm.subtotal}</th>
             </tr>
             <tr>
                 <th colspan="2" style="text-align: right;">GST:</th>
-                <th>{invoiceController.getTaxTotal(lines)}</th>
+                <th>{vm.taxTotal}</th>
             </tr>
             <tr>
                 <th colspan="2" style="text-align: right;">Grand Total:</th>
-                <th>{invoiceController.getGrandTotal(lines)}</th>
+                <th>{vm.grandTotal}</th>
             </tr>
         </tfoot>
     </table>
     
     <label>
         Footnote
-        <textarea bind:value={footnote}></textarea>
+        <textarea bind:value={vm.footnoteAsText}></textarea>
     </label>
 
     <footer>
-        <button onclick="{() => onSaveInvoice(buildInvoice())}">Save</button>
+        <button onclick="{() => onSaveInvoice(vm)}">Save</button>
     </footer>
 
 </article>

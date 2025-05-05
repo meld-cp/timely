@@ -1,5 +1,5 @@
 import { LocalStorageController } from "./LocalStoragController";
-import { InvoiceLineModel, InvoiceModel } from "./Models";
+import type { InvoiceModel } from "./Models";
 
 class InvoiceController{
 
