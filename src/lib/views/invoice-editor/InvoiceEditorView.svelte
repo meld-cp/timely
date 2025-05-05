@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { NumberFormat } from "$lib/utils";
-    import type { InvoiceViewModel } from "$lib/ViewModels.svelte";
+    import { NumberFormat } from "$lib/services/utils";
+    import type { InvoiceViewModel } from "$lib/view-models/ViewModels.svelte";
     import InvoiceEditorLineView from "./InvoiceEditorLineView.svelte";
 
 

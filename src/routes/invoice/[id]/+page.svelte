@@ -1,10 +1,10 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { settingsController } from '$lib/SettingsController.svelte';
-    import { NumberFormat } from '$lib/utils';
+    import { settingsController } from '$lib/services/SettingsController.svelte';
+    import { NumberFormat } from '$lib/services/utils';
     import { onMount } from 'svelte';
-    import { InvoiceViewModel } from '$lib/ViewModels.svelte';
-    import { invRepo } from '$lib/Repos';
+    import { InvoiceViewModel } from '$lib/view-models/ViewModels.svelte';
+    import { invRepo } from '$lib/services/Repos';
     
     let logoSrc :string|undefined = $state();
     

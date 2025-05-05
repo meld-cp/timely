@@ -1,8 +1,9 @@
 <script lang="ts">
-	import TaskList from "$lib/TaskList.svelte";
-	import TimeLogger from "$lib/TimeLogger.svelte";
+	import TaskList from "$lib/views/TaskList.svelte";
+	import TimeLogger from "$lib/views/TimeLogger.svelte";
 	import { onDestroy, onMount } from "svelte";
-	import { TaskViewModel, TimeLogPageViewModel } from "$lib/ViewModels.svelte";
+	import { TaskViewModel } from "$lib/view-models/ViewModels.svelte";
+	import { TimeLogPageViewModel } from "$lib/view-models/TimeLogPageViewModel.svelte";
 		
 	let vm = $state(new TimeLogPageViewModel())
 

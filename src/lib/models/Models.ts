@@ -1,5 +1,5 @@
-import { DateFormat } from "./utils";
-import type { TaskViewModel } from "./ViewModels.svelte";
+import { DateFormat } from "../services/utils";
+import type { TaskViewModel } from "../view-models/ViewModels.svelte";
 
 export class Icons {
     static TaskPause = "⏸️";
