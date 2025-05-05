@@ -209,9 +209,13 @@ export class InvoiceLineViewModel {
 	public quantity:number = $state(0);
 	public unitCost:number = $state(0);
 
-	tax:number = $derived(0);
-	total:number = $derived(this.quantity * this.unitCost );
+	public tax:number = $derived(0);
+	public total:number = $derived(this.quantity * this.unitCost );
 	
+	public get isDescriptionOnlyLine(): boolean {
+		return this.quantity == 0;
+	}
+
 	constructor( m?:InvoiceLineModel ){
 		if (m){
 			this.applyModel(m);

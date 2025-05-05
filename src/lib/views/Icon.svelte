@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome'
-  	import { faThumbsUp, type IconDefinition } from '@fortawesome/free-solid-svg-icons'
+  	import { type IconDefinition } from '@fortawesome/free-solid-svg-icons'
 	let{
 		icon
 	}:{
