@@ -12,9 +12,12 @@
 	let inv: InvoiceViewModel | null = $state( null );
 	
 	onMount(()=>{
-		const m = invRepo.get(page.params.id);
-		if (m){
-			inv = new InvoiceViewModel(m);
+		const id = page.url.searchParams.get("id");
+		if (id){
+			const m = invRepo.get(id);
+			if (m){
+				inv = new InvoiceViewModel(m);
+			}
 		}
 	})
 
