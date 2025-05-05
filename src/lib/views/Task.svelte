@@ -144,6 +144,12 @@
 					{#if !isReadOnly}
 					<button
 						style="flex: content;"
+						onclick="{() => taskController.archiveTask(vm)}"
+					>Archive</button>
+					
+					<button
+						style="flex: content;"
+						class="secondary"
 						onclick="{() => taskController.deleteTask(vm)}"
 					>Delete</button>
 					{/if}
