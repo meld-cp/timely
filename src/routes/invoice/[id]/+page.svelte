@@ -65,10 +65,12 @@
 						<th class="tar">Invoice #:</th>
 						<td>{inv.number}</td>
 					</tr>
-					<tr>
-						<th class="tar">Order #:</th>
-						<td></td>
-					</tr>
+					{#if inv.orderRef.length>0}
+						<tr>
+							<th class="tar">Order #:</th>
+							<td>{inv.orderRef}</td>
+						</tr>
+					{/if}
 				</tbody>
 			</table>
 		</section>
@@ -93,7 +95,7 @@
 					<td class="tal">{line.description}</td>
 					<td class="tar">{line.quantity}</td>
 					<td class="tac">{line.units}</td>
-					<td class="tar">{line.unitCost}</td>
+					<td class="tar">{FormatNumber.currency( line.unitCost, inv.currencyCode, settings.localeCode )}</td>
 					<td class="tar">{FormatNumber.currency( line.total, inv.currencyCode, settings.localeCode )}</td>
 				</tr>
 				{/each}

@@ -20,6 +20,7 @@
 	<fieldset class="row">
 		<input name="inv-num" type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{vm.number}"/>
 		<input name="inv-date" type="date" title="Invoice Date" bind:value="{vm.date}"/>
+		<input name="inv-order" type="text" title="Order #" bind:value="{vm.orderRef}"/>
 		<div style="flex: 99 1 auto"></div>
 	</fieldset>
 	<label>
@@ -104,6 +105,9 @@
 
 		input[name=inv-date]{
 			flex: 1 1 10ch;
+		}
+		input[name=inv-order]{
+			flex: 1 1 12ch;
 		}
 	}
 		#working-invoice-container nav li{
