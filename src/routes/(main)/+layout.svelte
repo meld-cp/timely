@@ -29,6 +29,7 @@
 		{ label:"Invoice Builder", url:"/invoices/" },
 		{ label:"Settings", url:"/admin/settings/" },
 		{ label:"Backup & Restore", url:"/admin/backup/" },
+		{ label:"Data", url:"/admin/data/" },
 		{ label:"Roadmap", url:"/admin/roadmap/" },
 	]
 	

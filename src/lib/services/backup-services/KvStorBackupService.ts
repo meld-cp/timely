@@ -7,6 +7,10 @@ import { KvStorClient } from "../kvstor-client";
 
 export class KvStorBackupService implements IBackupService {
 
+	public static readonly BUCKET_ID_SETTINGS = "settings";
+	public static readonly BUCKET_ID_TASKS = "tasks";
+	public static readonly BUCKET_ID_INVOICES = "invoices";
+
 	constructor(
 		public host: string,
 		public userId: string,
@@ -40,22 +44,71 @@ export class KvStorBackupService implements IBackupService {
 		);
 
 		// save settings
-		await kv.setItem("settings", "default", JSON.stringify(data.settings));
+		await kv.setItem(
+			KvStorBackupService.BUCKET_ID_SETTINGS,
+			"default",
+			JSON.stringify(data.settings)
+		);
 
 		// save tasks
 		const taskIds = data.tasks.map((task) => task.id);
-		await kv.setItem("tasks", "ids", JSON.stringify(taskIds));
+		await kv.setItem(
+			KvStorBackupService.BUCKET_ID_TASKS,
+			"ids",
+			JSON.stringify(taskIds)
+		);
 		for (const task of data.tasks) {
-			await kv.setItem("tasks", task.id, JSON.stringify(task));
+			await kv.setItem(
+				KvStorBackupService.BUCKET_ID_TASKS,
+				task.id,
+				JSON.stringify(task)
+			);
 		}
 
 		// save invoices
 		const invoiceIds = data.invoices.map((invoice) => invoice.id);
-		await kv.setItem("invoices", "ids", JSON.stringify(invoiceIds));
+		await kv.setItem(
+			KvStorBackupService.BUCKET_ID_INVOICES,
+			"ids",
+			JSON.stringify(invoiceIds)
+		);
 		for (const invoice of data.invoices) {
-			await kv.setItem("invoices", invoice.id, JSON.stringify(invoice));
+			await kv.setItem(
+				KvStorBackupService.BUCKET_ID_INVOICES,
+				invoice.id,
+				JSON.stringify(invoice)
+			);
 		}
 
+	}
+
+	async getStoredValueOrDefault<T>( kv:KvStorClient, bucketId:string, key:string, defaultValue:T ):Promise<T> {
+		try{
+			const jsonValue = await kv.getItem( bucketId, key );
+			if (jsonValue == undefined) {
+				return defaultValue;
+			}
+			const jsonObj = JSON.parse(jsonValue) as T;
+			if (jsonObj == undefined) {
+				return defaultValue
+			}
+			return jsonObj;
+		}catch (e) {
+			return defaultValue;
+		}
+	}
+
+	async getStoredValueOrThrow<T>( kv:KvStorClient, bucketId:string, key:string ):Promise<T> {
+		try{
+			const jsonValue = await kv.getItem( bucketId, key );
+			const jsonObj = JSON.parse(jsonValue) as T;
+			if (jsonObj == undefined) {
+				throw new Error( `Object is undefined after parsing and casting. JSON: ${jsonValue}`);
+			}
+			return jsonObj;
+		}catch (e) {
+			throw new Error( `Unable to get stored value for key ${key} in bucket ${bucketId}. ${e}` );
+		}
 	}
 
 	async getData(): Promise<ApplicationData | null> {
@@ -66,25 +119,45 @@ export class KvStorBackupService implements IBackupService {
 		);
 
 		// get settings
-		const settingsJson = await kv.getItem("settings", "default");
-		const settings = JSON.parse(settingsJson) as SettingsModel;
+		let settings:SettingsModel = await this.getStoredValueOrThrow<SettingsModel>(
+			kv,
+			KvStorBackupService.BUCKET_ID_SETTINGS,
+			"default"
+		);
 
 		// get tasks
-		const taskIdsJson = await kv.getItem("tasks", "ids");
-		const taskIds = JSON.parse(taskIdsJson) as string[];
-		const tasks = await Promise.all(taskIds.map(async (id) => {
-			const taskJson = await kv.getItem("tasks", id);
-			return JSON.parse(taskJson) as TaskModel;
-		}));
-
+		const taskIds = await this.getStoredValueOrDefault<string[]>(
+			kv,
+			KvStorBackupService.BUCKET_ID_TASKS,
+			"ids",
+			[]
+		);
+		const tasks:TaskModel[] = [];
+		for await (const id of taskIds) {
+			try {
+				const task = await this.getStoredValueOrThrow<TaskModel>( kv, KvStorBackupService.BUCKET_ID_TASKS, id );
+				tasks.push(task);
+			} catch (e) {
+				console.error( e );
+			}
+		}
+		
 		// get invoices
-		const invoiceIdsJson = await kv.getItem("invoices", "ids");
-		const invoiceIds = JSON.parse(invoiceIdsJson) as string[];
-		const invoices = await Promise.all(invoiceIds.map(async (id) => {
-			const invoiceJson = await kv.getItem("invoices", id);
-			return JSON.parse(invoiceJson) as InvoiceModel;
-		}));
-
+		const invoiceIds = await this.getStoredValueOrDefault<string[]>(
+			kv,
+			KvStorBackupService.BUCKET_ID_INVOICES,
+			"ids",
+			[]
+		);
+		const invoices:InvoiceModel[] = [];
+		for await (const id of invoiceIds) {
+			try {
+				const inv = await this.getStoredValueOrThrow<InvoiceModel>( kv, KvStorBackupService.BUCKET_ID_INVOICES, id );
+				invoices.push(inv);
+			} catch (e) {
+				console.error( e );
+			}
+		}
 
 		return {
 			settings,
