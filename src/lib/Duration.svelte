@@ -14,17 +14,21 @@
         icon2?:string, onAction2Click?: () => void, action2Hint?:string,
     } = $props();
 
-    let durationAsFormattedMinutes = $derived.by( () =>{
-        const wholeMins = Math.abs( Math.floor( durationSeconds / 60 ) )
+    let formattedDurationHMS = $derived.by( () =>{
+        // h m s
+        const wholeHours = Math.floor( Math.abs(durationSeconds) / 60 / 60 )
+        const wholeMins = Math.floor( Math.abs( durationSeconds / 60 ) )
+        const partMins = Math.abs( wholeMins % 60 )
         const partSecs = Math.abs( durationSeconds % 60 );
-        const sign = durationSeconds < 0 ? "-" : "";
         
-        let paddedSecs = partSecs.toString();
-        if (partSecs < 10){
-            paddedSecs = '0' + paddedSecs;
-        }
-
-        return `${sign}${wholeMins}:${paddedSecs}`;
+        const parts:string[] = [
+            wholeHours.toFixed(0) + 'h',
+            partMins.toFixed(0) + 'm',
+            partSecs.toFixed(0) + 's'
+        ]
+        
+        const sign = durationSeconds < 0 ? "-" : "";
+        return sign + parts.join(" ");
     } );
 
 </script>
@@ -37,7 +41,7 @@
     </div>
     {/if}
     <div class="affective">{affectiveDurationHours?.toFixed(2)}</div>
-    <div class="counter">({durationAsFormattedMinutes})</div>
+    <div class="counter" style="text-align: right; line-height: 1.4em; font-family: monospace;">{formattedDurationHMS}</div>
     {#if icon1 || onAction1Click || icon2 || onAction2Click }
     <div class="button-container">
         {#if onAction1Click}
