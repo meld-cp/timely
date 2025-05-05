@@ -13,16 +13,26 @@
 	let { children } = $props();
 </script>
 
+
+<h1 class="container" style="font-size: 110%; margin-bottom: 0; letter-spacing: 0.3rem;">Timley</h1>
+
 <nav class="container">
 	<ul>
-		<!-- <li><strong>Acme Corp</strong></li> -->
 		<li><a href="/">Home</a></li>
 		<li><a href="/timelog/">Time Log</a></li>
 		<li><a href="/invoices/">Invoice Builder</a></li>
 	</ul>
 	<ul>
-		<li><a href="/settings/">Settings</a></li>
-		<li><a href="/admin/roadmap">Roadmap</a></li>
+		<li>
+			<details class="dropdown">
+				<summary>Admin</summary>
+				<ul>
+					<li><a href="/admin/settings/">Settings</a></li>
+					<li><a href="/admin/backup">Backup &amp; Restore</a></li>
+					<li><a href="/admin/roadmap">Roadmap</a></li>
+				</ul>
+			</details>
+		</li>
 	</ul>
 </nav>
 <div class="container">
