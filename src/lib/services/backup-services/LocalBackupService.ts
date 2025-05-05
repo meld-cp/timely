@@ -20,6 +20,7 @@ export class LocalBackupService implements IBackupService {
 	}
 
 	public decodeFromJson(json: string): ApplicationData | null {
-		return JSON.parse(json) as ApplicationData;
+		const obj = JSON.parse(json);
+		return obj as ApplicationData;
 	}
 }

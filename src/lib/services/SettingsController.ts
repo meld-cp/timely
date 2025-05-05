@@ -1,16 +1,19 @@
-import { APP_LOCALSTORE_SETTINGS_NAME } from "$lib/constants";
 import { SettingsViewModel } from "$lib/view-models/SettingsViewModel.svelte";
 import type { SettingsModel } from "../models/SettingsModel";
+import { LocalStorageController } from "./LocalStorageController";
 
 export class SettingsController{
-
-	private defaultSettings:SettingsModel = {
-		localeCode : navigator.language,
+	
+	private static defaultSettings:SettingsModel = {
+		localeCode : "en-US",
+		
 		nextInvoiceNumber : 1000,
 		defaultInvoiceCurrencyCode : "USD",
+		
 		scratchPads : {},
 	};
-
+	
+	constructor( private repo:LocalStorageController<SettingsModel> ){}
 
 	public modify( fn: (settings:SettingsViewModel) => void ){
 		const settings = this.read();
@@ -19,19 +22,17 @@ export class SettingsController{
 	}
 
 	public read() : SettingsViewModel{
-		
-		const json = localStorage.getItem(APP_LOCALSTORE_SETTINGS_NAME);
-		
-		if (!json){
-			return new SettingsViewModel(this.defaultSettings);
+
+		const data = this.repo.get("")
+		if (!data){
+			return new SettingsViewModel(SettingsController.defaultSettings);
 		}
 		
-		return new SettingsViewModel( JSON.parse( json ) as SettingsModel || this.defaultSettings );
+		return new SettingsViewModel( data );
 	}
 
 	public write(settings: SettingsViewModel){
-		const json = JSON.stringify( settings.getModel() );
-		localStorage.setItem(APP_LOCALSTORE_SETTINGS_NAME, json);
+		this.repo.set("", settings.getModel());
 	}
 
     public incrementNextInvoiceNumber() {

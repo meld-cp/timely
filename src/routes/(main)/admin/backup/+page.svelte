@@ -53,6 +53,21 @@
 			if (!cloudService){
 				return;
 			}
+
+			// // check cloud data timestamp
+			// const lastCloudSyncTimestamp = appDataToBackup.settings.cloudSyncTimestamp;
+			// if (lastCloudSyncTimestamp){
+			// 	// check against cloud timestamp
+			// 	const cloudData = await cloudService.getData();
+			// 	if (cloudData){
+			// 		const cloudTimestamp = cloudData.settings.cloudSyncTimestamp;
+			// 		if (cloudTimestamp && lastCloudSyncTimestamp > cloudTimestamp){
+			// 			alert( "local6")
+			// 		}
+			// 	}
+			// }
+
+			// send to cloud
 			await cloudService.backup( appDataToBackup);
 		}finally{
 			writingToCloudData = false;

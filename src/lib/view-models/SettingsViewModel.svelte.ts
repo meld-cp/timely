@@ -13,6 +13,7 @@ export class SettingsViewModel{
 	
 	public cloudSyncHost?:string = $state();
 	public cloudSyncUserId?:string = $state();
+	public cloudSyncTimestamp?:number = $state();
 
 	constructor( m?:SettingsModel ){
 		if (m){
@@ -32,6 +33,7 @@ export class SettingsViewModel{
 		
 		this.cloudSyncHost = m.cloudSyncHost;
 		this.cloudSyncUserId = m.cloudSyncUserId;
+		this.cloudSyncTimestamp = m.cloudSyncTimestamp;
 	}
 
 	public getModel(): SettingsModel {
@@ -47,6 +49,7 @@ export class SettingsViewModel{
 
 			cloudSyncHost: this.cloudSyncHost,
 			cloudSyncUserId: this.cloudSyncUserId,
+			cloudSyncTimestamp: this.cloudSyncTimestamp,
 		};
 	}
 }
