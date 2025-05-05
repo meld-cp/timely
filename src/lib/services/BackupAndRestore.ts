@@ -1,4 +1,5 @@
 import { invPreviewsRepo } from "./Singletons";
+import { Utils } from "./Utils";
 
 export class BackupService{
 	
@@ -37,11 +38,6 @@ export class BackupService{
 
 export class RestoreService{
 
-	public async getFileTextContents(file:File) : Promise<string>{
-		const blob = new Blob([file], { type: file.type }); // Create a Blob from the file
-		return await blob.text()
-	}
-
 	public restoreFromBase64( base64Text:string ){
 		const dataJson = atob(base64Text);
 
@@ -59,8 +55,9 @@ export class RestoreService{
 	}
 
 	public async restoreFromFile( file:File ){
-		const dataBase64 = await this.getFileTextContents(file);
+		const dataBase64 = await file.text();
 		this.restoreFromBase64(dataBase64);
 	}
 
 }
+
