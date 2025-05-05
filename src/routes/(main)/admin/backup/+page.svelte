@@ -34,7 +34,7 @@
 
 	// local backup
 	function onBackupDataLocal(){
-		localBackupSvr.downloadAsFile( dataToBackupAsText );
+		localBackupSvr.downloadAsFile( dataToBackupAsText, settings.label );
 	}
 
 	async function onRestoreFileSelected(){

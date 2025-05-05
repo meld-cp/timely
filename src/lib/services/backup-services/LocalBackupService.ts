@@ -7,11 +7,12 @@ export class LocalBackupService implements IBackupService {
 
 	public async backup(data: ApplicationData): Promise<void> {
 		const encodedData = this.encode(data);
-		this.downloadAsFile(encodedData);
+		this.downloadAsFile(encodedData, data.settings.label );
 	}
 
-	public downloadAsFile(encodedData: string) {
-		const filename = `${new Date().valueOf()}.timely-backup`;
+	public downloadAsFile( encodedData: string, filePrefix?:string ) {
+		const prefix = filePrefix ? `${filePrefix}-` : "";
+		const filename = `${prefix}${new Date().valueOf()}.timely-backup`;
 		Utils.downloadAsFile(encodedData, filename);
 	}
 
