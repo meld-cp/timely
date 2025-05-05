@@ -65,9 +65,9 @@
 			<tbody>
 				{#each data as item, index(item.key) }
 				<tr out:fade>
-					<td><pre>{item.key}</pre></td>
-					<td><code>{item.value}</code></td>
-					<td>
+					<td style="vertical-align: top;"><pre>{item.key}</pre></td>
+					<td style:overflow-wrap="anywhere"><code>{item.value}</code></td>
+					<td style="vertical-align: top;">
 						<Icon icon={faTrash} onClick={async () => {
 							await onDeleteCloudData( bucketId, item.key );
 							data.filter( i => i.key !== item.key );

@@ -1,4 +1,4 @@
-import { APP_LOCALSTORE_INVOICES_NAME, APP_LOCALSTORE_SETTINGS_NAME, APP_LOCALSTORE_TASKS_NAME } from "$lib/constants";
+import { APP_LOCALSTORE_INVOICES_NAME, APP_LOCALSTORE_SETTINGS_NAME, APP_LOCALSTORE_TASKS_NAME, KV_STORE_APP_ID } from "$lib/constants";
 import type { ApplicationData } from "$lib/models/ApplicationData";
 import type { InvoiceModel } from "$lib/models/InvoiceModel";
 import type { TaskModel } from "$lib/models/TaskModel";
@@ -8,13 +8,15 @@ import { TaskViewModel } from "$lib/view-models/TaskViewModel.svelte";
 import { LocalStorageController } from "./LocalStorageController";
 import { SettingsController } from "./SettingsController";
 import type { SettingsModel } from "$lib/models/SettingsModel";
+import { KvStorBackupService } from "./backup-services/KvStorBackupService";
+import { LocalBackupService } from "./backup-services/LocalBackupService";
 
 export class ApplicationController {
 	private settingsRepo: LocalStorageController<SettingsModel>;
 	public taskRepo:LocalStorageController<TaskModel>;
 	public invRepo:LocalStorageController<InvoiceModel>;
 	public settingsController:SettingsController;
-
+	
 	public dataModifiedTimestamp:number = $state(0);
 
 	constructor(){
@@ -62,9 +64,45 @@ export class ApplicationController {
 		return num;
 	}
 
+    async backupData( mode: "auto" | "cloud" | "local" ):Promise<void> {
+		const appData = this.getAppData();
+		
+		const settings = this.settingsController.read();
+
+		const cloud = KvStorBackupService.build(
+			settings.cloudSyncHost,
+			settings.cloudSyncUserId,
+			KV_STORE_APP_ID
+		);
+		
+		if ( ( mode === "auto" || mode === "cloud" ) && cloud != null ) {
+			// if we can, backup to cloud
+			// else backup to local
+			const cloudData = await cloud.getData();
+			if ( cloudData ) {
+				if ( cloudData.modified >= appData.modified ) {
+					// Cloud data is newer or the same as app data, switching to local backup
+					await this.backupData( "local" );
+					return;
+				}
+			}
+			
+			// send to cloud
+			await cloud.backup( appData);
+
+			alert( "Backup to cloud successful" );
+
+		}else if ( mode === "local" ) {
+			const localBackup = new LocalBackupService();
+			await localBackup.backup( appData );
+		}
+
+    }
+
+
 	public async restoreAppData(data:ApplicationData):Promise<void> {
 	
-		console.debug("this.restore", data);
+		//console.debug("this.restore", data);
 		localStorage.clear();
 
 		// Restore localStorage

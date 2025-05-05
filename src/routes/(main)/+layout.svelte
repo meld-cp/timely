@@ -42,6 +42,17 @@
 		elMenu?.attributes.removeNamedItem("open")
 	}
 
+	let backingUpData = $state( false);
+
+	async function onBackupData(){
+		backingUpData = true;
+		try{
+			await appController.backupData("auto");
+		}finally{
+			backingUpData = false;
+		}
+	}
+
 	//const backupSvr = new BackupService();
 </script>
 
@@ -54,13 +65,22 @@
 		</li>
 	</ul>
 	<ul>
-		<!-- <li><button class="outline" onclick={() => backupSvr.downloadBackupFile()}>Backup</button></li> -->
+		<li>
+			<button
+				class="outline"
+				onclick="{onBackupData}"
+				aria-busy="{backingUpData}"
+				disabled="{backingUpData}"
+			>Backup Data</button>
+		</li>
 		<li>
 			<details class="dropdown" bind:this={elMenu}>
 				<summary style="width: 18ch;">Menu</summary>
 				<ul>
 					{#each memuItems as mi}
-						<li><a href="{mi.url}" onclick="{onMenuItemClick}">{mi.label}</a></li>
+						<li>
+							<a href="{mi.url}" onclick="{onMenuItemClick}">{mi.label}</a>
+						</li>
 					{/each}
 
 				</ul>
