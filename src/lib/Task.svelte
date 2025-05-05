@@ -1,16 +1,23 @@
 <script lang="ts">
     import Duration from "./Duration.svelte";
-    import { taskController } from "./TaskController.svelte";
-    import { taskRepo } from "./TaskRepo.svelte";
     import { Icons, type TaskActionModel, TaskState } from "./Models";
+    import type { TaskViewModel } from "./ViewModels.svelte";
     
     let {
-        taskId,
+        vm,
+        onPauseTask,
+        onStartTask,
+        onStopTask,
+        onDuplicateAndStartTask,
+        onIncreaseDuration,
     }:{
-        taskId:string,
+        vm:TaskViewModel,
+        onPauseTask:(task:TaskViewModel)=>void,
+        onStartTask:(task:TaskViewModel)=>void,
+        onStopTask:(task:TaskViewModel)=>void,
+        onDuplicateAndStartTask:(task:TaskViewModel)=>void,
+        onIncreaseDuration:(task:TaskViewModel, mins:number )=>void,
     } = $props();
-
-    let task = $derived( taskRepo.getTask( taskId ) );
 
     const taskAction1:TaskActionModel = {
         icon: ( task ) => {
@@ -36,13 +43,13 @@
         execute: ( task ) => {
             switch( task.state){
                 case TaskState.Running:
-                    taskController.pauseTask( task.id );
+                    onPauseTask(task);
                     break;  
                 case TaskState.Paused:
-                    taskController.resumeTask( task.id );
+                    onStartTask( task );
                     break;
                 case TaskState.Stopped:
-                    taskController.activateAndStartCopy( task.id );
+                    onDuplicateAndStartTask( task );
                     break;
             }
         }
@@ -72,13 +79,13 @@
         execute: ( task ) => {
             switch( task.state){
                 case TaskState.Running:
-                    taskController.stopTask( task.id );    
+                    onStopTask( task );
                     break;
                 case TaskState.Paused:
-                    taskController.stopTask( task.id );
+                    onStopTask( task );
                     break;
                 case TaskState.Stopped:
-                    taskController.startTask( task.id )   
+                    onStartTask( task );   
                     break;
             }
         }
@@ -86,43 +93,35 @@
 
     function increaseDuration( inc: boolean, small:boolean ) : void{
         let amount = small ? 1 : 15;
-        
-        taskController.incrementTaskDuration( taskId, inc ? amount : -amount );
-    }
-
-    function handleTaskChanged(){
-        if (!task){
-            return;
-        }
-        taskRepo.markAsChanged(task)
+        onIncreaseDuration( vm, inc ? amount : -amount );
     }
 
 </script>
 
-{#if task}
-<article class:running="{task.state == TaskState.Running}">
+
+<article class:running="{vm.state == TaskState.Running}">
     <div class="row1">
-        <input id="date" type="date" title="Date" bind:value={task.date} onchange="{handleTaskChanged}"/>
-        <input id="name" type="text" title="Description" bind:value={task.name} oninput="{handleTaskChanged}" />
+        <input id="date" type="date" title="Date" bind:value={vm.date}/>
+        <input id="name" type="text" title="Description" bind:value={vm.name} />
         <Duration
-            durationSeconds={task.duration}
-            affectiveDurationHours={task.affectiveDurationHours}
+            durationSeconds={vm.duration}
+            affectiveDurationHours={vm.affectiveDurationHours}
             onIncreaseDuration={increaseDuration}
 
-            icon1={taskAction1.icon(task)}
-            onAction1Click={() => taskAction1.execute(task)}
-            action1Hint={taskAction1.hint(task)}
+            icon1={taskAction1.icon(vm)}
+            onAction1Click={() => taskAction1.execute(vm)}
+            action1Hint={taskAction1.hint(vm)}
             
-            icon2={taskAction2.icon(task)}
-            onAction2Click={() => taskAction2.execute(task)}
-            action2Hint={taskAction2.hint(task)}
+            icon2={taskAction2.icon(vm)}
+            onAction2Click={() => taskAction2.execute(vm)}
+            action2Hint={taskAction2.hint(vm)}
         />
     </div>
     <!-- <div class="row2">
-        <span id="id">{runDuration.toFixed(2)}  {pauseDuration.toFixed(2)}</span>
+        <span id="id">{vm.duration}</span>
     </div> -->
 </article>
-{/if}
+
 
 <style>
     article{

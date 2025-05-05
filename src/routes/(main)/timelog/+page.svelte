@@ -1,50 +1,66 @@
 <script lang="ts">
-    import { taskController } from "$lib/TaskController.svelte";
     import TaskList from "$lib/TaskList.svelte";
     import TimeLogger from "$lib/TimeLogger.svelte";
-    import { TaskState } from "$lib/Models";
     import { onDestroy, onMount } from "svelte";
-    
+    import { TaskViewModel, TimeLogPageViewModel } from "$lib/ViewModels.svelte";
+        
+    let vm = new TimeLogPageViewModel()
+
     onMount(()=>{
-        taskController.start();
+        // taskController.start();
     })
 
     onDestroy(() =>{
-        taskController.stop();
+        // taskController.stop();
     })
 
-    let tasksRunning = $derived( taskController.fetchTasksByState( [TaskState.Running] ) );
-    let tasksPaused = $derived( taskController.fetchTasksByState( [TaskState.Paused] ) );
-    let tasksStopped = $derived( taskController.fetchTasksByState( [TaskState.Stopped] ) );
-    let tasksArchived = $derived( taskController.fetchTasksByState( [TaskState.Archived] ) );
+    function onPauseTask( task:TaskViewModel ){
+        vm.pauseTask( task );
+    }
+
+    function onStartTask( task:TaskViewModel ){
+        vm.startTask(task);
+    }
+    
+    function onStopTask( task:TaskViewModel ){
+        vm.stopTask(task);
+    }
+
+    function onDuplicateAndStartTask( task:TaskViewModel ){
+        vm.duplicateAndStartTask(task);
+    }
+
+    function onIncreaseDuration( task:TaskViewModel, mins:number ){
+        vm.increaseDuration(task, mins);
+    }
 
 </script>
 
 <h1>Time Log</h1>
 
-<TimeLogger/>
+<TimeLogger onStartTask={(name)=>vm.startNewTask(name)}/>
 
 <section>
-    <summary>In Progress ({tasksRunning.length})</summary>
-    <TaskList tasks={tasksRunning}/>
+    <summary>In Progress ({vm.tasksRunning.length})</summary>
+    <TaskList tasks={vm.tasksRunning} {onPauseTask} {onStartTask} {onStopTask} {onDuplicateAndStartTask} {onIncreaseDuration}/>
 </section>
 
 <section>
-    <summary>Paused ({tasksPaused.length})</summary>
-    <TaskList tasks={tasksPaused}/>
+    <summary>Paused ({vm.tasksPaused.length})</summary>
+    <TaskList tasks={vm.tasksPaused} {onPauseTask} {onStartTask} {onStopTask} {onDuplicateAndStartTask} {onIncreaseDuration}/>
 </section>
 
 <section>
     <details>
-        <summary>Stopped ({tasksStopped.length})</summary>
-        <TaskList tasks={tasksStopped}/>
+        <summary>Stopped ({vm.tasksStopped.length})</summary>
+        <TaskList tasks={vm.tasksStopped} {onPauseTask} {onStartTask} {onStopTask} {onDuplicateAndStartTask} {onIncreaseDuration}/>
     </details>
 </section>
 
 
 <section>
     <details>
-        <summary>Archived ({tasksArchived.length})</summary>
-        <TaskList tasks={tasksArchived}/>
+        <summary>Archived ({vm.tasksArchived.length})</summary>
+        <TaskList tasks={vm.tasksArchived} {onPauseTask} {onStartTask} {onStopTask} {onDuplicateAndStartTask} {onIncreaseDuration}/>
     </details>
 </section>
