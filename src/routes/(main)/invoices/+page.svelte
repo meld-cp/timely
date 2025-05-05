@@ -4,18 +4,18 @@
 	import { TaskState } from "$lib/models/TaskState";
 	import { onMount } from "svelte";
 	import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/view-models/ViewModels.svelte";
-	import { invPreviewsRepo, invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
+	import { invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
     import { FormatDate } from "$lib/services/formatters/FormatDate";
-                
-	let workingInvoice = $state( new InvoiceViewModel() );
+	
+	const draftInvoiceId = "draft";
+
+	let workingInvoice:InvoiceViewModel = $state( buildNewDraftInvoice() );
 	let uninvoicedTasks:TaskViewModel[] = $state([]);
 	let scratchPad:string = $state("");
 
 	let closedInvoices:InvoiceViewModel[] = $state([]);
 	
 	onMount(()=>{
-		resetWorkingInvoice();
-		
 		scratchPad = settingsController.getScratchPad("page-invoice-builder");
 		
 		uninvoicedTasks = fetchUninvoicedTasks();
@@ -23,15 +23,45 @@
 	})
     
 	function fetchInvoices(): InvoiceViewModel[] {
-        return invRepo.getAll().map( m => new InvoiceViewModel(m) );
+		// fetch all invoices and sort by date desc and then number desc
+        return invRepo
+			.getAll()
+			.filter( i=>i.id != draftInvoiceId)
+			.map( m => new InvoiceViewModel(m) )
+			.sort( (a,b) => {
+				// sort by date desc
+				const aSort1 = new Date( a.date ).valueOf();
+				const bSort1 = new Date( b.date ).valueOf();
+				if (aSort1 > bSort1) return -1;
+				if (aSort1 < bSort1) return 1;
+				
+				// if the dates are equal sort by number desc
+				const bSort2 = b.number;
+				const aSort2 = a.number;
+				if (aSort2 > bSort2) return -1;
+				if (aSort2 < bSort2) return 1;
+				
+				// if the numbers are equal sort by id
+				if (a.id > b.id) return 1;
+				if (a.id < b.id) return -1;
+				
+				return 0;
+
+			})
+		;
     }
 
-	function resetWorkingInvoice(){
+	function buildNewDraftInvoice() : InvoiceViewModel{
 		const settings = settingsController.read();
-		workingInvoice = new InvoiceViewModel();
-		workingInvoice.currencyCode = settings.defaultInvoiceCurrencyCode;
-		workingInvoice.number = `${settings.nextInvoiceNumber}`;
-		workingInvoice.footnoteAsText = settings.defaultInvoiceFooter ?? "";
+
+		const result = new InvoiceViewModel();
+		result.id = draftInvoiceId;
+
+		result.currencyCode = settings.defaultInvoiceCurrencyCode;
+		result.number = `${settings.nextInvoiceNumber}`;
+		result.footnoteAsText = settings.defaultInvoiceFooter ?? "";
+
+		return result;
 	}
 
 	function saveScratchPad(){
@@ -52,14 +82,24 @@
 		return newLine;
 	}
    
-	function onPreviewInvoice( inv: InvoiceViewModel) {
-		// save preview invoice.. TODO: delete later
-		invPreviewsRepo.set( inv.id, inv.getModel() );
-		viewInvoice( inv.id, { preview:true } );
+	function onPreviewInvoice() {
+		// save preview invoice
+		invRepo.set( workingInvoice.id, workingInvoice.getModel() );
+		viewInvoice( workingInvoice.id);
 	}
 
-	function onBuildInvoice( inv: InvoiceViewModel ) : void{
-		invRepo.set( inv.id, inv.getModel());
+	/**
+	 * Builds invoice from workingInvoice and saves it to the repo
+	 */
+	function onBuildInvoice() : void{
+
+		const model = workingInvoice.getModel();
+
+		// give the working invoice a unique id
+		model.id = crypto.randomUUID();
+
+		// save
+		invRepo.set( model.id, model);
 
 		//tag all tasks in invoice lines with invoice number
 		const attachedTaskIds = workingInvoice.lines.map( l=>l.extRefId ).filter( id=>id && id.length > 0);
@@ -73,19 +113,13 @@
 		closedInvoices = fetchInvoices();
 		
 		uninvoicedTasks = fetchUninvoicedTasks();
-		resetWorkingInvoice();
+		workingInvoice = buildNewDraftInvoice();
 
-		viewInvoice( inv.id, { preview: false } );
+		viewInvoice( model.id );
 	}
 	
-	function viewInvoice( id: string, options:{ preview?:boolean } ){
-		//window.open( `/view-invoice?id=${id}`, `inv-${id}` );
-		const urlParts = ["/view-invoice"]
-		if (options.preview){
-			urlParts.push("preview")
-		}
-		urlParts.push(id)
-		window.open( urlParts.join("/"), `inv-${id}` );
+	function viewInvoice( id: string ){
+		window.open( `/view-invoice/${id}`, `inv-${id}` );
 	}
 
 	function allUninvoicedTimeHaveBeenAddedToWorkingInvoice() : boolean{
@@ -176,7 +210,7 @@
 				{#each closedInvoices as inv}
 				<article>
 					{inv.number}
-					<a href="##" onclick="{(ev) => { ev.preventDefault(); viewInvoice(inv.id, {preview:false});}}">View</a>
+					<a href="##" onclick="{(ev) => { ev.preventDefault(); viewInvoice(inv.id);}}">View</a>
 				</article>
 				{/each}
 			</details>

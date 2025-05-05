@@ -10,8 +10,8 @@
 		onBuildInvoice,
 	}:{
 		vm:InvoiceViewModel,
-		onPreviewInvoice:(vm:InvoiceViewModel)=>void,
-		onBuildInvoice:(vm:InvoiceViewModel)=>void,
+		onPreviewInvoice:()=>void,
+		onBuildInvoice:()=>void,
 	} = $props();
 
 
@@ -37,7 +37,7 @@
 
 	<section>
 		<button onclick="{() => vm.addLine()}">Add Line</button>
-		<button class="secondary" onclick="{() => vm.sortLines()}">Sort Lines</button>
+		<button class="secondary" onclick="{() => vm.sortAndRenumberLines()}">Sort Lines</button>
 	</section>
 
 	<table id="working-inv-lines" class="striped">
@@ -49,13 +49,15 @@
 				<th>Units</th>
 				<th>Unit Cost</th>
 				<th>Total</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			{#each vm.lines as line}
 			<InvoiceEditorLineView
-				vm={line}
 				currencyCode={vm.currencyCode}
+				vm={line}
+				onRemoveLine={() => vm.removeLineWithId(line.id)}
 			/>
 			{/each}
 		</tbody>
@@ -84,8 +86,8 @@
 	</label>
 
 	<footer>
-		<button class="secondary" onclick="{() => onPreviewInvoice(vm)}">Preview</button>
-		<button onclick="{() => onBuildInvoice(vm)}">Build</button>
+		<button class="secondary" onclick="{onPreviewInvoice}">Preview</button>
+		<button onclick="{onBuildInvoice}">Build</button>
 	</footer>
 
 </article>
