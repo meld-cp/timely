@@ -47,7 +47,7 @@
 	<ul>
 		<li>
 			<strong style="letter-spacing: 0.3rem;">
-				<a class="app-name-link" href="/">[Timley]</a>
+				<a class="app-name-link" href="/">[Timely]</a>
 			</strong> 
 		</li>
 	</ul>
