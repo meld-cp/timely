@@ -14,29 +14,19 @@ export enum TaskState {
     Archived
 }
 
-export class TaskModel {
-    id: string = crypto.randomUUID()
-    state: TaskState = $state(TaskState.Stopped);
-    date: string = DateHelper.toInputDateValue(new Date());
-    name: string = "";
-    duration: number = 0;
-    affectiveDurationHours: number = 0; // todo: move this to invoice calculation?
+export type TaskModel = {
+    id: string;
+    state: TaskState;
+    date: string;
+    name: string;
+    duration: number;
+    affectiveDurationHours: number;
 }
 
-export class TaskActionModel{
+export type TaskActionModel = {
     icon: ( task: TaskModel ) => string | undefined;
     hint: ( task: TaskModel ) => string | undefined;
     execute: ( task: TaskModel ) => void;
-    
-    constructor( params : {
-        icon: ( task: TaskModel ) => string | undefined,
-        hint: ( task: TaskModel ) => string | undefined,
-        action: ( task: TaskModel ) => void
-    }){
-        this.icon = params.icon;
-        this.hint = params.hint;
-        this.execute = params.action;
-    }
 }
 
 export class InvoiceModel{

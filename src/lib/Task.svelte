@@ -2,7 +2,7 @@
     import Duration from "./Duration.svelte";
     import { getTaskControllerContext } from "./TaskController.svelte";
     import { getTaskRepoContext } from "./TaskRepo.svelte";
-    import { Icons, TaskActionModel, TaskState, type TaskModel } from "./Types.svelte";
+    import { Icons, type TaskActionModel, TaskState } from "./Types.svelte";
     
     let {
         taskId,
@@ -15,7 +15,7 @@
 
     const task = $derived( taskRepo.getTask( taskId ) );
 
-    const taskAction1 = new TaskActionModel( {
+    const taskAction1:TaskActionModel = {
         icon: ( task ) => {
             switch( task.state){
                 case TaskState.Running:
@@ -36,7 +36,7 @@
                     return "Start a new copy";
             }
         },
-        action: ( task ) => {
+        execute: ( task ) => {
             switch( task.state){
                 case TaskState.Running:
                     taskController.pauseTask( task.id );
@@ -49,9 +49,9 @@
                     break;
             }
         }
-    })
+    }
 
-    const taskAction2 = new TaskActionModel( {
+    const taskAction2:TaskActionModel = {
         icon: ( task ) => {
             switch( task.state){
                 case TaskState.Running:
@@ -72,7 +72,7 @@
                     return "Start";
             }
         },
-        action: ( task ) => {
+        execute: ( task ) => {
             switch( task.state){
                 case TaskState.Running:
                     taskController.stopTask( task.id );    
@@ -85,7 +85,7 @@
                     break;
             }
         }
-    })
+    };
 
     function increaseDuration( inc: boolean ) : void{
         taskController.incrementTaskDuration( taskId, inc ? 15 : -15 );
