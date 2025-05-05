@@ -1,6 +1,6 @@
 import { getContext, setContext } from "svelte";
 import type { ITaskRepo } from "./TaskRepo.svelte";
-import type { TaskModel } from "./Types";
+import type { TaskModel } from "./Types.svelte";
 
 export class TaskController{
     repo: ITaskRepo;

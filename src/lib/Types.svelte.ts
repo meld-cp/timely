@@ -11,14 +11,14 @@ export type TaskModel = {
 }
 
 export class InvoiceModel{
-    public number:string = "";
-    public date:string = DateHelper.toInputDateValue( new Date());
+    public number:string = $state("");
+    public date:string = $state( DateHelper.toInputDateValue( new Date()) );
 
-    public lines: InvoiceLine[] = [];
+    public lines: InvoiceLineModel[] = $state([]);
 
     private lineCounter = 0;
 
-    public addLine( line: InvoiceLine ){
+    public addLine( line: InvoiceLineModel ){
         this.removeLineWithRef(line.refId)
 
         this.lineCounter++;
@@ -48,13 +48,13 @@ export class InvoiceModel{
     }
 }
 
-export class InvoiceLine {
-    public number:number = 0
-    public refId = crypto.randomUUID().toString()
-    public description:string = ""
-    public units:string = ""
-    public quantity:number = 0
-    public unitCost:number = 0
+export class InvoiceLineModel {
+    public number:number = $state(0)
+    public refId = $state(crypto.randomUUID().toString())
+    public description:string = $state("")
+    public units:string = $state("")
+    public quantity:number = $state(0)
+    public unitCost:number = $state(0)
 
     public getTotal():number {
         return this.quantity * this.unitCost;

@@ -1,5 +1,5 @@
 import { getContext, setContext } from "svelte";
-import type { TaskModel } from "./Types";
+import type { TaskModel } from "./Types.svelte";
 import { DateHelper } from "./utils";
 
 export interface ITaskRepo{
