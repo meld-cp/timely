@@ -129,8 +129,7 @@
 		closedInvoices = fetchInvoices();
 		
 		uninvoicedTasks = fetchUninvoicedTasks();
-		workingInvoice = buildNewDraftInvoice();
-		saveDraftInvoice();
+		resetWorkingInvoice();
 
 		viewInvoice( model.id );
 	}
@@ -178,6 +177,11 @@
 		saveDraftInvoice();
 	}
 
+	function resetWorkingInvoice(){
+		workingInvoice = buildNewDraftInvoice();
+		saveDraftInvoice();
+	}
+
 
 </script>
 
@@ -194,6 +198,7 @@
 			onSortLines={onDraftInvoiceSortLines}
 			{onBuildInvoice}
 			onPreviewInvoice={onViewDraftInvoice}
+			onResetInvoice={resetWorkingInvoice}
 		/>
 
 		<div class="c-col-2">
