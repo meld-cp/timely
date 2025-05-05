@@ -91,13 +91,20 @@
         taskController.incrementTaskDuration( taskId, inc ? 15 : -15 );
     }
 
+    function handleTaskChanged(){
+        if (!task){
+            return;
+        }
+        taskRepo.markAsChanged(task)
+    }
+
 </script>
 
 {#if task}
 <article class:running="{task.state == TaskState.Running}">
     <div class="row1">
-        <input id="date" type="date" title="Date" bind:value={task.date} onchange="{() => taskRepo.markAsChanged(task)}"/>
-        <input id="name" type="text" title="Discription" bind:value={task.name} oninput="{() => taskRepo.markAsChanged(task)}" />
+        <input id="date" type="date" title="Date" bind:value={task.date} onchange="{handleTaskChanged}"/>
+        <input id="name" type="text" title="Description" bind:value={task.name} oninput="{handleTaskChanged}" />
         <Duration
             durationSeconds={task.duration}
             affectiveDurationHours={task.affectiveDurationHours}
