@@ -3,7 +3,7 @@ import { DateFormat } from "./utils";
 
 export class InvoiceViewModel {
    
-    public id = crypto.randomUUID().toString();
+    public id = $state( crypto.randomUUID().toString() );
     
     public number:string = $state("");
     public date:string = $state(DateFormat.toInputDateValue( new Date()));
@@ -89,7 +89,6 @@ export class InvoiceLineViewModel {
     public quantity:number = $state(0);
     public unitCost:number = $state(0);
 
-    //model:InvoiceLineModel = $state( new InvoiceLineModel() );
     tax:number = $derived(0);
     total:number = $derived(this.quantity * this.unitCost );
     
