@@ -5,12 +5,17 @@ import type { TaskModel } from "$lib/models/TaskModel";
 import type { IBackupService } from "./IBackupService";
 import { KvStorClient } from "../kvstor-client";
 
+const KEY_SETTINGS_DEFAULT = "default";
+const KEY_DATA_TIMESTAMP = "dataTimestamp";
+const KEY_ID_LIST = "ids";
+
 export class KvStorBackupService implements IBackupService {
 
 	public static readonly BUCKET_ID_META = "meta";
 	public static readonly BUCKET_ID_SETTINGS = "settings";
 	public static readonly BUCKET_ID_TASKS = "tasks";
 	public static readonly BUCKET_ID_INVOICES = "invoices";
+	
 
 	constructor(
 		public host: string,
@@ -44,10 +49,17 @@ export class KvStorBackupService implements IBackupService {
 			this.appId
 		);
 
+		//save last modified
+		await kv.setItem(
+			KvStorBackupService.BUCKET_ID_META,
+			KEY_DATA_TIMESTAMP,
+			JSON.stringify(data.modified)
+		);
+
 		// save settings
 		await kv.setItem(
 			KvStorBackupService.BUCKET_ID_SETTINGS,
-			"default",
+			KEY_SETTINGS_DEFAULT,
 			JSON.stringify(data.settings)
 		);
 
@@ -55,7 +67,7 @@ export class KvStorBackupService implements IBackupService {
 		const taskIds = data.tasks.map((task) => task.id);
 		await kv.setItem(
 			KvStorBackupService.BUCKET_ID_TASKS,
-			"ids",
+			KEY_ID_LIST,
 			JSON.stringify(taskIds)
 		);
 		for (const task of data.tasks) {
@@ -70,7 +82,7 @@ export class KvStorBackupService implements IBackupService {
 		const invoiceIds = data.invoices.map((invoice) => invoice.id);
 		await kv.setItem(
 			KvStorBackupService.BUCKET_ID_INVOICES,
-			"ids",
+			KEY_ID_LIST,
 			JSON.stringify(invoiceIds)
 		);
 		for (const invoice of data.invoices) {
@@ -123,7 +135,7 @@ export class KvStorBackupService implements IBackupService {
 		const lastModified = await this.getStoredValueOrDefault<number>(
 			kv,
 			KvStorBackupService.BUCKET_ID_META,
-			"dataTimestamp",
+			KEY_DATA_TIMESTAMP,
 			0
 		);
 
@@ -131,14 +143,14 @@ export class KvStorBackupService implements IBackupService {
 		let settings:SettingsModel = await this.getStoredValueOrThrow<SettingsModel>(
 			kv,
 			KvStorBackupService.BUCKET_ID_SETTINGS,
-			"default"
+			KEY_SETTINGS_DEFAULT
 		);
 
 		// get tasks
 		const taskIds = await this.getStoredValueOrDefault<string[]>(
 			kv,
 			KvStorBackupService.BUCKET_ID_TASKS,
-			"ids",
+			KEY_ID_LIST,
 			[]
 		);
 		const tasks:TaskModel[] = [];
@@ -155,7 +167,7 @@ export class KvStorBackupService implements IBackupService {
 		const invoiceIds = await this.getStoredValueOrDefault<string[]>(
 			kv,
 			KvStorBackupService.BUCKET_ID_INVOICES,
-			"ids",
+			KEY_ID_LIST,
 			[]
 		);
 		const invoices:InvoiceModel[] = [];

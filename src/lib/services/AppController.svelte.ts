@@ -70,7 +70,7 @@ export class ApplicationController {
 		// Restore localStorage
 
 		// restore last modified timestamp
-		this.setChangedTimestamp( data.modified);
+		this.setChangedTimestamp( data.modified );
 
 		// restore settings
 		this.settingsController.write( new SettingsViewModel( data.settings ) );
