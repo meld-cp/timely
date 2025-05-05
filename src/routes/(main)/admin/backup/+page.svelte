@@ -54,18 +54,18 @@
 				return;
 			}
 
-			// // check cloud data timestamp
-			// const lastCloudSyncTimestamp = appDataToBackup.settings.cloudSyncTimestamp;
-			// if (lastCloudSyncTimestamp){
-			// 	// check against cloud timestamp
-			// 	const cloudData = await cloudService.getData();
-			// 	if (cloudData){
-			// 		const cloudTimestamp = cloudData.settings.cloudSyncTimestamp;
-			// 		if (cloudTimestamp && lastCloudSyncTimestamp > cloudTimestamp){
-			// 			alert( "local6")
-			// 		}
-			// 	}
-			// }
+			// check cloud data timestamp
+			const cloudData = await cloudService.getData();
+			if ( cloudData ) {
+				if ( cloudData.modified == appDataToBackup.modified ) {
+					alert( "Cloud data is same as app data, skipping backup" );
+					return;
+				}
+				if ( cloudData.modified > appDataToBackup.modified ) {
+					alert( "Cloud data is newer than app data, skipping backup" );
+					return;
+				}
+			}
 
 			// send to cloud
 			await cloudService.backup( appDataToBackup);

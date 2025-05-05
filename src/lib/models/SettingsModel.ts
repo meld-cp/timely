@@ -14,5 +14,5 @@ export type SettingsModel = {
 	
 	cloudSyncHost?:string;
 	cloudSyncUserId?:string;
-	cloudSyncTimestamp?:number;
+	//cloudSyncTimestamp?:number;
 };
