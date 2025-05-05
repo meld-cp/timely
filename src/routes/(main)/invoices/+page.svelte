@@ -8,16 +8,24 @@
 	import { invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
 
 	let wiNextLineNumber = $state(1);
-
 	let workingInvoice = $state( new InvoiceViewModel() );
-
 	let uninvoicedTasks:TaskViewModel[] = $state([]);
+	let scratchPad:string = $state("");
+
+	
 	onMount(()=>{
 		const settings = settingsController.read();
 		workingInvoice.number = `${settings.nextInvoiceNumber}`;
 		workingInvoice.footnoteAsText = settings.defaultInvoiceFooter ?? "";
+		
+		scratchPad = settingsController.getScratchPad("page-invoice-builder");
+		
 		uninvoicedTasks = getUninvoicedTasks();
 	})
+
+	function saveScratchPad(){
+		settingsController.setScratchPad("page-invoice-builder", scratchPad);
+	}
 
 	function getUninvoicedTasks(): TaskViewModel[]{
 		return taskRepo.getAll().filter( t=>t.state == TaskState.Stopped).map(t=> new TaskViewModel(t) );
@@ -63,6 +71,8 @@
 		}
 	}
 
+
+
 </script>
 
 <h1>Invoice Builder</h1>
@@ -72,43 +82,51 @@
 	<section id="row1">
 		<InvoiceEditorView bind:vm={workingInvoice} onSaveInvoice={saveWorkingInvoice}/>
 
-		<article id="uninvoiced-time-container">
-			<header>Uninvoiced Time</header>
+		<div class="c-col-2">
+		
+			<article class="time-list">
+				<header>Uninvoiced Time</header>
 
-			{#if uninvoicedTasks.length != 0}
-				{#if uninvoicedTasks.length > 1}
-					<label>
-						<input id="untagged-select-all" type="checkbox" bind:checked={
-							() => allUninvoicedTimeHasBeenAddedToWorkingInvoice(),
-							(checked) => selectAllUninvoicedTime(checked)
-						}/>
-						Select All
-					</label>
-					<hr/>
+				{#if uninvoicedTasks.length != 0}
+					{#if uninvoicedTasks.length > 1}
+						<label>
+							<input id="untagged-select-all" type="checkbox" bind:checked={
+								() => allUninvoicedTimeHasBeenAddedToWorkingInvoice(),
+								(checked) => selectAllUninvoicedTime(checked)
+							}/>
+							Select All
+						</label>
+						<hr/>
+					{/if}
+					{#each uninvoicedTasks as task }
+					<div>
+						<label>
+							<input id="{task.id}" type="checkbox" bind:checked={
+								() => workingInvoice.containsExtRefId( task.id ),
+								(checked) =>{
+									if (checked){
+										workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
+									}else{
+										workingInvoice.removeLineWithExtRefId( task.id );
+									}
+								} 
+							}/>
+							[{task.date}, {task.affectiveDurationHours.toFixed(2)} hrs] {task.name}
+						</label>
+					</div>
+					{/each}
+				{:else}
+					<p><i>All time has been account for.</i></p>
 				{/if}
-				{#each uninvoicedTasks as task }
-				<div>
-					<label>
-						<input id="{task.id}" type="checkbox" bind:checked={
-							() => workingInvoice.containsExtRefId( task.id ),
-							(checked) =>{
-								if (checked){
-									workingInvoice.addLine( buildTimeLogInvoiceLine(task ) );
-								}else{
-									workingInvoice.removeLineWithExtRefId( task.id );
-								}
-							} 
-						}/>
-						[{task.date}, {task.affectiveDurationHours.toFixed(2)} hrs] {task.name}
-					</label>
-				</div>
-				{/each}
-			{:else}
-				<p><i>All time has been account for.</i></p>
-			{/if}
-			<footer></footer>
-			
-		</article>
+				
+			</article>
+
+			<article class="scratch-pad">
+				<header>Scratch Pad</header>
+				<textarea bind:value={scratchPad} oninput={(ev) => saveScratchPad() }></textarea>
+			</article>
+
+		</div>
 	</section>
 			
 	<section id="row2">
@@ -131,10 +149,29 @@
 		font-size: medium;
 	}
 	
-	#uninvoiced-time-container{
+	.c-col-2{
+		display: flex;
+		flex-direction: column;
 		flex: 4;
-		height: fit-content;
 		min-width: 200px;
+		background-color: aliceblue;
+	}
+
+	.time-list{
+		flex: 2;
+		overflow-y: auto;
+	}
+
+	.scratch-pad{
+		flex: 2;
+		overflow-y: auto;
+
+		textarea{
+			font-size: 80%;
+			height: 80%;
+			margin: 0;
+			box-sizing: border-box;
+		}
 	}
 
 </style>

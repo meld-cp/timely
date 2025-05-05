@@ -4,7 +4,6 @@
 	import type { InvoiceViewModel } from "$lib/view-models/ViewModels.svelte";
 	import InvoiceEditorLineView from "./InvoiceEditorLineView.svelte";
 
-
 	let {
 		vm = $bindable(),
 		onSaveInvoice
@@ -14,27 +13,18 @@
 	} = $props();
 
 
-
-	// function buildInvoice():InvoiceModel{
-	//     const inv = new InvoiceModel();
-	//     inv.number = invoiceNumber;
-	//     inv.date = invoiceDate;
-	//     inv.issueToLines = issueTo.split("\n");
-	//     inv.lines = lines.map( vm=>vm.model );
-	//     inv.footerLines = footnote.split("\n");
-	//     return inv;
-	// }
 </script>
 
 <article id="working-invoice-container" >
 	<header>Working Invoice</header>
-	<fieldset class="grid">
+	<fieldset class="row">
 		<input name="inv-num" type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{vm.number}"/>
 		<input name="inv-date" type="date" title="Invoice Date" bind:value="{vm.date}"/>
+		<div style="flex: 99 1 auto"></div>
 	</fieldset>
 	<label>
 		Issue to
-		<textarea name="inv-issue-to" bind:value={vm.issueToAsText}></textarea>
+		<textarea name="inv-issue-to" title="Address of the company or person being issued to" bind:value={vm.issueToAsText}></textarea>
 	</label>
 
 
@@ -53,7 +43,7 @@
 		<thead>
 			<tr>
 				<th>Line No.</th>
-				<th>Description</th>
+				<th style="width: 100%;">Description</th>
 				<th>Quantity</th>
 				<th>Units</th>
 				<th>Unit Cost</th>
@@ -101,6 +91,20 @@
 		flex: 8;
 		height: fit-content;
 		min-width: 800px;
+
+		.row{
+			display: flex;
+			gap: 0.5rem;
+			justify-content: space-between;
+		}
+		
+		input[name=inv-num]{
+			flex: 1 1 10ch;
+		}
+
+		input[name=inv-date]{
+			flex: 1 1 10ch;
+		}
 	}
 		#working-invoice-container nav li{
 			padding-top: 0;
@@ -111,6 +115,13 @@
 		}
 		#working-invoice-container button{
 			font-size: small;
+		}
+
+		#working-inv-lines{
+			th{
+				font-size: 80%;
+				white-space: nowrap;
+			}
 		}
 
 </style>

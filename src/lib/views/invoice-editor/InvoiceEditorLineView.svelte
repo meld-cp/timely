@@ -27,12 +27,10 @@
 	}
 	.c-line input{
 		margin-bottom: 0;
-		padding: 0em;
 		height: fit-content;
+		font-size: 80%;
 	}
-	.c-line td:has(input[name=line-desc]){
-		width: 100%;
-	}
+
 	input[name=line-num]{
 		text-align: center;
 	}
