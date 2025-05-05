@@ -10,19 +10,26 @@
 </svelte:head>
 
 <script>
+    import { BackupService } from '$lib/services/BackupAndRestore';
+
 	let { children } = $props();
+
+	const backupSvr = new BackupService();
 </script>
-
-
-<h1 class="container" style="font-size: 110%; margin-bottom: 0; letter-spacing: 0.3rem;">Timley</h1>
 
 <nav class="container">
 	<ul>
+		<li>
+			<strong style="letter-spacing: 0.3rem;">
+				[Timley]
+			</strong>
+		</li>
 		<li><a href="/">Home</a></li>
 		<li><a href="/timelog/">Time Log</a></li>
 		<li><a href="/invoices/">Invoice Builder</a></li>
 	</ul>
 	<ul>
+		<li><button onclick={() => backupSvr.downloadBackupFile()}>Backup</button></li>
 		<li>
 			<details class="dropdown">
 				<summary>Admin</summary>
