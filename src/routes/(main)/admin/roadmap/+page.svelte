@@ -7,13 +7,17 @@
 	</li> -->
 	<li>
 		Later
-		<br>- Invoices - Ability to edit
+		<br>- ???
 	</li>
 </ul>
 
 
 <h3>Completed</h3>
 <ul>
+	<li>
+		2025-05-06
+		<br>- Invoices - Ability to edit
+	</li>
 	<li>
 		2025-01-26
 		<br>- Invoices - Auto save draft invoices
