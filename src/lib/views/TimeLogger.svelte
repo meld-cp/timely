@@ -1,9 +1,13 @@
 <script lang="ts">
+    import type { TaskViewModel } from "$lib/view-models/ViewModels.svelte";
+
 
 	let{
-		onStartTask
+		onStartTask,
+		previousTasksList,
 	}:{
-		onStartTask:( name:string ) => void
+		onStartTask:( name:string ) => void,
+		previousTasksList?:TaskViewModel[]
 	} = $props()
 
 	let taskName = $state("");
@@ -18,8 +22,23 @@
 
 
 <form onsubmit="{startTask}">
+	<!-- svelte-ignore a11y_no_redundant_roles -->
 	<fieldset role="group">
-		<input id="taskname" type="text" bind:value="{taskName}" placeholder="Whatcha doin?" autocorrect="on" autocomplete="on"/>
+		<input
+			name="task-name"
+			type="text"
+			bind:value="{taskName}"
+			placeholder="Whatcha doin?"
+			spellcheck="true"
+			list="list-task-names"
+		/>
+		{#if previousTasksList}
+		<datalist id="list-task-names" >
+			{#each previousTasksList as task}
+			<option value="{task.name}"></option>
+			{/each}
+		</datalist>
+		{/if}
 		<input type="submit" value="Start"/>
 	</fieldset>
 </form>

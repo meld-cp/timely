@@ -27,7 +27,7 @@
 	</fieldset>
 	<label>
 		Issue to
-		<textarea name="inv-issue-to" title="Address of the company or person being issued to" bind:value={vm.issueToAsText}></textarea>
+		<textarea name="inv-issue-to" title="Address of the company or person being issued to" bind:value={vm.issueToAsText} spellcheck="true"></textarea>
 	</label>
 
 	<section>
@@ -72,7 +72,7 @@
 	
 	<label>
 		Footnote
-		<textarea name="inv-footnote" bind:value={vm.footnoteAsText}></textarea>
+		<textarea name="inv-footnote" bind:value={vm.footnoteAsText} spellcheck="true"></textarea>
 	</label>
 
 	<footer>
