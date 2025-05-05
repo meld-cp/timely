@@ -8,6 +8,8 @@
 
 	let {
 		vm,
+		title,
+		canChangeNumber,
 		onChange,
 		onAddLine,
 		onRemoveLine,
@@ -17,6 +19,8 @@
 		onResetInvoice,
 	}:{
 		vm:InvoiceViewModel,
+		title:string,
+		canChangeNumber:boolean,
 		onChange:()=>void,
 		onAddLine:()=>void,
 		onRemoveLine:( line:InvoiceLineViewModel )=>void,
@@ -31,9 +35,9 @@
 </script>
 
 <article id="working-invoice-container" >
-	<header>Working Invoice</header>
+	<header>{title}</header>
 	<fieldset class="row">
-		<input name="inv-num" type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{vm.number}" onchange="{onChange}"/>
+		<input name="inv-num" type="text" title="Invoice Number" placeholder="Invoice Number" readonly={!canChangeNumber||null} bind:value="{vm.number}" onchange="{onChange}"/>
 		<input name="inv-date" type="date" title="Invoice Date" bind:value="{vm.date}" onchange="{onChange}"/>
 		<input name="inv-order" type="text" title="Order #" placeholder="Order #" bind:value="{vm.orderRef}" onchange="{onChange}"/>
 		<div style="flex: 99 1 auto"></div>

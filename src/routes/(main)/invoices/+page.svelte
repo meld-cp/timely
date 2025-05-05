@@ -12,7 +12,14 @@
 	
 	const draftInvoiceId = "draft";
 
-	let workingInvoice:InvoiceViewModel = $state( loadDraftInvoice());
+	let workingInvoice:InvoiceViewModel = $state(loadDraftInvoice());
+	let isEditingDraftInvoice:boolean = $derived( workingInvoice.id == draftInvoiceId );
+	let workingInvoiceTitle:string = $derived.by( () => { 
+		if (isEditingDraftInvoice){
+			return "Draft Invoice";
+		}
+		return `Editing Invoice ${workingInvoice.number}`;
+	});
 	let uninvoicedTasks:TaskViewModel[] = $state([]);
 	let scratchPad:string = $state("");
 
@@ -28,7 +35,7 @@
 	function loadDraftInvoice() : InvoiceViewModel{
 		var m = appController.invRepo.get(draftInvoiceId)
 		if (m){
-			 return new InvoiceViewModel(m);
+			return new InvoiceViewModel(m);
 		}
 		return buildNewDraftInvoice();
 	}
@@ -113,9 +120,12 @@
 	function onBuildInvoice() : void{
 
 		const newInvModel = workingInvoice.getModel();
+		const isDraftInvoice = isEditingDraftInvoice;
 
 		// give the working invoice a unique id
-		newInvModel.id = crypto.randomUUID();
+		if (isDraftInvoice){
+			newInvModel.id = crypto.randomUUID();
+		}
 
 		// save
 		appController.invRepo.set( newInvModel.id, newInvModel);
@@ -129,10 +139,13 @@
 			appController.taskRepo.set( task.id, task.getModel() );
 		}
 
-		appController.incrementNextInvoiceNumber();
+		if (isDraftInvoice){
+			appController.incrementNextInvoiceNumber();
+		}
+
 		closedInvoices = fetchInvoices();
-		
 		uninvoicedTasks = fetchUninvoicedTasks();
+
 		resetWorkingInvoice();
 
 		viewInvoice( newInvModel.id );
@@ -144,6 +157,16 @@
 			url += `/${options.wattermark}`;
 		}
 		window.open( url, `inv-${id}` );
+	}
+
+	async function editInvoice( id: string ){
+		const invVm = await appController.getInvoiceById(id);
+		if (!invVm){
+			return;
+		}
+		workingInvoice = invVm;
+		// scroll to top of page
+		window.scrollTo(0, 0);
 	}
 
 	function allUninvoicedTimeHaveBeenAddedToWorkingInvoice() : boolean{
@@ -198,8 +221,11 @@
 <div id="container">
 
 	<section id="row1">
+
 		<InvoiceEditorView
 			vm={workingInvoice}
+			title={workingInvoiceTitle}
+			canChangeNumber={isEditingDraftInvoice}
 			onChange={saveDraftInvoice}
 			onAddLine={onDraftInvoiceAddLine}
 			onRemoveLine={onDraftInvoiceRemoveLine}
@@ -264,6 +290,7 @@
 				<article>
 					{inv.number}
 					<a href="##" onclick="{(ev) => { ev.preventDefault(); viewInvoice(inv.id);}}">View</a>
+					<a href="##" onclick="{(ev) => { ev.preventDefault(); editInvoice(inv.id);}}">Edit</a>
 				</article>
 				{/each}
 			</details>

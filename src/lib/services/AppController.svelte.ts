@@ -61,6 +61,14 @@ export class ApplicationController {
 		return this.invRepo.getAll().map(i => new InvoiceViewModel(i));
 	}
 
+	public async getInvoiceById(id:string):Promise<InvoiceViewModel | null>{
+		const invoice = this.invRepo.get(id);
+		if (invoice) {
+			return new InvoiceViewModel(invoice);
+		}
+		return null;
+	}
+
 	public getAppData(): ApplicationData {
 		return {
 			modified: this.readDataModifiedTimestamp() ?? 0,
