@@ -1,5 +1,7 @@
 <script lang="ts">
-	
+    import { faMinus, faPlus, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
+    import Icon from "./Icon.svelte";
+
 	let {
 		durationSeconds,
 		affectiveDurationHours,
@@ -10,8 +12,8 @@
 		durationSeconds: number,
 		affectiveDurationHours: number,
 		onIncreaseDuration?: ( inc:boolean, alt:boolean ) => void,
-		icon1?:string, onAction1Click?: () => void, action1Hint?:string,
-		icon2?:string, onAction2Click?: () => void, action2Hint?:string,
+		icon1?: IconDefinition, onAction1Click?: () => void, action1Hint?:string,
+		icon2?: IconDefinition, onAction2Click?: () => void, action2Hint?:string,
 	} = $props();
 
 	let formattedDurationHMS = $derived.by( () =>{
@@ -36,23 +38,23 @@
 <div class="c-main">
 	{#if onIncreaseDuration}
 	<div class="c-buttons">
-		<button class="outline" title="Add Time" onclick="{(ev) => onIncreaseDuration( true, ev.ctrlKey )}">+</button>
-		<button class="outline" title="Remove Time" onclick="{(ev) => onIncreaseDuration( false, ev.ctrlKey )}">-</button>
+		<button class="outline" title="Add Time" onclick="{(ev) => onIncreaseDuration( true, ev.ctrlKey )}"><Icon icon={faPlus}/></button>
+		<button class="outline" title="Remove Time" onclick="{(ev) => onIncreaseDuration( false, ev.ctrlKey )}"><Icon icon={faMinus}/></button>
 	</div>
 	{/if}
 	<div class="affective">{affectiveDurationHours?.toFixed(2)}</div>
-	<div class="counter" style="text-align: right; line-height: 1.4em; font-family: monospace;">{formattedDurationHMS}</div>
+	<div class="counter">{formattedDurationHMS}</div>
 	{#if icon1 || onAction1Click || icon2 || onAction2Click }
 	<div class="c-buttons">
 		{#if onAction1Click}
-		<button class="outline" title="{action1Hint}" onclick="{() => onAction1Click()}">{icon1}</button>
+		<button class="outline" title="{action1Hint}" onclick="{() => onAction1Click()}"><Icon icon={icon1}/></button>
 		{:else if icon1}
-		<div class="icon">{icon1}</div>
+		<div class="icon"><Icon icon={icon1}/></div>
 		{/if}
 		{#if onAction2Click}
-		<button class="outline secondary" title="{action2Hint}" onclick="{() => onAction2Click()}">{icon2}</button>
+		<button class="outline secondary" title="{action2Hint}" onclick="{() => onAction2Click()}"><Icon icon={icon2}/></button>
 		{:else if icon2}
-		<div class="icon">{icon2}</div>
+		<div class="icon secondary"><Icon icon={icon2}/></div>
 		{/if}
 	</div>
 	{/if}
@@ -60,8 +62,9 @@
 
 <style>
 	.c-main{
-		background-color: hsl(0, 0%, 99%);
-		border-radius: 0.2em;
+		background-color: var(--pico-form-element-background-color);
+		border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+		border-radius: var(--pico-border-radius);
 		
 		padding: 0.5rem;
 		
@@ -77,7 +80,7 @@
 			flex-direction: column;
 			gap: 0.5rem;
 		}
-
+		
 		button{
 			font-size: 80%;
 			padding: 0em;
@@ -94,7 +97,9 @@
 		.counter{
 			align-self: center;
 			width: 3ch;
-			/* font-size: 90%; */
+			text-align: right;
+			line-height: 1.1rem;
+			font-family: monospace;
 		}
 	}
 </style>
