@@ -16,6 +16,8 @@
 		taskController:ITaskController,
 	} = $props();
 
+	const isReadOnly = vm.state == "Archived";
+
 	const taskAction1:TaskActionModel = {
 		icon: ( task ) => {
 			switch( task.state){
@@ -102,8 +104,25 @@
 
 <article class="c-task" class:s-running="{vm.state == TaskState.Running}">
 	<div class="c-task-fields">
-		<input class="date" name="task-date" type="date" title="Date" bind:value={vm.date} oninput="{saveTask}"/>
-		<input class="name" name="task-name" type="text" title="Description" placeholder="Description" bind:value={vm.name} oninput="{saveTask}"/>
+		<input
+			class="date"
+			name="task-date"
+			type="date"
+			title="Date"
+			bind:value={vm.date}
+			oninput="{saveTask}"
+			readonly={isReadOnly}
+		/>
+		<input
+			class="name"
+			name="task-name"
+			type="text"
+			title="Description"
+			placeholder="Description"
+			bind:value={vm.name}
+			oninput="{saveTask}"
+			readonly={isReadOnly}
+		/>
 		<div class="c-task-fields-row-2">
 			<details>
 				<summary>Other</summary>
@@ -111,8 +130,23 @@
 				<span style="flex: content;" class="inv" title="Invoice">Attached to Invoice Id: {vm.invoiceRefId}</span>
 				{/if}
 				<div style="display: flex; flex-direction: row; gap:1rem; flex-wrap: wrap;">
-					<input style="flex: 10;" class="tags" name="task-tags" type="text" placeholder="Tags" title="Tags" bind:value={vm.tagsAsText} oninput="{()=>taskController?.saveTask(vm)}"/>
-					<button style="flex: content;" onclick="{() => taskController.deleteTask(vm)}">Delete</button>
+					<input
+						style="flex: 10;"
+						class="tags"
+						name="task-tags"
+						type="text"
+						placeholder="Tags"
+						title="Tags"
+						bind:value={vm.tagsAsText}
+						oninput="{()=>taskController?.saveTask(vm)}"
+						readonly={isReadOnly}
+					/>
+					{#if !isReadOnly}
+					<button
+						style="flex: content;"
+						onclick="{() => taskController.deleteTask(vm)}"
+					>Delete</button>
+					{/if}
 				</div>		
 			</details>
 			<div style="flex: 2;"></div>
@@ -122,7 +156,7 @@
 		<Duration
 			durationSeconds={vm.duration}
 			affectiveDurationHours={vm.affectiveDurationHours}
-			onIncreaseDuration={increaseDuration}
+			onIncreaseDuration={ isReadOnly ? undefined : increaseDuration}
 			
 			icon1={taskAction1.icon(vm)}
 			onAction1Click={() => taskAction1.execute(vm)}
