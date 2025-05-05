@@ -1,10 +1,11 @@
 <script lang="ts">
 	import InvoiceEditorView from "$lib/views/invoice-editor/InvoiceEditorView.svelte";
-	import { settingsController } from "$lib/services/SettingsController.svelte";
-	import { type TaskModel, TaskState } from "$lib/models/Models";
+	
+	import { type TaskModel } from "$lib/models/TaskModel";
+	import { TaskState } from "$lib/models/TaskState";
 	import { onMount } from "svelte";
 	import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/view-models/ViewModels.svelte";
-	import { invRepo, taskRepo } from "$lib/services/Repos";
+	import { invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
 
 	let wiNextLineNumber = $state(1);
 

@@ -1,11 +1,14 @@
-import { type InvoiceModel, type InvoiceLineModel, TaskState, type TaskModel } from "../models/Models";
-import { DateFormat } from "../services/utils";
+import { type InvoiceLineModel } from "$lib/models/InvoiceLineModel";
+import { type InvoiceModel } from "$lib/models/InvoiceModel";
+import { type TaskModel } from "$lib/models/TaskModel";
+import { TaskState } from "$lib/models/TaskState";
+import { FormatDate } from "$lib/services/formatters/FormatDate";
 
 
 export class TaskViewModel {
 	id: string = $state( crypto.randomUUID() );
 	state: TaskState = $state(TaskState.Stopped);
-	date: string = $state( DateFormat.toInputDateValue( new Date() ) );
+	date: string = $state( FormatDate.toInputDateValue( new Date() ) );
 	name: string = $state("");
 	duration: number = $state(0);
 	affectiveDurationHours: number = $state(0);
@@ -100,7 +103,7 @@ export class InvoiceViewModel {
 	public currencyCode:string = $state("NZD");
   
 	public number:string = $state("");
-	public date:string = $state(DateFormat.toInputDateValue( new Date()));
+	public date:string = $state(FormatDate.toInputDateValue( new Date()));
 	public orderRef:string = $state("");
 
 	public issueToLines: string[] = $state([]);
