@@ -10,6 +10,7 @@
         onStopTask,
         onDuplicateAndStartTask,
         onIncreaseDuration,
+        onDeleteTask,
     } : {
         tasks: TaskViewModel[],
         onPauseTask:(task:TaskViewModel)=>void,
@@ -17,12 +18,21 @@
         onStopTask:(task:TaskViewModel)=>void,
         onDuplicateAndStartTask:(task:TaskViewModel)=>void,
         onIncreaseDuration:(task:TaskViewModel, mins:number )=>void,
+        onDeleteTask:(task:TaskViewModel)=>void,
     } = $props();
 
 </script>
 
 {#each tasks as task, index (task.id)}
 <div transition:slide={{duration:200}}>
-    <Task vm={task} {onPauseTask} {onStartTask} {onStopTask} {onDuplicateAndStartTask} {onIncreaseDuration}/>
+    <Task
+        vm={task}
+        {onPauseTask}
+        {onStartTask}
+        {onStopTask}
+        {onDuplicateAndStartTask}
+        {onIncreaseDuration}
+        {onDeleteTask}
+    />
 </div>
 {/each}
