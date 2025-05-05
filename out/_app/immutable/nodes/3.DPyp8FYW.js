@@ -1,0 +1,1 @@
+import{a as o,t as r}from"../chunks/D-9eU7Ls.js";import"../chunks/54l_imbZ.js";import{i as a}from"../chunks/D_6JOOz4.js";var n=r("<h2>Home</h2> <section><article><p>Nothing here yet, but try the menu...</p></article></section>",1);function c(t){var e=n();a(2),o(t,e)}export{c as component};
