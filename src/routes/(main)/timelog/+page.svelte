@@ -4,14 +4,14 @@
     import { onDestroy, onMount } from "svelte";
     import { TaskViewModel, TimeLogPageViewModel } from "$lib/ViewModels.svelte";
         
-    let vm = new TimeLogPageViewModel()
+    let vm = $state(new TimeLogPageViewModel())
 
     onMount(()=>{
-        // taskController.start();
+        vm.start()
     })
 
     onDestroy(() =>{
-        // taskController.stop();
+        vm.stop()
     })
 
     function onPauseTask( task:TaskViewModel ){
