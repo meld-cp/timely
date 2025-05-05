@@ -13,7 +13,7 @@
     const taskRepo = getTaskRepoContext();
     const taskController = getTaskControllerContext();
 
-    const task = $derived( taskRepo.getTask( taskId ) );
+    let task = $derived( taskRepo.getTask( taskId ) );
 
     const taskAction1:TaskActionModel = {
         icon: ( task ) => {
@@ -87,8 +87,10 @@
         }
     };
 
-    function increaseDuration( inc: boolean ) : void{
-        taskController.incrementTaskDuration( taskId, inc ? 15 : -15 );
+    function increaseDuration( inc: boolean, small:boolean ) : void{
+        let amount = small ? 1 : 15;
+        
+        taskController.incrementTaskDuration( taskId, inc ? amount : -amount );
     }
 
     function handleTaskChanged(){
@@ -120,7 +122,7 @@
         />
     </div>
     <!-- <div class="row2">
-        <span id="id">{task.id}</span>
+        <span id="id">{runDuration.toFixed(2)}  {pauseDuration.toFixed(2)}</span>
     </div> -->
 </article>
 {/if}
