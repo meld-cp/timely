@@ -22,9 +22,9 @@ export class TimeLogPageViewModel implements ITaskController {
 		this.refresh();
 		// catch up duration
 		for (const task of this.tasksRunning) {
-			console.log("recalculateDurationFromRunningSession:before", task.getModel());
+			//console.log("recalculateDurationFromRunningSession:before", task.getModel());
 			task.recalculateDurationFromRunningSession();
-			console.log("recalculateDurationFromRunningSession:after", task.getModel());
+			//console.log("recalculateDurationFromRunningSession:after", task.getModel());
 		}
 
 		this.intervalId = setInterval(() => this.incrementRunningTaskDuration(), 1000);

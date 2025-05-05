@@ -68,7 +68,7 @@
 		display: flex;
 		justify-content: space-between;
 
-
+		width: fit-content;
 		flex: 1;
 		gap: 0.5rem;
 

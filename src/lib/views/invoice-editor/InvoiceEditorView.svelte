@@ -91,7 +91,6 @@
 	#working-invoice-container{
 		flex: 8;
 		height: fit-content;
-		min-width: 800px;
 
 		.row{
 			display: flex;
