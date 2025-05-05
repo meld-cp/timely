@@ -101,8 +101,8 @@
 
 <article class:running="{vm.state == TaskState.Running}">
     <div class="row1">
-        <input id="date" type="date" title="Date" bind:value={vm.date}/>
-        <input id="name" type="text" title="Description" bind:value={vm.name} />
+        <input class="date" name="task-date" type="date" title="Date" bind:value={vm.date}/>
+        <input class="name" name="task-name" type="text" title="Description" bind:value={vm.name} />
         <Duration
             durationSeconds={vm.duration}
             affectiveDurationHours={vm.affectiveDurationHours}
@@ -140,10 +140,10 @@
     input{
         margin-bottom: 0em;
     }
-    #date{
+    .date{
         flex: 1;
     }
-    #name{
+    .name{
         flex: 10;
         min-width: 20ch;
     }
