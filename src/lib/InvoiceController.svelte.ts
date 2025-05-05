@@ -3,7 +3,6 @@ import type { InvoiceModel } from "./Models";
 
 class InvoiceController{
 
-    
     private repo = new LocalStorageController<InvoiceModel>("invoices");
 
     save( inv: InvoiceModel ){

@@ -1,16 +1,16 @@
-import { TaskState, type TTask } from "./Models";
+import { TaskState, type TaskModel } from "./Models";
 import { DateFormat } from "./utils";
 
 export interface ITaskRepo{
-    fetch(predicate: (t: TTask) => boolean): TTask[];
-    createTask() : TTask;
-    getTask( id:string ) : TTask | undefined;
-    markAsChanged( task:TTask ) : void;
+    fetch(predicate: (t: TaskModel) => boolean): TaskModel[];
+    createTask() : TaskModel;
+    getTask( id:string ) : TaskModel | undefined;
+    markAsChanged( task:TaskModel ) : void;
 }
 
 export class TaskRepo implements ITaskRepo{
 
-    tasks = $state<TTask[]>([]);
+    tasks = $state<TaskModel[]>([]);
 
     store =  new TaskStoreLocalStorage();
 
@@ -18,12 +18,12 @@ export class TaskRepo implements ITaskRepo{
         this.tasks = this.store.loadTasks();
     }
 
-    public fetch(predicate: (t: TTask) => boolean): TTask[] {
+    public fetch(predicate: (t: TaskModel) => boolean): TaskModel[] {
         return this.tasks.filter(predicate);
     }
 
-    public createTask() : TTask{
-        const task : TTask = {
+    public createTask() : TaskModel{
+        const task : TaskModel = {
             id: crypto.randomUUID(),
             state: TaskState.Stopped,
             date: DateFormat.toInputDateValue( new Date() ),
@@ -38,11 +38,11 @@ export class TaskRepo implements ITaskRepo{
         return task;
     }
 
-    public getTask( id:string ): TTask | undefined {
+    public getTask( id:string ): TaskModel | undefined {
         return this.tasks.find( x=>x.id === id );
     }
 
-    public markAsChanged( task:TTask ) {
+    public markAsChanged( task:TaskModel ) {
         this.store.saveTask( task );
     }
 
@@ -65,8 +65,8 @@ class TaskStoreLocalStorage{
         localStorage.setItem( "taskIds", taskIdsJson );
     }
 
-    public loadTasks() : TTask[]{
-        const tasks : TTask[] = [];
+    public loadTasks() : TaskModel[]{
+        const tasks : TaskModel[] = [];
         
         const taskIds = this.loadTaskIds();
         for (const taskId of taskIds) {
@@ -74,7 +74,7 @@ class TaskStoreLocalStorage{
             if (!taskJson){
                 continue;
             }
-            const task = JSON.parse( taskJson ) as TTask;
+            const task = JSON.parse( taskJson ) as TaskModel;
             if (!task){
                 continue;
             }
@@ -83,7 +83,7 @@ class TaskStoreLocalStorage{
         return tasks;
     }
     
-    public saveTask( task: TTask ) {
+    public saveTask( task: TaskModel ) {
         const ids = this.loadTaskIds().filter( id => id != task.id);
         ids.push( task.id );
         this.saveIds( ids );

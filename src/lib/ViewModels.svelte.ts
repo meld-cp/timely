@@ -1,5 +1,52 @@
-import { type InvoiceModel, type InvoiceLineModel } from "./Models";
+import { type InvoiceModel, type InvoiceLineModel, TaskState, type TaskModel } from "./Models";
 import { DateFormat } from "./utils";
+
+
+export class TaskViewModel implements TaskModel {
+    id: string = $state( crypto.randomUUID() );
+    state: TaskState = $state(TaskState.Stopped);
+    date: string = $state( DateFormat.toInputDateValue( new Date() ) );
+    name: string = $state("");
+    duration: number = $state(0);
+    affectiveDurationHours: number = $state(0);
+    timeRunStarted : number | undefined = $state();
+
+    constructor( m?:TaskModel ){
+        if (m){
+            this.applyModel(m);
+        }
+    }
+
+    public pause(){
+        if (this.state != TaskState.Running){
+            return;
+        }
+        this.state = TaskState.Paused;
+        this.timeRunStarted = undefined;
+    }
+
+    getModel(): TaskModel {
+        return {
+            id:this.id,
+            state:this.state,
+            date:this.date,
+            name:this.name,
+            duration:this.duration,
+            affectiveDurationHours:this.affectiveDurationHours,
+            timeRunStarted:this.timeRunStarted,
+        }
+    }
+
+    applyModel(m: TaskModel) {
+        this.id = m.id;
+        this.state = m.state;
+        this.date = m.date;
+        this.name = m.name;
+        this.duration = m.duration;
+        this.affectiveDurationHours = m.affectiveDurationHours;
+        this.timeRunStarted = m.timeRunStarted;
+    }
+}
 
 export class InvoiceViewModel implements InvoiceModel {
    
@@ -23,38 +70,6 @@ export class InvoiceViewModel implements InvoiceModel {
         if (m){
             this.applyModel(m);
         }
-    }
-
-    get issueToAsText() {
-        return this.issueToLines.join("\n")
-    }
-    set issueToAsText( v:string ){
-        this.issueToLines = v.split("\n");
-    }
-
-    get footnoteAsText() {
-        return this.footerLines.join("\n")
-    }
-    set footnoteAsText( v:string ){
-        this.footerLines = v.split("\n");
-    }
-    
-    public containsExtRefId(extRefId: string): boolean {
-        return this.lines.some( l=>l.extRefId == extRefId);
-    }
-    
-    public removeLineWithExtRefId( extRefId:string ){
-        this.lines = this.lines.filter( l=>l.extRefId != extRefId );
-    }
-
-    public addLine( line?: InvoiceLineViewModel ):string{
-        const m  = line ?? new InvoiceLineViewModel();
-        this.lines.push(m);
-        return m.id;
-    }
-
-    public sortLines(){
-        //TODO:
     }
 
     getModel(): InvoiceModel {
@@ -81,6 +96,39 @@ export class InvoiceViewModel implements InvoiceModel {
         this.footerLines = m.footerLines;
     }
 
+    get issueToAsText() {
+        return this.issueToLines.join("\n")
+    }
+    
+    set issueToAsText( v:string ){
+        this.issueToLines = v.split("\n");
+    }
+
+    get footnoteAsText() {
+        return this.footerLines.join("\n")
+    }
+    
+    set footnoteAsText( v:string ){
+        this.footerLines = v.split("\n");
+    }
+    
+    public containsExtRefId(extRefId: string): boolean {
+        return this.lines.some( l=>l.extRefId == extRefId);
+    }
+    
+    public removeLineWithExtRefId( extRefId:string ){
+        this.lines = this.lines.filter( l=>l.extRefId != extRefId );
+    }
+
+    public addLine( line?: InvoiceLineViewModel ):string{
+        const m  = line ?? new InvoiceLineViewModel();
+        this.lines.push(m);
+        return m.id;
+    }
+
+    public sortLines(){
+        //TODO:
+    }
 }
 
 export class InvoiceLineViewModel implements InvoiceLineModel {

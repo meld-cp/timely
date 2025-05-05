@@ -1,5 +1,5 @@
 import { taskRepo, type ITaskRepo } from "./TaskRepo.svelte";
-import { TaskState, type TTask } from "./Models";
+import { TaskState, type TaskModel } from "./Models";
 
 export class TaskController{
     repo: ITaskRepo;
@@ -112,7 +112,7 @@ export class TaskController{
         this.repo.markAsChanged(task);
     }
 
-    public activateAndStartCopy(id:string) : TTask | undefined {
+    public activateAndStartCopy(id:string) : TaskModel | undefined {
         const task = this.cloneTask(id);
         if (task){
             this.startTask(task.id);
@@ -132,7 +132,7 @@ export class TaskController{
         this.repo.markAsChanged(task);
     }
 
-    public recalculateDurationFromRunningSession( task:TTask) {
+    public recalculateDurationFromRunningSession( task:TaskModel) {
         if ( task.state != TaskState.Running ){
             return
         }
@@ -159,7 +159,7 @@ export class TaskController{
         }
     }
 
-    public fetchTasksByState( states : TaskState[] ) : TTask[]{
+    public fetchTasksByState( states : TaskState[] ) : TaskModel[]{
         return this.repo.fetch( t=>states.includes(t.state) );
     }
    
@@ -171,7 +171,7 @@ export class TaskController{
         }
     }
     
-    private compareDateDescending( a:TTask, b:TTask) : number{
+    private compareDateDescending( a:TaskModel, b:TaskModel) : number{
         if (a.date === b.date){
             return 0;
         }
@@ -191,11 +191,11 @@ export class TaskController{
     //     return -1
     // }
 
-    private sortByDateDescending( tasks:TTask[]):TTask[]{
+    private sortByDateDescending( tasks:TaskModel[]):TaskModel[]{
         return tasks.toSorted( this.compareDateDescending )
     }
 
-    private cloneTask( id:string ): TTask | undefined {
+    private cloneTask( id:string ): TaskModel | undefined {
         const taskToClone = this.repo.getTask(id);
         if (!taskToClone){
             return undefined;
