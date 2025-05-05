@@ -137,10 +137,13 @@
 
 <style>
 	.c-task{
+		--pico-form-element-spacing-vertical: 0.25rem;
+		--pico-form-element-spacing-horizontal: 0.25rem;
+
 		display: flex;
 		flex-direction: row;
 		flex-wrap: wrap-reverse;
-		align-items: flex-start;
+		/* align-items: flex-start; */
 		gap: 0.5rem;
 		padding: 0.5rem;
 		overflow: hidden;

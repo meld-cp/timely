@@ -91,6 +91,9 @@
 	#working-invoice-container{
 		flex: 8;
 		height: fit-content;
+		
+		--pico-form-element-spacing-vertical: 0.25rem;
+		--pico-form-element-spacing-horizontal: 0.25rem;
 
 		.row{
 			display: flex;
