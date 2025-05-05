@@ -77,7 +77,8 @@
 	}
 	
 	function viewInvoice( id: string ){
-		window.open( `/view-invoice?id=${id}`, `inv-${id}` );
+		//window.open( `/view-invoice?id=${id}`, `inv-${id}` );
+		window.open( `/view-invoice/${id}`, `inv-${id}` );
 	}
 
 	function allUninvoicedTimeHaveBeenAddedToWorkingInvoice() : boolean{
