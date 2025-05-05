@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { invoiceController } from "$lib/InvoiceController.svelte";
     import InvoiceEditorView from "$lib/InvoiceEditor/InvoiceEditorView.svelte";
     import { settingsController } from "$lib/SettingsController.svelte";
     import { type TaskModel, TaskState } from "$lib/Models";
     import { onMount } from "svelte";
     import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/ViewModels.svelte";
-    import { taskRepo } from "$lib/Repos";
+    import { invRepo, taskRepo } from "$lib/Repos";
 
     let wiNextLineNumber = $state(1);
 
@@ -35,17 +34,22 @@
     }
    
     function saveWorkingInvoice( inv: InvoiceViewModel ) : void{
-        invoiceController.save(inv.getModel());
+        invRepo.set( inv.id, inv.getModel());
         window.open( `/invoice/${inv.id}`, )
     }
 
     function allUninvoicedTimeHasBeenAddedToWorkingInvoice() : boolean{
+
+        if (uninvoicedTasks.length == 0){
+            return false;
+        }
         for (const task of uninvoicedTasks) {
-            if (workingInvoice.containsExtRefId( task.id )){
+            if (!workingInvoice.containsExtRefId( task.id )){
                 return false;
             }
         }
         return true;
+        
     }
 
     function selectAllUninvoicedTime( select: boolean ){

@@ -1,10 +1,10 @@
 <script lang="ts">
     import { page } from '$app/state';
-    import { invoiceController } from '$lib/InvoiceController.svelte';
     import { settingsController } from '$lib/SettingsController.svelte';
     import { NumberFormat } from '$lib/utils';
     import { onMount } from 'svelte';
     import { InvoiceViewModel } from '$lib/ViewModels.svelte';
+    import { invRepo } from '$lib/Repos';
     
     let logoSrc :string|undefined = $state();
     
@@ -12,7 +12,7 @@
     
     onMount(()=>{
         let settings = settingsController.read();
-        const m = invoiceController.fetch(page.params.id);
+        const m = invRepo.get(page.params.id);
         if (m){
             inv = new InvoiceViewModel(m);
         }
