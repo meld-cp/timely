@@ -1,30 +1,50 @@
 <script lang="ts">
 	
 	import { FormatNumber } from "$lib/services/formatters/FormatNumber";
-	import type { InvoiceViewModel } from "$lib/view-models/ViewModels.svelte";
+	import type { InvoiceLineViewModel, InvoiceViewModel } from "$lib/view-models/ViewModels.svelte";
 	import InvoiceEditorLineView from "./InvoiceEditorLineView.svelte";
 
 	let {
 		vm,
+		onChange,
+		onAddLine,
+		onRemoveLine,
+		onSortLines,
 		onPreviewInvoice,
 		onBuildInvoice,
 	}:{
 		vm:InvoiceViewModel,
+		onChange:()=>void,
+		onAddLine:()=>void,
+		onRemoveLine:( line:InvoiceLineViewModel )=>void,
+		onSortLines:()=>void,
 		onPreviewInvoice:()=>void,
 		onBuildInvoice:()=>void,
 	} = $props();
 
+	
 
 </script>
 
 <article id="working-invoice-container" >
 	<header>Working Invoice</header>
 	<fieldset class="row">
-		<input name="inv-num" type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{vm.number}"/>
-		<input name="inv-date" type="date" title="Invoice Date" bind:value="{vm.date}"/>
-		<input name="inv-order" type="text" title="Order #" placeholder="Order #" bind:value="{vm.orderRef}"/>
+		<input name="inv-num" type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{vm.number}" onchange="{onChange}"/>
+		<input name="inv-date" type="date" title="Invoice Date" bind:value="{vm.date}" onchange="{onChange}"/>
+		<input name="inv-order" type="text" title="Order #" placeholder="Order #" bind:value="{vm.orderRef}" onchange="{onChange}"/>
 		<div style="flex: 99 1 auto"></div>
 	</fieldset>
+	<label>
+		Header Lines
+		<textarea
+			name="inv-header"
+			title="Header lines for the invoice"
+			bind:value={vm.headerLinesAsText}
+			spellcheck="true"
+			onchange="{onChange}"
+			placeholder="Header lines for the invoice"
+		></textarea>
+	</label>
 	<label>
 		Issue to
 		<textarea
@@ -32,12 +52,14 @@
 			title="Address of the company or person being issued to"
 			bind:value={vm.issueToAsText}
 			spellcheck="true"
+			onchange="{onChange}"
+			placeholder="Who will receive the invoice?"
 		></textarea>
 	</label>
 
 	<section>
-		<button onclick="{() => vm.addLine()}">Add Line</button>
-		<button class="secondary" onclick="{() => vm.sortAndRenumberLines()}">Sort Lines</button>
+		<button onclick="{onAddLine}">Add Line</button>
+		<button class="secondary" onclick="{onSortLines}">Sort Lines</button>
 	</section>
 
 	<table id="working-inv-lines" class="striped">
@@ -57,7 +79,8 @@
 			<InvoiceEditorLineView
 				currencyCode={vm.currencyCode}
 				vm={line}
-				onRemoveLine={() => vm.removeLineWithId(line.id)}
+				onRemoveLine={() => onRemoveLine(line)}
+				onChange={onChange}
 			/>
 			{/each}
 		</tbody>
@@ -82,7 +105,13 @@
 	
 	<label>
 		Footnote
-		<textarea name="inv-footnote" bind:value={vm.footnoteAsText} spellcheck="true"></textarea>
+		<textarea
+			name="inv-footnote"
+			bind:value={vm.footnoteAsText}
+			spellcheck="true"
+			onchange="{onChange}"
+			placeholder="Optional Footnote"
+		></textarea>
 	</label>
 
 	<footer>

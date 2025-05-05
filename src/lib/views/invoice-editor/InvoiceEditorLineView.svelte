@@ -8,11 +8,13 @@
 	let {
 		currencyCode,
 		vm: vmLine,
+		onChange,
 		onRemoveLine,
 	}:{
 		currencyCode:string
 		vm:InvoiceLineViewModel,
-		onRemoveLine:()=>void
+		onChange:()=>void,
+		onRemoveLine:()=>void,
 	} = $props();
 
 	function handleRemoveLine(ev:Event){
@@ -22,11 +24,11 @@
 
 </script>
 <tr class="c-line">
-	<td><input name="line-num" type="number" min="1" bind:value="{vmLine.number}"/></td>
-	<td><input name="line-desc" type="text" bind:value="{vmLine.description}" spellcheck="true"/></td>
-	<td><input name="line-qty" type="number" step="0.25" bind:value="{vmLine.quantity}"/></td>
-	<td><input name="line-units" type="text" bind:value="{vmLine.units}"/></td>
-	<td><input name="line-unit-cost" type="number" bind:value="{vmLine.unitCost}"/></td>
+	<td><input name="line-num" type="number" min="1" bind:value="{vmLine.number}" onchange="{onChange}"/></td>
+	<td><input name="line-desc" type="text" bind:value="{vmLine.description}" spellcheck="true" onchange="{onChange}"/></td>
+	<td><input name="line-qty" type="number" step="0.25" bind:value="{vmLine.quantity}" onchange="{onChange}"/></td>
+	<td><input name="line-units" type="text" bind:value="{vmLine.units}" onchange="{onChange}"/></td>
+	<td><input name="line-unit-cost" type="number" bind:value="{vmLine.unitCost}" onchange="{onChange}"/></td>
 	<td style="text-align: right;">{FormatNumber.currency( vmLine.total, currencyCode )}</td>
 	<td><a href="##" onclick="{handleRemoveLine}"><Icon icon={faTrash}/></a></td>
 </tr>

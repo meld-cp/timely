@@ -7,7 +7,7 @@ export class SettingsViewModel{
 	public logoData?:string = $state()
 	public nextInvoiceNumber:number = $state(1000);
 	public scratchPads:ScratchPadsDictionary = $state({});
-	public invoiceHeader?:string = $state();
+	public defaultInvoiceHeader?:string = $state();
 	public defaultInvoiceCurrencyCode:string = $state("USD");
 	public defaultInvoiceFooter?:string = $state();
 
@@ -22,7 +22,7 @@ export class SettingsViewModel{
 		this.address = m.address ?? "";
 		this.logoData = m.logoData;
 		this.nextInvoiceNumber = m.nextInvoiceNumber ?? 1000;
-		this.invoiceHeader = m.invoiceHeader;
+		this.defaultInvoiceHeader = m.defaultInvoiceHeader;
 		this.defaultInvoiceCurrencyCode = m.defaultInvoiceCurrencyCode ?? "USD";
 		this.defaultInvoiceFooter = m.defaultInvoiceFooter;
 		this.scratchPads = m.scratchPads ?? {};
@@ -34,7 +34,7 @@ export class SettingsViewModel{
 			address: this.address,
 			logoData: this.logoData,
 			nextInvoiceNumber: this.nextInvoiceNumber,
-			invoiceHeader: this.invoiceHeader,
+			defaultInvoiceHeader: this.defaultInvoiceHeader,
 			defaultInvoiceCurrencyCode: this.defaultInvoiceCurrencyCode,
 			defaultInvoiceFooter: this.defaultInvoiceFooter,
 			scratchPads: this.scratchPads,

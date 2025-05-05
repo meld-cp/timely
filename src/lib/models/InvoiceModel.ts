@@ -8,6 +8,7 @@ export type InvoiceModel = {
 	date: string;
 	orderRef: string;
 
+	headerLines: string[];
 	issueToLines: string[];
 	footerLines: string[];
 
