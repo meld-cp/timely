@@ -14,13 +14,13 @@ export enum TaskState {
     Archived
 }
 
-export type TaskModel = {
-    id: string;
-    state: TaskState;
-    date: string;
-    name: string;
-    duration: number;
-    affectiveDurationHours: number;
+export class TaskModel {
+    id: string = crypto.randomUUID();
+    state: TaskState = $state(TaskState.Stopped);
+    date: string = $state( DateHelper.toInputDateValue( new Date() ) );
+    name: string = $state("");
+    duration: number = $state(0);
+    affectiveDurationHours: number = $state(0);
 }
 
 export type TaskActionModel = {
