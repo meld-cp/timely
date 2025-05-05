@@ -88,7 +88,7 @@
 	</ul>
   </nav>
 
-<div class="container">
+<div class="container" style:padding-bottom="10rem">
 	{@render children()}
 </div>
 
