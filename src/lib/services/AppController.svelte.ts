@@ -15,6 +15,8 @@ export class ApplicationController {
 	public invRepo:LocalStorageController<InvoiceModel>;
 	public settingsController:SettingsController;
 
+	public dataModifiedTimestamp:number = $state(0);
+
 	constructor(){
 		const localStorageOptions = {
 			onModifiedCallback: () => this.setChangedTimestamp()
@@ -35,18 +37,19 @@ export class ApplicationController {
 
 	public getAppData(): ApplicationData {
 		return {
-			modified: this.getDataModifiedTimestamp() ?? 0,
+			modified: this.readDataModifiedTimestamp() ?? 0,
 			settings: this.settingsController.read().getModel(),
 			tasks: this.taskRepo.getAll(),
 			invoices: this.invRepo.getAll()
 		}
     }
 
-	private setChangedTimestamp(){
-		localStorage.setItem( "_modified", new Date().valueOf().toString() );
+	private setChangedTimestamp( newTimestamp?:number ){
+		this.dataModifiedTimestamp = newTimestamp ?? new Date().valueOf();
+		localStorage.setItem( "_modified", this.dataModifiedTimestamp.toString() );
 	}
 	
-	public getDataModifiedTimestamp():number | null {
+	private readDataModifiedTimestamp():number | null {
 		const value = localStorage.getItem( "_modified" );
 		if (value === null){
 			return null;
@@ -55,6 +58,7 @@ export class ApplicationController {
 		if (isNaN(num)){
 			return null;
 		}
+		this.dataModifiedTimestamp = num;
 		return num;
 	}
 
@@ -66,7 +70,7 @@ export class ApplicationController {
 		// Restore localStorage
 
 		// restore last modified timestamp
-
+		this.setChangedTimestamp( data.modified);
 
 		// restore settings
 		this.settingsController.write( new SettingsViewModel( data.settings ) );
