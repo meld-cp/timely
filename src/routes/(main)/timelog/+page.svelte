@@ -15,30 +15,6 @@
 		vm.stop()
 	})
 
-	function onPauseTask( task:TaskViewModel ){
-		vm.pauseTask( task );
-	}
-
-	function onStartTask( task:TaskViewModel ){
-		vm.startTask(task);
-	}
-	
-	function onStopTask( task:TaskViewModel ){
-		vm.stopTask(task);
-	}
-
-	function onDuplicateAndStartTask( task:TaskViewModel ){
-		vm.duplicateAndStartTask(task);
-	}
-
-	function onIncreaseDuration( task:TaskViewModel, mins:number ){
-		vm.increaseDuration(task, mins);
-	}
-
-	function onDeleteTask( task:TaskViewModel ){
-		vm.deleteTask(task);
-	}
-
 </script>
 
 <h1>Time Log</h1>
@@ -48,26 +24,16 @@
 <section>
 	<summary>In Progress ({vm.tasksRunning.length})</summary>
 	<TaskList
+		taskController={vm}
 		tasks={vm.tasksRunning}
-		{onPauseTask}
-		{onStartTask}
-		{onStopTask}
-		{onDuplicateAndStartTask}
-		{onIncreaseDuration}
-		{onDeleteTask}
 	/>
 </section>
 
 <section>
 	<summary>Paused ({vm.tasksPaused.length})</summary>
 	<TaskList
+		taskController={vm}
 		tasks={vm.tasksPaused}
-		{onPauseTask}
-		{onStartTask}
-		{onStopTask}
-		{onDuplicateAndStartTask}
-		{onIncreaseDuration}
-		{onDeleteTask}
 	/>
 </section>
 
@@ -75,13 +41,8 @@
 	<details>
 		<summary>Stopped ({vm.tasksStopped.length})</summary>
 		<TaskList
+			taskController={vm}
 			tasks={vm.tasksStopped}
-			{onPauseTask}
-			{onStartTask}
-			{onStopTask}
-			{onDuplicateAndStartTask}
-			{onIncreaseDuration}
-			{onDeleteTask}
 		/>
 	</details>
 </section>
@@ -91,13 +52,8 @@
 	<details>
 		<summary>Archived ({vm.tasksArchived.length})</summary>
 		<TaskList
+			taskController={vm}
 			tasks={vm.tasksArchived}
-			{onPauseTask}
-			{onStartTask}
-			{onStopTask}
-			{onDuplicateAndStartTask}
-			{onIncreaseDuration}
-			{onDeleteTask}
 		/>
 	</details>
 </section>

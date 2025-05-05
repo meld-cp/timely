@@ -1,6 +1,5 @@
 import type { TaskState } from "./TaskState";
 
-
 export type TaskModel = {
 	id: string;
 	state: TaskState;
@@ -9,4 +8,6 @@ export type TaskModel = {
 	duration: number;
 	affectiveDurationHours: number;
 	timeRunStarted: number | undefined;
+	invoiceRefId:string;
+	tags: string[];
 };

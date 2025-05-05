@@ -5,23 +5,14 @@
 	import { TaskState } from "$lib/models/TaskState";
 	import { Icons } from "$lib/models/Icons";
 	import type { TaskViewModel } from "../view-models/ViewModels.svelte";
+    import type { ITaskController } from "$lib/ITaskController";
 	
 	let {
 		vm,
-		onPauseTask,
-		onStartTask,
-		onStopTask,
-		onDuplicateAndStartTask,
-		onIncreaseDuration,
-		onDeleteTask
+		taskController,
 	}:{
 		vm:TaskViewModel,
-		onPauseTask:(task:TaskViewModel)=>void,
-		onStartTask:(task:TaskViewModel)=>void,
-		onStopTask:(task:TaskViewModel)=>void,
-		onDuplicateAndStartTask:(task:TaskViewModel)=>void,
-		onIncreaseDuration:(task:TaskViewModel, mins:number )=>void,
-		onDeleteTask:(task:TaskViewModel)=>void,
+		taskController:ITaskController,
 	} = $props();
 
 	const taskAction1:TaskActionModel = {
@@ -48,13 +39,13 @@
 		execute: ( task ) => {
 			switch( task.state){
 				case TaskState.Running:
-					onPauseTask(task);
+					taskController.pauseTask(task);
 					break;  
 				case TaskState.Paused:
-					onStartTask( task );
+				taskController.startTask( task );
 					break;
 				case TaskState.Stopped:
-					onDuplicateAndStartTask( task );
+					taskController.duplicateAndStartTask( task );
 					break;
 			}
 		}
@@ -84,13 +75,13 @@
 		execute: ( task ) => {
 			switch( task.state){
 				case TaskState.Running:
-					onStopTask( task );
+					taskController.stopTask( task );
 					break;
 				case TaskState.Paused:
-					onStopTask( task );
+					taskController.stopTask( task );
 					break;
 				case TaskState.Stopped:
-					onStartTask( task );   
+					taskController.startTask( task );   
 					break;
 			}
 		}
@@ -98,7 +89,11 @@
 
 	function increaseDuration( inc: boolean, small:boolean ) : void{
 		let amount = small ? 1 : 15;
-		onIncreaseDuration( vm, inc ? amount : -amount );
+		taskController.increaseDuration( vm, inc ? amount : -amount );
+	}
+
+	function saveTask(){
+		taskController.saveTask(vm);
 	}
 
 </script>
@@ -106,16 +101,18 @@
 
 <article class="c-task" class:s-running="{vm.state == TaskState.Running}">
 	<div class="c-task-fields">
-		<input class="date" name="task-date" type="date" title="Date" bind:value={vm.date}/>
-		<input class="name" name="task-name" type="text" title="Description" bind:value={vm.name} />
+		<input class="date" name="task-date" type="date" title="Date" bind:value={vm.date} oninput="{saveTask}"/>
+		<input class="name" name="task-name" type="text" title="Description" bind:value={vm.name} oninput="{saveTask}"/>
 		<div class="c-task-fields-row-2">
 			<details>
 				<summary>Other</summary>
-				<button onclick="{() => onDeleteTask(vm)}">Delete</button>
+				<span style="flex: content;" class="inv" title="Invoice">Attached to Invoice Id: {vm.invoiceRefId}</span>
+				<div style="display: flex; flex-direction: row; gap:1rem; flex-wrap: wrap;">
+					<input style="flex: 10;" class="tags" name="task-tags" type="text" title="Tags" bind:value={vm.tagsAsText} oninput="{()=>taskController?.saveTask(vm)}"/>
+					<button style="flex: content;" onclick="{() => taskController.deleteTask(vm)}">Delete</button>
+				</div>		
 			</details>
-			<div style="flex: 100;">
-				
-			</div>
+			<div style="flex: 2;"></div>
 		</div>
 	</div>
 	<div class="c-task-duration">
