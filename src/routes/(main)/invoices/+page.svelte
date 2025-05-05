@@ -4,7 +4,7 @@
 	import { TaskState } from "$lib/models/TaskState";
 	import { onMount } from "svelte";
 	import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/view-models/ViewModels.svelte";
-	import { invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
+	import { invPreviewsRepo, invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
     import { FormatDate } from "$lib/services/formatters/FormatDate";
         
 	let wiNextLineNumber = $state(1);
@@ -24,7 +24,7 @@
 	})
     
 	function fetchInvoices(): InvoiceViewModel[] {
-        return invRepo.getAll().map( m=> new InvoiceViewModel(m) );
+        return invRepo.getAll().map( m => new InvoiceViewModel(m) );
     }
 
 	function resetWorkingInvoice(){
@@ -53,10 +53,16 @@
 		return newLine;
 	}
    
-	function saveWorkingInvoice( inv: InvoiceViewModel ) : void{
+	function onPreviewInvoice( inv: InvoiceViewModel) {
+		// save preview invoice.. TODO: delete later
+		invPreviewsRepo.set( inv.id, inv.getModel() );
+		viewInvoice( inv.id, { preview:true } );
+	}
+
+	function onBuildInvoice( inv: InvoiceViewModel ) : void{
 		invRepo.set( inv.id, inv.getModel());
 
-		//TODO: tag all tasks in invoice lines with invoice number
+		//tag all tasks in invoice lines with invoice number
 		const attachedTaskIds = workingInvoice.lines.map( l=>l.extRefId ).filter( id=>id && id.length > 0);
 		const attachedTasks = uninvoicedTasks.filter( t=> attachedTaskIds.includes( t.id ));
 		for (const task of attachedTasks) {
@@ -73,12 +79,17 @@
 		uninvoicedTasks = fetchUninvoicedTasks();
 		resetWorkingInvoice();
 
-		viewInvoice( inv.id );
+		viewInvoice( inv.id, { preview: false } );
 	}
 	
-	function viewInvoice( id: string ){
+	function viewInvoice( id: string, options:{ preview?:boolean } ){
 		//window.open( `/view-invoice?id=${id}`, `inv-${id}` );
-		window.open( `/view-invoice/${id}`, `inv-${id}` );
+		const urlParts = ["/view-invoice"]
+		if (options.preview){
+			urlParts.push("preview")
+		}
+		urlParts.push(id)
+		window.open( urlParts.join("/"), `inv-${id}` );
 	}
 
 	function allUninvoicedTimeHaveBeenAddedToWorkingInvoice() : boolean{
@@ -113,7 +124,7 @@
 <div id="container">
 
 	<section id="row1">
-		<InvoiceEditorView bind:vm={workingInvoice} onSaveInvoice={saveWorkingInvoice}/>
+		<InvoiceEditorView vm={workingInvoice} {onBuildInvoice} {onPreviewInvoice}/>
 
 		<div class="c-col-2">
 		
@@ -169,7 +180,7 @@
 				{#each closedInvoices as inv}
 				<article>
 					{inv.number}
-					<a href="##" onclick="{(ev) => { ev.preventDefault(); viewInvoice(inv.id);}}">View</a>
+					<a href="##" onclick="{(ev) => { ev.preventDefault(); viewInvoice(inv.id, {preview:false});}}">View</a>
 				</article>
 				{/each}
 			</details>

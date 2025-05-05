@@ -5,11 +5,13 @@
 	import InvoiceEditorLineView from "./InvoiceEditorLineView.svelte";
 
 	let {
-		vm = $bindable(),
-		onSaveInvoice
+		vm,
+		onPreviewInvoice,
+		onBuildInvoice,
 	}:{
 		vm:InvoiceViewModel,
-		onSaveInvoice:(vm:InvoiceViewModel)=>void
+		onPreviewInvoice:(vm:InvoiceViewModel)=>void,
+		onBuildInvoice:(vm:InvoiceViewModel)=>void,
 	} = $props();
 
 
@@ -20,7 +22,7 @@
 	<fieldset class="row">
 		<input name="inv-num" type="text" title="Invoice Number" placeholder="Invoice Number" bind:value="{vm.number}"/>
 		<input name="inv-date" type="date" title="Invoice Date" bind:value="{vm.date}"/>
-		<input name="inv-order" type="text" title="Order #" bind:value="{vm.orderRef}"/>
+		<input name="inv-order" type="text" title="Order #" placeholder="Order #" bind:value="{vm.orderRef}"/>
 		<div style="flex: 99 1 auto"></div>
 	</fieldset>
 	<label>
@@ -28,17 +30,10 @@
 		<textarea name="inv-issue-to" title="Address of the company or person being issued to" bind:value={vm.issueToAsText}></textarea>
 	</label>
 
-
-	<nav>
-		<ul>
-			<li>
-				<button onclick="{() => vm.addLine()}">Add Line</button>
-			</li>
-			<li>
-				<button class="secondary" onclick="{() => vm.sortLines()}">Sort Lines</button>
-			</li>
-		</ul>
-	</nav>
+	<section>
+		<button onclick="{() => vm.addLine()}">Add Line</button>
+		<button class="secondary" onclick="{() => vm.sortLines()}">Sort Lines</button>
+	</section>
 
 	<table id="working-inv-lines" class="striped">
 		<thead>
@@ -81,7 +76,8 @@
 	</label>
 
 	<footer>
-		<button onclick="{() => onSaveInvoice(vm)}">Save</button>
+		<button class="secondary" onclick="{() => onPreviewInvoice(vm)}">Preview</button>
+		<button onclick="{() => onBuildInvoice(vm)}">Build</button>
 	</footer>
 
 </article>
@@ -94,6 +90,7 @@
 		
 		--pico-form-element-spacing-vertical: 0.25rem;
 		--pico-form-element-spacing-horizontal: 0.25rem;
+		
 
 		.row{
 			display: flex;
@@ -112,10 +109,6 @@
 			flex: 1 1 12ch;
 		}
 	}
-		#working-invoice-container nav li{
-			padding-top: 0;
-			padding-bottom: 0;
-		}
 		#working-invoice-container input{
 			margin-bottom: 0;
 		}
@@ -124,6 +117,9 @@
 		}
 
 		#working-inv-lines{
+
+			margin: 0;
+			
 			th{
 				font-size: 80%;
 				white-space: nowrap;

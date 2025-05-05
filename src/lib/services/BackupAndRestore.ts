@@ -1,6 +1,14 @@
+import { invPreviewsRepo } from "./Singletons";
+
 export class BackupService{
 	
+	public cleanUpDatabase(){
+		invPreviewsRepo.removeAll(); // remove previews
+	}
+
 	public encodeDataToBackup() : string {
+		// first clean up database
+		this.cleanUpDatabase();
 		return btoa(JSON.stringify(localStorage));
 	}
 
