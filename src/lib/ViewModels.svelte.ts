@@ -1,10 +1,11 @@
 import { type InvoiceModel, type InvoiceLineModel } from "./Models";
 import { DateFormat } from "./utils";
 
-export class InvoiceViewModel {
+export class InvoiceViewModel implements InvoiceModel {
    
     public id = $state( crypto.randomUUID().toString() );
-    
+    public currencyCode:string = $state("NZD");
+  
     public number:string = $state("");
     public date:string = $state(DateFormat.toInputDateValue( new Date()));
     public orderRef:string = $state("");
@@ -59,6 +60,7 @@ export class InvoiceViewModel {
     getModel(): InvoiceModel {
         return {
             id:this.id,
+            currencyCode:this.currencyCode,
             number:this.number,
             date:this.date,
             orderRef:this.orderRef,
@@ -70,6 +72,7 @@ export class InvoiceViewModel {
 
     applyModel(m: InvoiceModel) {
         this.id = m.id;
+        this.currencyCode = m.currencyCode;
         this.number = m.number;
         this.date = m.date;
         this.orderRef = m.orderRef;
@@ -80,7 +83,7 @@ export class InvoiceViewModel {
 
 }
 
-export class InvoiceLineViewModel {
+export class InvoiceLineViewModel implements InvoiceLineModel {
     public id = $state( crypto.randomUUID().toString() );
     public extRefId:string|undefined = $state();
     public number:number = $state(0);

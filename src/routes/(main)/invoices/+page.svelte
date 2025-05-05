@@ -3,24 +3,13 @@
     import InvoiceEditorView from "$lib/InvoiceEditor/InvoiceEditorView.svelte";
     import { settingsController } from "$lib/SettingsController.svelte";
     import { taskController } from "$lib/TaskController.svelte";
-    import { type InvoiceLineModel,  type InvoiceModel, type TTask, TaskState } from "$lib/Models";
-    import { DateFormat, NumberFormat } from "$lib/utils";
+    import { type TTask, TaskState } from "$lib/Models";
     import { onMount } from "svelte";
     import { InvoiceLineViewModel, InvoiceViewModel } from "$lib/ViewModels.svelte";
 
     let wiNextLineNumber = $state(1);
 
     let workingInvoice = $state( new InvoiceViewModel() );
-
-    // let wiNumber: string = $state("");
-    // let wiDate: string = $state( DateFormat.toInputDateValue( new Date() ));
-    
-    // let wiIssueTo:string = $state("");
-    
-    // let wiLines: InvoiceLineViewModel[] = $state([]);
-    // let wiFootnote:string = $state("");
-    
-    $inspect(workingInvoice)
 
     let uninvoicedTasks:TTask[] = $state([]);
     onMount(()=>{
@@ -40,28 +29,13 @@
         newLine.unitCost = 200; //TODO: to model
         return newLine;
     }
-
-    // function addBlankLineToWorkingInvoice(){
-    //     const line = new InvoiceLineModel();
-    //     line.number = wiNextLineNumber;
-
-    //     wiNextLineNumber++;
-
-    //     wiLines.push( new InvoiceLineViewModel( line ) );
-    // }
-
-    // function sortWorkingInvoiceLines(){
-
-    // }
-    
+   
     function saveWorkingInvoice( inv: InvoiceViewModel ) : void{
         invoiceController.save(inv.getModel());
-        //workingInvoice = invoiceController.workingInvoice;
         window.open( `/invoice/${inv.id}`, )
     }
 
     function allUninvoicedTimeHasBeenAddedToWorkingInvoice() : boolean{
-        // todo: check each ref id
         for (const task of uninvoicedTasks) {
             if (workingInvoice.containsExtRefId( task.id )){
                 return false;
