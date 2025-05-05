@@ -2,6 +2,7 @@
     import Duration from "./Duration.svelte";
     import { getTaskControllerContext } from "./TaskController.svelte";
     import { getTaskRepoContext } from "./TaskRepo.svelte";
+    import { Icons, TaskActionModel, TaskState, type TaskModel } from "./Types.svelte";
     
     let {
         taskId,
@@ -14,34 +15,86 @@
 
     const task = $derived( taskRepo.getTask( taskId ) );
 
-    // $effect(()=>{
-    //     if(task){
-    //         taskRepo.store.saveTask(task);
-    //     }
-    // })
-
-
-    const iconFirstAction = $derived.by( () =>{
-        if (!task){
-            return;
+    const taskAction1 = new TaskActionModel( {
+        icon: ( task ) => {
+            switch( task.state){
+                case TaskState.Running:
+                    return Icons.TaskPause;    
+                case TaskState.Paused:
+                    return Icons.TaskResume;    
+                case TaskState.Stopped:
+                    return Icons.TaskDuplicateAndStart;    
+            }
+        },
+        hint: ( task ) => {
+            switch( task.state){
+                case TaskState.Running:
+                    return "Pause";    
+                case TaskState.Paused:
+                    return "Resume";    
+                case TaskState.Stopped:
+                    return "Start a new copy";
+            }
+        },
+        action: ( task ) => {
+            switch( task.state){
+                case TaskState.Running:
+                    taskController.pauseTask( task.id );
+                    break;  
+                case TaskState.Paused:
+                    taskController.resumeTask( task.id );
+                    break;
+                case TaskState.Stopped:
+                    taskController.activateAndStartCopy( task.id );
+                    break;
+            }
         }
-        if (!task.active){
-            return "⏫";
-        }
-        if (task.paused){
-            return "▶️";
-        }
-        return "⏸️";
-    } );
+    })
 
-    function increaseDuration( inc: boolean) : void{
+    const taskAction2 = new TaskActionModel( {
+        icon: ( task ) => {
+            switch( task.state){
+                case TaskState.Running:
+                    return Icons.TaskStop;
+                case TaskState.Paused:
+                    return Icons.TaskStop;    
+                case TaskState.Stopped:
+                    return Icons.TaskResume;    
+            }
+        },
+        hint: ( task ) => {
+            switch( task.state){
+                case TaskState.Running:
+                    return "Stop";    
+                case TaskState.Paused:
+                    return "Stop";    
+                case TaskState.Stopped:
+                    return "Start";
+            }
+        },
+        action: ( task ) => {
+            switch( task.state){
+                case TaskState.Running:
+                    taskController.stopTask( task.id );    
+                    break;
+                case TaskState.Paused:
+                    taskController.stopTask( task.id );
+                    break;
+                case TaskState.Stopped:
+                    taskController.startTask( task.id )   
+                    break;
+            }
+        }
+    })
+
+    function increaseDuration( inc: boolean ) : void{
         taskController.incrementTaskDuration( taskId, inc ? 15 : -15 );
     }
 
 </script>
 
 {#if task}
-<article class="{task.paused ? "paused" : "running"}">
+<article class:running="{task.state == TaskState.Running}">
     <div class="row1">
         <input id="date" type="date" title="Date" bind:value={task.date} onchange="{() => taskRepo.markAsChanged(task)}"/>
         <input id="name" type="text" title="Discription" bind:value={task.name} oninput="{() => taskRepo.markAsChanged(task)}" />
@@ -50,29 +103,13 @@
             affectiveDurationHours={task.affectiveDurationHours}
             onIncreaseDuration={increaseDuration}
 
-            icon1={iconFirstAction}
-            onAction1Click={
-                taskController.canPauseOrResume(taskId)
-                ? () => taskController.togglePaused(taskId)
-                : () => taskController.activateAndStartCopy(taskId)
-            }
-            action1Hint={
-                taskController.canPauseOrResume(taskId)
-                ? ( task.paused ? "Resume" : "Pause" )
-                : "Activate a Copy"
-            }
+            icon1={taskAction1.icon(task)}
+            onAction1Click={() => taskAction1.execute(task)}
+            action1Hint={taskAction1.hint(task)}
             
-            icon2={ task.active ? "⏹️" : "▶️"}
-            onAction2Click={
-                task.active
-                ? () => taskController.deactivateTask(taskId)
-                : () => taskController.activateAndStart(taskId)
-            }
-            action2Hint={
-                task.active
-                ? "Stop"
-                : "Resume"
-            }
+            icon2={taskAction2.icon(task)}
+            onAction2Click={() => taskAction2.execute(task)}
+            action2Hint={taskAction2.hint(task)}
         />
     </div>
     <!-- <div class="row2">

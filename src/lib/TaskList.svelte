@@ -2,32 +2,33 @@
     import Task from "./Task.svelte";
     import { getTaskControllerContext } from "./TaskController.svelte";
     import { blur, fade, fly, scale, slide } from "svelte/transition";
+    import { TaskState } from "./Types.svelte";
         
     const taskController = getTaskControllerContext();
 
-    let runningTask = $derived( taskController.fetchFirstRunningTask() )
-    let activePausedTasks = $derived( taskController.fetchActiveButPausedTasks() )
-    let inactiveTasks = $derived( taskController.fetchInactiveTasks() )
+    let runningTasks = $derived( taskController.fetchTasksByState( [TaskState.Running]) )
+    let pausedTasks = $derived( taskController.fetchTasksByState( [TaskState.Paused]) )
+    let stoppedTasks = $derived( taskController.fetchTasksByState( [TaskState.Stopped]) )
 
 </script>
 
 <div class="container">
-    {#if runningTask}
+    {#if runningTasks.length > 0}
     <section class="list">
         <header>In Progress</header>
-        {#key runningTask}
+        {#each runningTasks as task, index (task.id)}
         <div transition:slide={{duration:200}}>
-            <Task taskId={runningTask.id}/>
+            <Task taskId={task.id}/>
         </div>
-        {/key}
+        {/each}
     </section>
     {/if}
     
-    {#if activePausedTasks.length > 0}
+    {#if pausedTasks.length > 0}
     <hr/>
     <details open>
         <summary>Paused</summary>
-        {#each activePausedTasks as task, index (task.id)}
+        {#each pausedTasks as task, index (task.id)}
         <div transition:slide={{duration:200}}>
             <Task taskId={task.id}/>
         </div>
@@ -35,11 +36,11 @@
     </details>
     {/if}
     
-    {#if inactiveTasks.length > 0}
+    {#if stoppedTasks.length > 0}
     <hr/>
     <details>
         <summary>Inactive</summary>
-        {#each inactiveTasks as task, index(task.id)}
+        {#each stoppedTasks as task, index(task.id)}
         <div transition:slide={{duration:200}}>
             <Task taskId={task.id}/>
         </div>
