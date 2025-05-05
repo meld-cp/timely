@@ -149,7 +149,7 @@
 					</div>
 					{/each}
 				{:else}
-					<p><i>All time has been account for.</i></p>
+					<p><i>All time has been accounted for.</i></p>
 				{/if}
 				
 			</article>
