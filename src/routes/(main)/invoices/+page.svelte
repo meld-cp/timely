@@ -112,19 +112,20 @@
 	 */
 	function onBuildInvoice() : void{
 
-		const model = workingInvoice.getModel();
+		const newInvModel = workingInvoice.getModel();
 
 		// give the working invoice a unique id
-		model.id = crypto.randomUUID();
+		newInvModel.id = crypto.randomUUID();
 
 		// save
-		appController.invRepo.set( model.id, model);
+		appController.invRepo.set( newInvModel.id, newInvModel);
 
 		//tag all tasks in invoice lines with invoice number
-		const attachedTaskIds = workingInvoice.lines.map( l=>l.extRefId ).filter( id=>id && id.length > 0);
+		const attachedTaskIds = newInvModel.lines.map( l=>l.extRefId ).filter( id=>id && id.length > 0);
 		const attachedTasks = uninvoicedTasks.filter( t=> attachedTaskIds.includes( t.id ));
 		for (const task of attachedTasks) {
-			task.invoiceRefId = workingInvoice.id;
+			task.invoiceRefId = newInvModel.id;
+			task.state = TaskState.Archived;
 			appController.taskRepo.set( task.id, task.getModel() );
 		}
 
@@ -134,7 +135,7 @@
 		uninvoicedTasks = fetchUninvoicedTasks();
 		resetWorkingInvoice();
 
-		viewInvoice( model.id );
+		viewInvoice( newInvModel.id );
 	}
 	
 	function viewInvoice( id: string ){
