@@ -22,8 +22,7 @@
 
 <script lang="ts">
     import { appController } from '$lib/services/Singletons';
-
-   
+	
 	let { children } = $props();
 
 	const memuItems:{ label:string, url:string }[] = [

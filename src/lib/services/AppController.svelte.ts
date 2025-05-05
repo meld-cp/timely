@@ -27,6 +27,8 @@ export class ApplicationController {
 		this.taskRepo = new LocalStorageController<TaskModel>(APP_LOCALSTORE_TASKS_NAME, localStorageOptions);
 		this.invRepo = new LocalStorageController<InvoiceModel>(APP_LOCALSTORE_INVOICES_NAME, localStorageOptions);
 		this.settingsController = new SettingsController( this.settingsRepo);
+
+		this.dataModifiedTimestamp = this.readDataModifiedTimestamp() ?? 0;
 	}
 
 	public async getTasks():Promise<TaskViewModel[]>{

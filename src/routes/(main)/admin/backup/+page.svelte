@@ -15,6 +15,8 @@
 		KV_STORE_APP_ID,
 	));
 
+	let restoreWarningMessage:string|null = $state( null );
+
 	let writingToCloudData = $state( false );
 	let canWriteToCloudData = $derived( cloudService && !writingToCloudData );
 
@@ -84,6 +86,10 @@
 			const dataToRestore = await cloudService.getData();
 			if (!dataToRestore){
 				throw Error("Invalid data to restore");
+			}
+			restoreWarningMessage = null;
+			if ( dataToRestore.modified < appDataToBackup.modified ) {
+				restoreWarningMessage = "Warning: Current app data is newer than cloud data";
 			}
 			dataAsTextToRestore = localBackupSvr.encode( dataToRestore );
 		}finally{
@@ -161,6 +167,9 @@
 		</div>
 		<textarea name="restore-text" bind:value={dataAsTextToRestore}></textarea>
 		<button onclick={onRestoreData}>Restore</button>
+		{#if restoreWarningMessage}
+		<p style:color="red">{restoreWarningMessage}</p>
+		{/if}
 	</article>
 
 </section>
