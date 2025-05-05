@@ -14,10 +14,13 @@
 <form>
     <label>
         Logo Data
-        <textarea
-            bind:value={settings.logoData} oninput="{handleSettingsChanged}"
-            style="font-size: small; height: 10em;"
-        ></textarea>
+        <div class="grid">
+            <textarea
+                bind:value={settings.logoData} oninput="{handleSettingsChanged}"
+                style="font-size: small; height: 10em;"
+            ></textarea>
+            <img src={settings.logoData} alt="" style="height: 6em;"/>
+        </div>
     </label>
     <label>
         Next Invoice Number

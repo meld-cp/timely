@@ -13,6 +13,7 @@ export enum TaskState {
     Stopped,
     Archived
 }
+
 export type TTask = {
     id: string;
     state: TaskState;
@@ -52,37 +53,6 @@ export class InvoiceModel{
 
     public lines: InvoiceLineModel[] = [];
 
-    // public addLine( line: InvoiceLineModel ){
-    //     this.removeLinesWithId(line.id)
-
-    //     //this.lineCounter++;
-        
-    //     //line.number = this.lineCounter;
-    //     this.lines.push( line );
-    // }
-
-    // public removeLinesWithExtRefId( extRefId:string ) {
-    //     this.lines = this.lines.filter( l=>l.extRefId != extRefId );
-    // }
-
-    // public removeLinesWithId(id: string) {
-    //     this.lines = this.lines.filter( l=>l.id != id );
-    // }
-
-    // public containsLineWithId(id: string) : boolean {
-    //     return this.lines.some( l=>l.id == id );
-    // }
-    // public getSubtotal():number {
-    //     return this.lines.reduce( (p,line) => p + line.getTotal(), 0 );
-    // }
-    
-    // public getTaxTotal():number {
-    //     return this.lines.reduce( (p,line) => p + line.getTax(), 0 );
-    // }
-
-    // public getGrandTotal():number {
-    //     return this.getSubtotal() + this.getTaxTotal();
-    // }
 }
 
 export class InvoiceLineModel {
