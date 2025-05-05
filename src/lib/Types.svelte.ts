@@ -11,6 +11,7 @@ export type TaskModel = {
 }
 
 export class InvoiceModel{
+    public id = $state(crypto.randomUUID().toString())
     public number:string = $state("");
     public date:string = $state( DateHelper.toInputDateValue( new Date()) );
 
@@ -19,7 +20,7 @@ export class InvoiceModel{
     private lineCounter = 0;
 
     public addLine( line: InvoiceLineModel ){
-        this.removeLineWithRef(line.refId)
+        this.removeLineWithId(line.id)
 
         this.lineCounter++;
         
@@ -28,12 +29,12 @@ export class InvoiceModel{
         this.lines.push( line );
     }
 
-    public removeLineWithRef(id: string) {
-        this.lines = this.lines.filter( l=>l.refId != id );
+    public removeLineWithId(id: string) {
+        this.lines = this.lines.filter( l=>l.id != id );
     }
 
-    public containsLineWithRef(id: string) : boolean {
-        return this.lines.some( l=>l.refId == id );
+    public containsLineWithId(id: string) : boolean {
+        return this.lines.some( l=>l.id == id );
     }
     public getSubtotal():number {
         return 0;
@@ -49,8 +50,8 @@ export class InvoiceModel{
 }
 
 export class InvoiceLineModel {
+    public id = $state(crypto.randomUUID().toString())
     public number:number = $state(0)
-    public refId = $state(crypto.randomUUID().toString())
     public description:string = $state("")
     public units:string = $state("")
     public quantity:number = $state(0)
