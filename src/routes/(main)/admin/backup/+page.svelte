@@ -23,7 +23,7 @@
 	
 	//TODO: move this to app controller
 	const localBackupSvr = new LocalBackupService();
-	let dataToBackup = $state( localBackupSvr.encodeDataToBackup( appDataToBackup ) );
+	let dataToBackup = $state( localBackupSvr.encode( appDataToBackup ) );
 	
 	let restoreFiles:FileList | undefined = $state();
 	let dataAsTextToRestore:string | undefined = $state();
@@ -70,7 +70,7 @@
 			if (!dataToRestore){
 				throw Error("Invalid data to restore");
 			}
-			dataAsTextToRestore = localBackupSvr.encodeDataToBackup( dataToRestore );
+			dataAsTextToRestore = localBackupSvr.encode( dataToRestore );
 		}finally{
 			readingFromCloudData = false;
 		}
@@ -83,7 +83,7 @@
 				throw Error("No data to restore, select a file first")
 			}
 			
-			const dataToRestore = localBackupSvr.decodeFromBase64(dataAsTextToRestore);
+			const dataToRestore = localBackupSvr.decodeFromJson(dataAsTextToRestore);
 
 			if (!dataToRestore){
 				throw Error("Invalid data to restore");
@@ -96,7 +96,7 @@
 			if ( eInputRestoreFile ) eInputRestoreFile.value = '';
 			
 			// refresh data to backup
-			dataToBackup = localBackupSvr.encodeDataToBackup( dataToRestore )
+			dataToBackup = localBackupSvr.encode( dataToRestore )
 
 			alert('Restored successfully!');
 

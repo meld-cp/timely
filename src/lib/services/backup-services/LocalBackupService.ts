@@ -6,7 +6,7 @@ import { Utils } from "../Utils";
 export class LocalBackupService implements IBackupService {
 
 	public async backup(data: ApplicationData): Promise<void> {
-		const encodedData = this.encodeDataToBackup(data);
+		const encodedData = this.encode(data);
 		this.downloadAsFile(encodedData);
 	}
 
@@ -15,13 +15,11 @@ export class LocalBackupService implements IBackupService {
 		Utils.downloadAsFile(encodedData, filename);
 	}
 
-	public encodeDataToBackup(data: ApplicationData): string {
-		return btoa(JSON.stringify(data));
+	public encode(data: ApplicationData): string {
+		return JSON.stringify(data, null, 2);
 	}
 
-	public decodeFromBase64(base64Text: string): ApplicationData | null {
-		const dataJson = atob(base64Text);
-		console.debug(dataJson);
-		return JSON.parse(dataJson) as ApplicationData;
+	public decodeFromJson(json: string): ApplicationData | null {
+		return JSON.parse(json) as ApplicationData;
 	}
 }
