@@ -4,16 +4,29 @@
 	import { settingsController } from "$lib/services/Singletons";
     import { Utils } from "$lib/services/Utils";
 
+	const selectableLocales = [
+		{"code":"en-NZ", "name":"English (New Zealand)"},
+		{"code":"en-US", "name":"English (United States)"},
+		{"code":"de-DE", "name":"Deutsch"},
+	]
+
+	const selectableCurrencies = [
+		{"code":"NZD", "name":"New Zealand Dollar"},
+		{"code":"USD", "name":"United States Dollar"},
+		{"code":"EUR", "name":"Euro"},
+	]
+
+
 	let settings = $state(settingsController.read());
 
 	let eInputInvoiceLogoFile:HTMLInputElement;
 
 	let localeExamples = $derived( [
 		`Date: ${FormatDate.toLocalDate(new Date(), settings.localeCode )}`,
-		`Numbers: ${FormatNumber.decimalPlaces( 1234567.89, 2, settings.localeCode )}`,
+		`Numbers: ${FormatNumber.decimalPlaces( 123456.789, 2, settings.localeCode )}`,
 	] );
 
-	// $inspect(settings);
+	let currencyExample = $derived( FormatNumber.currency( 123456.789, settings.defaultInvoiceCurrencyCode, settings.localeCode ) );
 
 	function onSettingsChanged(){
 		saveSettings();
@@ -43,10 +56,10 @@
 			<label>
 				Locale
 				<select name="locale" bind:value={settings.localeCode}  onchange="{onSettingsChanged}">
-					<option value="" selected={""==( settings.localeCode ?? "")}></option>
-					<option value="en-NZ" selected={"en-NZ"==settings.localeCode}>New Zealand</option>
-					<option value="en-DE" selected={"en-DE"==settings.localeCode}>Deutsch</option>
-					<option value="en-US" selected={"en-US"==settings.localeCode}>US</option>
+					<option value="" selected={""==settings.localeCode}></option>
+					{#each selectableLocales as locale}
+					<option value={locale.code} selected={locale.code==settings.localeCode}>{locale.name}</option>
+					{/each}
 				</select>
 				<small>
 					Examples:
@@ -61,6 +74,19 @@
 	<article>
 		<details open>
 			<summary>Invoice Settings</summary>
+			<label>
+				Default Currency
+				<select name="currency" bind:value={settings.defaultInvoiceCurrencyCode}  onchange="{onSettingsChanged}">
+					<option value="" selected={""==settings.defaultInvoiceCurrencyCode}></option>
+					{#each selectableCurrencies as currency}
+					<option value={currency.code} selected={currency.code==settings.defaultInvoiceCurrencyCode}>{currency.name}</option>
+					{/each}
+				</select>
+				<small>
+					Example:
+					<span style:padding="0 0.5rem">{currencyExample}</span>
+				</small>
+			</label>
 			<label>
 				Your Address
 				<textarea

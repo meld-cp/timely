@@ -27,7 +27,12 @@
 	</fieldset>
 	<label>
 		Issue to
-		<textarea name="inv-issue-to" title="Address of the company or person being issued to" bind:value={vm.issueToAsText} spellcheck="true"></textarea>
+		<textarea
+			name="inv-issue-to"
+			title="Address of the company or person being issued to"
+			bind:value={vm.issueToAsText}
+			spellcheck="true"
+		></textarea>
 	</label>
 
 	<section>
@@ -48,7 +53,10 @@
 		</thead>
 		<tbody>
 			{#each vm.lines as line}
-			<InvoiceEditorLineView vm={line} currencyCode={vm.currencyCode} />
+			<InvoiceEditorLineView
+				vm={line}
+				currencyCode={vm.currencyCode}
+			/>
 			{/each}
 		</tbody>
 		<tfoot>

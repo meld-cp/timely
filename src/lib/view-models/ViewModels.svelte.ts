@@ -118,7 +118,7 @@ export class TaskViewModel {
 export class InvoiceViewModel {
    
 	public id = $state( crypto.randomUUID().toString() );
-	public currencyCode:string = $state("NZD");
+	public currencyCode:string = $state("USD");
   
 	public number:string = $state("");
 	public date:string = $state(FormatDate.toInputDateValue( new Date()));
