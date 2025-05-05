@@ -116,17 +116,18 @@ export class TaskViewModel {
 }
 
 export class InvoiceViewModel {
-   
+	
 	public id = $state( crypto.randomUUID().toString() );
 	public currencyCode:string = $state("USD");
-  
+	
 	public number:string = $state("");
 	public date:string = $state(FormatDate.toInputDateValue( new Date()));
 	public orderRef:string = $state("");
-
+	
 	public issueToLines: string[] = $state([]);
 	public footerLines: string[] = $state([]);
-
+	
+	public nextLineNumber = $state(10);
 	public lines: InvoiceLineViewModel[] = $state([]);
 
 	subtotal:number = $derived( this.lines.reduce( (p,line) => p + line.total, 0 ))
@@ -181,7 +182,6 @@ export class InvoiceViewModel {
 	
 	public containsExtRefId(extRefId: string): boolean {
 		const contains =  this.lines.some( l=>l.extRefId === extRefId);
-		//console.log(extRefId, contains)
 		return contains;
 	}
 	
@@ -191,12 +191,16 @@ export class InvoiceViewModel {
 
 	public addLine( line?: InvoiceLineViewModel ):string{
 		const m  = line ?? new InvoiceLineViewModel();
+		
+		m.number = this.nextLineNumber;
+		this.nextLineNumber += 10;
 		this.lines.push(m);
+
 		return m.id;
 	}
 
 	public sortLines(){
-		//TODO:
+		this.lines.sort( (a,b) => a.number - b.number );
 	}
 }
 
