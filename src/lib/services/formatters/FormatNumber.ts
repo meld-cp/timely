@@ -1,4 +1,16 @@
 export class FormatNumber {
+
+	static decimalPlaces( n: number, decimalPlaces: number, locale?:string ): string {
+		const f = new Intl.NumberFormat(
+			locale,
+			{
+				style: "decimal",
+				minimumFractionDigits: decimalPlaces,
+			}
+		);
+		return f.format(n);
+	}
+
 	static currency( n: number, currencyCode: string, locale?:string ): string {
 		const f = new Intl.NumberFormat(
 			locale,

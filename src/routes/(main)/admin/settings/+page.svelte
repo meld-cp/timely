@@ -1,10 +1,19 @@
 <script lang="ts">
+    import { FormatDate } from "$lib/services/formatters/FormatDate";
+    import { FormatNumber } from "$lib/services/formatters/FormatNumber";
 	import { settingsController } from "$lib/services/Singletons";
     import { Utils } from "$lib/services/Utils";
 
-	const settings = settingsController.read();
+	let settings = $state(settingsController.read());
 
 	let eInputInvoiceLogoFile:HTMLInputElement;
+
+	let localeExamples = $derived( [
+		`Date: ${FormatDate.toLocalDate(new Date(), settings.localeCode )}`,
+		`Numbers: ${FormatNumber.decimalPlaces( 1234567.89, 2, settings.localeCode )}`,
+	] );
+
+	// $inspect(settings);
 
 	function onSettingsChanged(){
 		saveSettings();
@@ -36,9 +45,15 @@
 				<select name="locale" bind:value={settings.localeCode}  onchange="{onSettingsChanged}">
 					<option value="" selected={""==( settings.localeCode ?? "")}></option>
 					<option value="en-NZ" selected={"en-NZ"==settings.localeCode}>New Zealand</option>
-					<option value="en-DE" selected={"en-DE"==settings.localeCode}>Deutschl</option>
+					<option value="en-DE" selected={"en-DE"==settings.localeCode}>Deutsch</option>
 					<option value="en-US" selected={"en-US"==settings.localeCode}>US</option>
 				</select>
+				<small>
+					Examples:
+					{#each localeExamples as example}
+						<span style:padding="0 0.5rem">{example}</span>
+					{/each}
+				</small>
 			</label>
 		</details>
 	</article>
