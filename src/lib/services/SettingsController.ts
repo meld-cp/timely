@@ -1,3 +1,4 @@
+import { APP_LOCALSTORE_SETTINGS_NAME } from "$lib/constants";
 import { SettingsViewModel } from "$lib/view-models/SettingsViewModel.svelte";
 import type { SettingsModel } from "../models/SettingsModel";
 
@@ -19,7 +20,7 @@ export class SettingsController{
 
 	public read() : SettingsViewModel{
 		
-		const json = localStorage.getItem("settings");
+		const json = localStorage.getItem(APP_LOCALSTORE_SETTINGS_NAME);
 		
 		if (!json){
 			return new SettingsViewModel(this.defaultSettings);
@@ -30,8 +31,7 @@ export class SettingsController{
 
 	public write(settings: SettingsViewModel){
 		const json = JSON.stringify( settings.getModel() );
-		//console.log(json)
-		localStorage.setItem("settings", json);
+		localStorage.setItem(APP_LOCALSTORE_SETTINGS_NAME, json);
 	}
 
     public incrementNextInvoiceNumber() {

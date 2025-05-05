@@ -1,35 +1,43 @@
 <script lang="ts">
-    import { KV_STORE_APP_ID, KV_STORE_BACKUP_KEY, KV_STORE_BUCKET_ID } from "$lib/constants";
-    import { BackupService, CloudBackupService, RestoreService } from "$lib/services/BackupAndRestore";
-    import { settingsController } from "$lib/services/Singletons";
+    import { KV_STORE_APP_ID } from "$lib/constants";
+    
+    import { KvStorBackupService } from "$lib/services/backup-services/KvStorBackupService";
+    import { LocalBackupService } from "$lib/services/backup-services/LocalBackupService";
+    import { appController } from "$lib/services/Singletons";
+    import { onMount } from "svelte";
 	
-	const settings = settingsController.read();
-	
-	let cloudService = CloudBackupService.build(
-		settings.cloudSyncHost,
-		settings.cloudSyncUserId,
+	//let settings:SettingsViewModel | undefined = $state();
+
+	onMount(async()=>{
+		//settings = await appController.getSettings();
+	})
+	let appDataToBackup = $state( appController.getAppData() );
+
+	//TODO: move this to app controller
+	let cloudService = $state( KvStorBackupService.build(
+		appController.settings.cloudSyncHost,
+		appController.settings.cloudSyncUserId,
 		KV_STORE_APP_ID,
-		KV_STORE_BUCKET_ID
-	);
+	));
 
 	let writingToCloudData = $state( false );
-	let canWriteToCloudData = $derived( cloudService !== undefined && !writingToCloudData );
+	let canWriteToCloudData = $derived( cloudService && !writingToCloudData );
 
 	let readingFromCloudData = $state( false );
-	let canReadFromCloudData = $derived( cloudService !== undefined && !readingFromCloudData );
+	let canReadFromCloudData = $derived( cloudService && !readingFromCloudData );
 	
-
-	const backupSvr = new BackupService();
-	let dataToBackup = $state( backupSvr.encodeDataToBackup() );
+	//TODO: move this to app controller
+	const localBackupSvr = new LocalBackupService();
+	let dataToBackup = $state( localBackupSvr.encodeDataToBackup( appDataToBackup ) );
 	
 	let restoreFiles:FileList | undefined = $state();
-	let dataToRestore:string | undefined = $state();
+	let dataAsTextToRestore:string | undefined = $state();
 
 	let eInputRestoreFile:HTMLInputElement;
 
 	// local backup
 	function onBackupDataLocal(){
-		backupSvr.downloadBackupFile();
+		localBackupSvr.downloadAsFile( dataToBackup );
 	}
 
 	async function onRestoreFileSelected(){
@@ -39,7 +47,7 @@
 			return;
 		}
 
-		dataToRestore = await file.text();
+		dataAsTextToRestore = await file.text();
 
 	}
 
@@ -50,7 +58,7 @@
 			if (!cloudService){
 				return;
 			}
-			await cloudService.put(KV_STORE_BACKUP_KEY, dataToBackup);
+			await cloudService.backup( appDataToBackup);
 		}finally{
 			writingToCloudData = false;
 		}
@@ -62,27 +70,38 @@
 			if (!cloudService){
 				return;
 			}
-			dataToRestore = await cloudService.get(KV_STORE_BACKUP_KEY);
+			
+			const dataToRestore = await cloudService.getData();
+			if (!dataToRestore){
+				throw Error("Invalid data to restore");
+			}
+			dataAsTextToRestore = localBackupSvr.encodeDataToBackup( dataToRestore );
 		}finally{
 			readingFromCloudData = false;
 		}
 	}
 
 
-	function onRestoreData(){
+	async function onRestoreData(){
 		try {
-			if (!dataToRestore){
+			if (!dataAsTextToRestore){
 				throw Error("No data to restore, select a file first")
 			}
 			
-			const restoreSvr = new RestoreService();
-			restoreSvr.restoreFromBase64(dataToRestore);
+			const dataToRestore = localBackupSvr.decodeFromBase64(dataAsTextToRestore);
 
-			dataToRestore = undefined;
+			if (!dataToRestore){
+				throw Error("Invalid data to restore");
+			}
+
+			await appController.restoreAppData(dataToRestore);
+
+			// reset
+			dataAsTextToRestore = undefined;
 			if ( eInputRestoreFile ) eInputRestoreFile.value = '';
 			
 			// refresh data to backup
-			dataToBackup = backupSvr.encodeDataToBackup();
+			dataToBackup = localBackupSvr.encodeDataToBackup( dataToRestore )
 
 			alert('Restored successfully!');
 
@@ -130,7 +149,7 @@
 				aria-busy="{readingFromCloudData}"
 			>Read From Cloud</button>
 		</div>
-		<textarea name="restore-text" bind:value={dataToRestore}></textarea>
+		<textarea name="restore-text" bind:value={dataAsTextToRestore}></textarea>
 		<button onclick={onRestoreData}>Restore</button>
 	</article>
 

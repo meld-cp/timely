@@ -21,8 +21,7 @@
 </svelte:head>
 
 <script lang="ts">
-    import { BackupService } from '$lib/services/BackupAndRestore';
-    
+   
 	let { children } = $props();
 
 	const memuItems:{ label:string, url:string }[] = [
@@ -40,7 +39,7 @@
 		elMenu?.attributes.removeNamedItem("open")
 	}
 
-	const backupSvr = new BackupService();
+	//const backupSvr = new BackupService();
 </script>
 
 <nav class="container">
@@ -52,7 +51,7 @@
 		</li>
 	</ul>
 	<ul>
-		<li><button class="outline" onclick={() => backupSvr.downloadBackupFile()}>Backup</button></li>
+		<!-- <li><button class="outline" onclick={() => backupSvr.downloadBackupFile()}>Backup</button></li> -->
 		<li>
 			<details class="dropdown" bind:this={elMenu}>
 				<summary style="width: 18ch;">Menu</summary>

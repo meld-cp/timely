@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Task from "./Task.svelte";
 	import { slide } from "svelte/transition";
-	import type { TaskViewModel } from "../view-models/ViewModels.svelte";
+	
+	import type { TaskViewModel } from "$lib/view-models/TaskViewModel.svelte";
     import type { ITaskController } from "$lib/ITaskController";
 		
 	let {

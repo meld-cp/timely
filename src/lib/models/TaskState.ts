@@ -1,7 +1,6 @@
-
 export enum TaskState {
-	Running,
-	Paused,
-	Stopped,
-	Archived
+	Running = "Running",
+	Paused = "Paused",
+	Stopped = "Stopped",
+	Archived = "Archived",
 }

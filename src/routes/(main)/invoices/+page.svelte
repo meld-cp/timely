@@ -3,11 +3,16 @@
 	import { type TaskModel } from "$lib/models/TaskModel";
 	import { TaskState } from "$lib/models/TaskState";
 	import { onMount } from "svelte";
-	import { InvoiceLineViewModel, InvoiceViewModel, TaskViewModel } from "$lib/view-models/ViewModels.svelte";
-	import { invRepo, settingsController, taskRepo } from "$lib/services/Singletons";
-    import { FormatDate } from "$lib/services/formatters/FormatDate";
+	
+	import { InvoiceLineViewModel } from "$lib/view-models/InvoiceLineViewModel.svelte";
+	import { InvoiceViewModel } from "$lib/view-models/InvoiceViewModel.svelte";
+	import { TaskViewModel } from "$lib/view-models/TaskViewModel.svelte";
+	import { FormatDate } from "$lib/services/formatters/FormatDate";
+    import { appController } from "$lib/services/Singletons";
 	
 	const draftInvoiceId = "draft";
+
+	const settings = appController.settings;
 
 	let workingInvoice:InvoiceViewModel = $state( loadDraftInvoice());
 	let uninvoicedTasks:TaskViewModel[] = $state([]);
@@ -16,14 +21,14 @@
 	let closedInvoices:InvoiceViewModel[] = $state([]);
 	
 	onMount(()=>{
-		scratchPad = settingsController.getScratchPad("page-invoice-builder");
+		scratchPad = appController.settingsController.getScratchPad("page-invoice-builder");
 		
 		uninvoicedTasks = fetchUninvoicedTasks();
 		closedInvoices = fetchInvoices();
 	})
     
 	function loadDraftInvoice() : InvoiceViewModel{
-		var m = invRepo.get(draftInvoiceId)
+		var m = appController.invRepo.get(draftInvoiceId)
 		if (m){
 			 return new InvoiceViewModel(m);
 		}
@@ -32,7 +37,7 @@
 
 	function fetchInvoices(): InvoiceViewModel[] {
 		// fetch all invoices and sort by date desc and then number desc
-        return invRepo
+        return appController.invRepo
 			.getAll()
 			.filter( i=>i.id != draftInvoiceId)
 			.map( m => new InvoiceViewModel(m) )
@@ -60,7 +65,7 @@
     }
 
 	function buildNewDraftInvoice() : InvoiceViewModel{
-		const settings = settingsController.read();
+		const settings = appController.settings;
 
 		const result = new InvoiceViewModel();
 		result.id = draftInvoiceId;
@@ -75,11 +80,11 @@
 	}
 
 	function saveScratchPad(){
-		settingsController.setScratchPad("page-invoice-builder", scratchPad);
+		appController.settingsController.setScratchPad("page-invoice-builder", scratchPad);
 	}
 
 	function fetchUninvoicedTasks(): TaskViewModel[]{
-		return taskRepo.getAll().filter( t=> t.invoiceRefId.length == 0 && t.state == TaskState.Stopped).map(m=> new TaskViewModel(m) );
+		return appController.taskRepo.getAll().filter( t=> t.invoiceRefId.length == 0 && t.state == TaskState.Stopped).map(m=> new TaskViewModel(m) );
 	}
 
 	function buildTimeLogInvoiceLine( timeLog: TaskModel ): InvoiceLineViewModel {
@@ -101,7 +106,7 @@
 
 	function saveDraftInvoice() {
 		// save invoice
-		invRepo.set( workingInvoice.id, workingInvoice.getModel() );
+		appController.invRepo.set( workingInvoice.id, workingInvoice.getModel() );
 	}
 
 	/**
@@ -115,17 +120,17 @@
 		model.id = crypto.randomUUID();
 
 		// save
-		invRepo.set( model.id, model);
+		appController.invRepo.set( model.id, model);
 
 		//tag all tasks in invoice lines with invoice number
 		const attachedTaskIds = workingInvoice.lines.map( l=>l.extRefId ).filter( id=>id && id.length > 0);
 		const attachedTasks = uninvoicedTasks.filter( t=> attachedTaskIds.includes( t.id ));
 		for (const task of attachedTasks) {
 			task.invoiceRefId = workingInvoice.id;
-			taskRepo.set( task.id, task.getModel() );
+			appController.taskRepo.set( task.id, task.getModel() );
 		}
 
-		settingsController.incrementNextInvoiceNumber();
+		appController.settingsController.incrementNextInvoiceNumber();
 		closedInvoices = fetchInvoices();
 		
 		uninvoicedTasks = fetchUninvoicedTasks();

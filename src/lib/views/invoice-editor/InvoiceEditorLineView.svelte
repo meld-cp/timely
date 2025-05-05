@@ -1,7 +1,8 @@
 <script lang="ts">
 	
 	import { FormatNumber } from "$lib/services/formatters/FormatNumber";
-	import type { InvoiceLineViewModel } from "$lib/view-models/ViewModels.svelte";
+	
+	import type { InvoiceLineViewModel } from "$lib/view-models/InvoiceLineViewModel.svelte";
     import { faTrash } from "@fortawesome/free-solid-svg-icons";
     import Icon from "../Icon.svelte";
 
