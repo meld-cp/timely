@@ -84,7 +84,7 @@
 					<th class="tar" style="width: 2cm;">Quantity</th>
 					<th class="tac" style="width: 2cm;">Unit</th>
 					<th class="tar" style="width: 2cm;">Unit Price</th>
-					<th class="tar" style="width: 2cm;">Amount</th>
+					<th class="tar" style="width: 2cm; white-space: nowrap;">Amount ({inv.currencyCode})</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -100,15 +100,15 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<th class="tar" colspan="4">Subtotal</th>
+					<th class="tar" colspan="4">Subtotal:</th>
 					<th class="tar">{FormatNumber.currency( inv.subtotal, inv.currencyCode, settings.localeCode )}</th>
 				</tr>
 				<tr>
-					<th class="tar" colspan="4">GST</th>
+					<th class="tar" colspan="4">GST:</th>
 					<th class="tar">{FormatNumber.currency( inv.taxTotal, inv.currencyCode, settings.localeCode )}</th>
 				</tr>
 				<tr>
-					<th class="tar" colspan="4">Grand Total</th>
+					<th class="tar" colspan="4">Grand Total:</th>
 					<th class="tar">{FormatNumber.currency( inv.grandTotal, inv.currencyCode, settings.localeCode )}</th>
 				</tr>
 			</tfoot>
@@ -146,7 +146,7 @@
 	th, td{
 		padding: 0.1cm;
 	}
-
+	
 	#c-inv{
 		margin: 0;
 		font-size: 0.4cm;
@@ -177,8 +177,15 @@
 		font-size: 1cm;
 	}
 
-	#c-lines table{
-		width: 100%;
+	#c-lines{
+
+		td, th{
+			padding: 0.3rem 0.5rem;
+		}
+		table{
+			width: 100%;
+		}
+		
 	}
 	
 
