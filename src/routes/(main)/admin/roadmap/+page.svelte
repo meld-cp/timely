@@ -2,10 +2,9 @@
 
 <h3>To Do</h3>
 <ul>
-	<li>
+	<!-- <li>
 		Next
-		<br>- Invoices - Auto save draft invoices
-	</li>
+	</li> -->
 	<li>
 		Later
 		<br>- Invoices - Ability to edit
@@ -16,6 +15,11 @@
 <h3>Completed</h3>
 <ul>
 	<li>
+		2025-01-26
+		<br>- Invoices - Auto save draft invoices
+	</li>
+
+	<li>
 		2025-01-25
 		<br>- Invoices - sort and renumber lines
 		<br>- Invoices - delete line
@@ -24,6 +28,7 @@
 		<br>- Settings - Easy logo selection
 		<br>- Time Log - Task description suggestions
 	</li>
+
 	<li>
 		2025-01-23
 		<br>- Backup & Restore
