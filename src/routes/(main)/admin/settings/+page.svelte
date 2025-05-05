@@ -18,7 +18,7 @@
 
 	let eInputInvoiceLogoFile:HTMLInputElement;
 
-	let settings = appController.settings;
+	let settings = appController.settingsController.read();
 
 	let localeExamples = $derived( [
 		`Date: ${FormatDate.toLocalDate(new Date(), settings.localeCode )}`,

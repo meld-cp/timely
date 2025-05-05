@@ -11,7 +11,7 @@
 	let cloudTaskData:{ key:string, value:string }[] = $state( [] );
 	let cloudInvoiceData:{ key:string, value:string }[] = $state( [] );
 	
-	const settings = appController.settings;
+	const settings = appController.settingsController.read();
 
 	const kv = (
 		settings.cloudSyncHost
