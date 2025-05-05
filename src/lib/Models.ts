@@ -1,4 +1,4 @@
-import { DateHelper } from "./utils";
+import { DateFormat } from "./utils";
 
 export class Icons {
     static TaskPause = "⏸️";
@@ -45,7 +45,7 @@ export class InvoiceModel{
     public id = crypto.randomUUID().toString();
     
     public number:string = "";
-    public date:string = DateHelper.toInputDateValue( new Date());
+    public date:string = DateFormat.toInputDateValue( new Date());
     public orderRef:string = "";
 
     public issueToLines: string[] = [];
@@ -64,3 +64,4 @@ export class InvoiceLineModel {
     public quantity:number = 0;
     public unitCost:number = 0;
 }
+

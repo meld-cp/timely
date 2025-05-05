@@ -1,4 +1,4 @@
-export class DateHelper{
+export class DateFormat{
 
 
     static toInputDateValue( dt:Date ) : string{
@@ -7,18 +7,20 @@ export class DateHelper{
         var month = dt.getMonth() + 1;
         var year = dt.getFullYear();
 
-        const result = `${year}-${StringHelper.padLeft(month.toString(), "0", 2)}-${StringHelper.padLeft(day.toString(), "0", 2)}`;
-
-        console.log(result);
-
+        const result = `${year}-${StringFormat.padLeft(month.toString(), "0", 2)}-${StringFormat.padLeft(day.toString(), "0", 2)}`;
         return result;
     }
 
-
-
 }
 
-export class StringHelper{
+export class NumberFormat{
+    static currency( n:number, currency:string ) : string {
+        const f = new Intl.NumberFormat( undefined, {style:"currency", currency:currency});
+        return f.format(n);
+    }
+}
+
+export class StringFormat{
 
     static padLeft( s:string, fillWith:string, len:number ) : string{
         const lenToFill = len - s.length;
