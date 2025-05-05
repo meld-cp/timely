@@ -12,6 +12,10 @@
 	
 	let inv: InvoiceViewModel | null = $state( null );
 	
+	let docTitle = $derived.by(() =>{
+		return `${inv?.issueToLines.at(0)} - Invoice ${inv?.number}`;
+	});
+
 	onMount(()=>{
 		const id = page.params.id;
 		if (id){
@@ -23,6 +27,10 @@
 	})
 
 </script>
+<svelte:head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{docTitle}</title>
+</svelte:head>
 
 {#if inv}
 <div id="c-inv">
@@ -125,7 +133,7 @@
 		</table>
 	</section>
 
-	<section id="footer" class="row">
+	<section id="footer" class="row" style:font-weight="bold">
 		<!-- footer -->
 		{#each inv.footerLines as line }
 			{line}<br/>
@@ -189,8 +197,11 @@
 
 	#c-lines{
 
-		td, th{
-			padding: 0.3rem 0.5rem;
+		th,td{
+			padding: 0.3rem 0.2rem;
+		}
+		thead th{
+			font-size: 80%;
 		}
 		table{
 			width: 100%;
