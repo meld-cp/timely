@@ -4,6 +4,7 @@ import type { SettingsModel } from "$lib/models/SettingsModel";
 import type { TaskModel } from "$lib/models/TaskModel";
 import type { IBackupService } from "./IBackupService";
 import { KvStorClient } from "../kvstor-client";
+import { SettingsViewModel } from "$lib/view-models/SettingsViewModel.svelte";
 
 const KEY_SETTINGS_DEFAULT = "default";
 const KEY_DATA_TIMESTAMP = "dataTimestamp";
@@ -140,10 +141,11 @@ export class KvStorBackupService implements IBackupService {
 		);
 
 		// get settings
-		let settings:SettingsModel = await this.getStoredValueOrThrow<SettingsModel>(
+		let settings:SettingsModel = await this.getStoredValueOrDefault<SettingsModel>(
 			kv,
 			KvStorBackupService.BUCKET_ID_SETTINGS,
-			KEY_SETTINGS_DEFAULT
+			KEY_SETTINGS_DEFAULT,
+			( new SettingsViewModel() ).getModel()
 		);
 
 		// get tasks
