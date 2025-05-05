@@ -2,6 +2,24 @@ import { settingsController } from "./SettingsController.svelte";
 import { InvoiceLineModel, InvoiceModel } from "./Types.svelte";
 
 class InvoiceController{
+    
+    workingInvoice = this.build();
+
+    commitWorkingInvoice(): InvoiceModel {
+        //TODO: save working invoice, update next invoice number
+
+        const settings = settingsController.read();
+        var newInv = this.workingInvoice;
+
+        newInv.number = `${settings.nextInvoiceNumber}`
+
+        settings.nextInvoiceNumber++
+        settingsController.write(settings);
+
+        this.workingInvoice = this.build();
+
+        return newInv;
+    }
 
     build():InvoiceModel{
         
@@ -11,10 +29,6 @@ class InvoiceController{
 
         inv.number = `${settings.nextInvoiceNumber}`
         inv.footerLines = settings.defaultInvoiceFooter?.split("\n") ?? []
-        
-        //settings.nextInvoiceNumber = settings.nextInvoiceNumber + 1;
-        //settingsController.write(settings);
-
         
         return inv;
     }

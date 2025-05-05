@@ -3,6 +3,9 @@
     import { taskController } from "$lib/TaskController.svelte";
     import { InvoiceLineModel, type TTask, TaskState } from "$lib/Types.svelte";
     
+
+    let workingInvoice = $state( invoiceController.workingInvoice );
+
     function buildTimeLogInvoiceLine( timeLog: TTask ): InvoiceLineModel {
         const newLine =  new InvoiceLineModel()
         //newLine.number = this.lineCounter;
@@ -14,8 +17,6 @@
         return newLine;
     }
 
-    const workingInvoice = invoiceController.build();
-
     function addBlankLineToWorkingInvoice(){
         workingInvoice.addLine( new InvoiceLineModel() )
     }
@@ -25,7 +26,9 @@
     }
     
     function saveWorkingInvoice(){
-        window.open( `/invoice/${workingInvoice.id}`, )
+        const newInv = invoiceController.commitWorkingInvoice();
+        workingInvoice = invoiceController.workingInvoice;
+        window.open( `/invoice/${newInv.id}`, )
     }
 
     function allUninvoicedTimeHasBeenAddedToWorkingInvoice() : boolean{
