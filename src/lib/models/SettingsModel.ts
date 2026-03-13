@@ -14,6 +14,7 @@ export type SettingsModel = {
 	defaultInvoiceHeader?:string;
 	defaultInvoiceCurrencyCode?: string;
 	defaultInvoiceFooter?: string;
+	defaultHourlyRate?: number;
 	
 	cloudSyncHost?:string;
 	cloudSyncUserId?:string;

@@ -1,76 +1,19 @@
 <script lang="ts">
-    import { KV_STORE_APP_ID } from "$lib/constants";
-    import { KvStorBackupService } from "$lib/services/backup-services/KvStorBackupService";
-    import { KvStorClient } from "$lib/services/kvstor-client";
-    import { appController } from "$lib/services/Singletons";
-    import { fade } from "svelte/transition";
+	import { pbService } from "$lib/services/Singletons";
 
-	let cloudSettingsData:{ key:string, value:string }[] = $state( [] );
-	let cloudTaskData:{ key:string, value:string }[] = $state( [] );
-	let cloudInvoiceData:{ key:string, value:string }[] = $state( [] );
-	
-	const settings = appController.settings;
-
-	const kv = (
-		settings.cloudSyncHost
-		&& settings.cloudSyncUserId
-	) ? new KvStorClient(
-		settings.cloudSyncHost, 
-		settings.cloudSyncUserId, 
-		KV_STORE_APP_ID
-	) : undefined;
-
-    async function onFetchCloudData() {
-		if (!kv){
-			return;
-		}
-
-		cloudSettingsData = await kv.getItemList( KvStorBackupService.BUCKET_ID_SETTINGS )
-		cloudTaskData = await kv.getItemList( KvStorBackupService.BUCKET_ID_TASKS )
-		cloudInvoiceData = await kv.getItemList( KvStorBackupService.BUCKET_ID_INVOICES) 
-        
-    }
-
+	let pbUrl = $derived(pbService.pb.baseURL);
 </script>
-
-{#snippet dataTableDetails(
-	header:string,
-	data:{ key:string, value:string }[]
-)}
-<article>
-	<details open>
-		<summary>{header}</summary>
-		<table>
-			<thead>
-				<tr>
-					<th>Key</th>
-					<th>Value</th>
-				</tr>
-			</thead>
-		
-			<tbody>
-				{#each data as item, index(item.key) }
-				<tr out:fade>
-					<td style="vertical-align: top;"><pre>{item.key}</pre></td>
-					<td style:overflow-wrap="anywhere"><code>{item.value}</code></td>
-				</tr>
-					{/each}
-			</tbody>
-		</table>
-	</details>
-</article>
-{/snippet}
 
 <h2>Data</h2>
 
-<section style:font-size="80%">
-	<section>
-		<button onclick="{onFetchCloudData}">Fetch Cloud Data</button>
-	</section>
-	{@render dataTableDetails( 'Settings Data', cloudSettingsData )}
-	{@render dataTableDetails( 'Task Data', cloudTaskData )}
-	{@render dataTableDetails( 'Invoice Data', cloudInvoiceData )}
+<section>
+	<article>
+		<p>Data is stored in PocketBase.</p>
+		<p>
+			Server: <code>{pbUrl}</code>
+		</p>
+		<p>
+			<a href="{pbUrl}/_/" target="_blank" rel="noopener">Open PocketBase Admin Panel</a>
+		</p>
+	</article>
 </section>
-
-
-

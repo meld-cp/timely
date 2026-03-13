@@ -1,11 +1,12 @@
 import type { InvoiceModel } from "$lib/models/InvoiceModel";
 import { FormatDate } from "$lib/services/formatters/FormatDate";
 import { InvoiceLineViewModel } from "./InvoiceLineViewModel.svelte";
+import { Utils } from "$lib/services/Utils";
 
 
 export class InvoiceViewModel {
 
-	public id = $state(crypto.randomUUID().toString());
+	public id = $state(Utils.generateId());
 	public currencyCode: string = $state("USD");
 
 	public number: string = $state("");

@@ -13,6 +13,7 @@ export class SettingsViewModel{
 	public defaultInvoiceHeader?:string = $state();
 	public defaultInvoiceCurrencyCode:string = $state("USD");
 	public defaultInvoiceFooter?:string = $state();
+	public defaultHourlyRate:number = $state(0);
 	
 	public cloudSyncHost?:string = $state();
 	public cloudSyncUserId?:string = $state();
@@ -35,6 +36,7 @@ export class SettingsViewModel{
 		this.defaultInvoiceHeader = m.defaultInvoiceHeader;
 		this.defaultInvoiceCurrencyCode = m.defaultInvoiceCurrencyCode ?? "USD";
 		this.defaultInvoiceFooter = m.defaultInvoiceFooter;
+		this.defaultHourlyRate = m.defaultHourlyRate ?? 0;
 		
 		this.cloudSyncHost = m.cloudSyncHost;
 		this.cloudSyncUserId = m.cloudSyncUserId;
@@ -54,6 +56,7 @@ export class SettingsViewModel{
 			defaultInvoiceHeader: this.defaultInvoiceHeader,
 			defaultInvoiceCurrencyCode: this.defaultInvoiceCurrencyCode,
 			defaultInvoiceFooter: this.defaultInvoiceFooter,
+			defaultHourlyRate: this.defaultHourlyRate,
 
 			cloudSyncHost: this.cloudSyncHost,
 			cloudSyncUserId: this.cloudSyncUserId,
