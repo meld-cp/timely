@@ -68,7 +68,7 @@ export class TaskViewModel {
 
 	public start() {
 		this.state = TaskState.Running;
-		this.timeRunStarted = Date.now();
+		this.timeRunStarted = Date.now() - (this.duration * 1000);
 	}
 
 	public stop() {
