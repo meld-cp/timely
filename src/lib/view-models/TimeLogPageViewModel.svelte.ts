@@ -15,6 +15,7 @@ export class TimeLogPageViewModel implements ITaskController {
 	public tasksStopped: TaskViewModel[] = $state([]);
 	public tasksArchived: TaskViewModel[] = $state([]);
 
+	private static readonly SAVE_INTERVAL_TICKS = 30;
 	private intervalId: number | undefined;
 	private saveTick = 0;
 
@@ -97,11 +98,11 @@ export class TimeLogPageViewModel implements ITaskController {
 		this.saveTick++;
 		for (const task of this.tasksRunning) {
 			task.setDuration(task.duration + 1);
-			if (this.saveTick >= 30) {
+			if (this.saveTick >= TimeLogPageViewModel.SAVE_INTERVAL_TICKS) {
 				this.saveTask(task);
 			}
 		}
-		if (this.saveTick >= 30) {
+		if (this.saveTick >= TimeLogPageViewModel.SAVE_INTERVAL_TICKS) {
 			this.saveTick = 0;
 		}
 	}

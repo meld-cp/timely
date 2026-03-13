@@ -38,10 +38,10 @@
 		{ label: "Roadmap", url: "/admin/roadmap/" },
 	];
 
-	let elMenu: HTMLElement | undefined = $state();
+	let menuOpen = $state(false);
 
 	function onMenuItemClick() {
-		elMenu?.attributes.removeNamedItem("open");
+		menuOpen = false;
 	}
 
 	async function onSignOut() {
@@ -83,7 +83,7 @@
 			<button class="outline secondary" onclick={onSignOut}>Sign Out</button>
 		</li>
 		<li>
-			<details class="dropdown" bind:this={elMenu}>
+			<details class="dropdown" bind:open={menuOpen}>
 				<summary style="width: 18ch;">Menu</summary>
 				<ul>
 					{#each menuItems as mi}

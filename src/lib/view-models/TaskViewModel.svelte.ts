@@ -19,7 +19,7 @@ export class TaskViewModel {
 		return this.tags.join(" ");
 	}
 	set tagsAsText(txt: string) {
-		this.tags = txt.trim().split(" ");
+		this.tags = txt.trim().split(/\s+/).filter(t => t.length > 0);
 	}
 
 	constructor(m?: TaskModel) {
@@ -59,7 +59,7 @@ export class TaskViewModel {
 	}
 
 	public pause() {
-		if (this.state != TaskState.Running) {
+		if (this.state !== TaskState.Running) {
 			return;
 		}
 		this.state = TaskState.Paused;
@@ -82,7 +82,7 @@ export class TaskViewModel {
 	}
 
 	public incrementDuration(incrementMinutes: number) {
-		if (this.state == TaskState.Running) {
+		if (this.state === TaskState.Running) {
 			const currentSessionStartTime = (this.timeRunStarted ?? Date.now());
 			const incMs = incrementMinutes * 60 * 1000;
 			const newSessionTime = currentSessionStartTime - incMs;
@@ -94,7 +94,7 @@ export class TaskViewModel {
 	}
 
 	public recalculateDurationFromRunningSession() {
-		if (this.state != TaskState.Running) {
+		if (this.state !== TaskState.Running) {
 			return;
 		}
 		const sessionStartTime = (this.timeRunStarted ?? Date.now());

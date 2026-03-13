@@ -6,8 +6,7 @@
 	import { InvoiceViewModel } from "$lib/view-models/InvoiceViewModel.svelte";
 	import { appController } from '$lib/services/Singletons';
 	import { pbService } from '$lib/services/Singletons';
-
-	const DRAFT_KEY = 'timely-draft-invoice';
+	import { DRAFT_INVOICE_KEY, DRAFT_INVOICE_ID } from '$lib/StorageKeys';
 
 	const settings = appController.settings;
 
@@ -34,8 +33,8 @@
 			logoSrc = appController.settings.logoData;
 		}
 
-		if (id === 'draft') {
-			const stored = localStorage.getItem(DRAFT_KEY);
+		if (id === DRAFT_INVOICE_ID) {
+			const stored = localStorage.getItem(DRAFT_INVOICE_KEY);
 			if (stored) {
 				inv = new InvoiceViewModel(JSON.parse(stored));
 			}

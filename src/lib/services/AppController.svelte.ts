@@ -62,7 +62,7 @@ export class ApplicationController {
 	}
 
 	public deleteInvoice(id: string): void {
-		this.pbService.deleteInvoice(id);
+		this.pbService.deleteInvoice(id).catch(e => console.error('deleteInvoice failed:', e));
 	}
 
 	public async getAppData(): Promise<ApplicationData> {

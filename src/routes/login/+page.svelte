@@ -8,6 +8,7 @@
 	import { onMount } from 'svelte';
 	import { pbService } from '$lib/services/Singletons';
 	import { appController } from '$lib/services/Singletons';
+	import { PB_URL_KEY, PB_EMAIL_KEY } from '$lib/StorageKeys';
 
 	let url = $state('');
 	let email = $state('');
@@ -16,8 +17,8 @@
 	let error = $state('');
 
 	onMount(async () => {
-		url = localStorage.getItem('pb_url') ?? '';
-		email = localStorage.getItem('pb_email') ?? '';
+		url = localStorage.getItem(PB_URL_KEY) ?? '';
+		email = localStorage.getItem(PB_EMAIL_KEY) ?? '';
 
 		if (pbService.pb.authStore.isValid) {
 			loading = true;

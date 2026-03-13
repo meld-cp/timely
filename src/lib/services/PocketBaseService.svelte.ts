@@ -5,6 +5,15 @@ import type { TaskModel } from '$lib/models/TaskModel';
 import type { SettingsModel } from '$lib/models/SettingsModel';
 import { TaskState } from '$lib/models/TaskState';
 import { FormatDate } from './formatters/FormatDate';
+import { PB_URL_KEY, PB_EMAIL_KEY } from '$lib/StorageKeys';
+
+const C = {
+	USERS: 'users',
+	TIMELY_USER: 'timely_user',
+	TIMELY_TASK: 'timely_task',
+	TIMELY_INVOICE: 'timely_invoice',
+	TIMELY_INVOICE_LINE: 'timely_invoice_line',
+} as const;
 
 export class PocketBaseService {
 	public pb: PocketBase;
@@ -15,7 +24,7 @@ export class PocketBaseService {
 	constructor() {
 		const url =
 			typeof localStorage !== 'undefined'
-				? (localStorage.getItem('pb_url') ?? 'http://localhost:8090')
+				? (localStorage.getItem(PB_URL_KEY) ?? 'http://localhost:8090')
 				: 'http://localhost:8090';
 		this.pb = new PocketBase(url);
 	}
@@ -34,14 +43,14 @@ export class PocketBaseService {
 
 	private async resolveTimelyUserId(authUserId: string): Promise<string> {
 		// First try: read timelyUser relation from the auth user record
-		const userRecord = await this.pb.collection('users').getOne(authUserId);
+		const userRecord = await this.pb.collection(C.USERS).getOne(authUserId);
 		const fromRelation = userRecord['timelyUser'] as string;
 		if (fromRelation) {
 			return fromRelation;
 		}
 		// Second try: query timely_user where user = authUserId
 		const timelyUser = await this.pb
-			.collection('timely_user')
+			.collection(C.TIMELY_USER)
 			.getFirstListItem(`user="${authUserId}"`);
 		return timelyUser.id;
 	}
@@ -62,11 +71,11 @@ export class PocketBaseService {
 	}
 
 	async login(url: string, email: string, password: string): Promise<void> {
-		localStorage.setItem('pb_url', url);
-		localStorage.setItem('pb_email', email);
+		localStorage.setItem(PB_URL_KEY, url);
+		localStorage.setItem(PB_EMAIL_KEY, email);
 		this.pb = new PocketBase(url);
 
-		const authData = await this.pb.collection('users').authWithPassword(email, password);
+		const authData = await this.pb.collection(C.USERS).authWithPassword(email, password);
 		this._authUserId = authData.record.id;
 		this._timelyUserId = await this.resolveTimelyUserId(this._authUserId);
 		this.isInitialized = true;
@@ -87,7 +96,7 @@ export class PocketBaseService {
 	// ---- Tasks ----
 
 	async getAllTasks(): Promise<TaskModel[]> {
-		const records = await this.pb.collection('timely_task').getFullList({
+		const records = await this.pb.collection(C.TIMELY_TASK).getFullList({
 			filter: `user="${this._timelyUserId}"`,
 			sort: '-created',
 			requestKey: null
@@ -108,22 +117,22 @@ export class PocketBaseService {
 			tags: task.tags
 		};
 		if (this._knownTaskIds.has(task.id)) {
-			await this.pb.collection('timely_task').update(task.id, data);
+			await this.pb.collection(C.TIMELY_TASK).update(task.id, data);
 		} else {
-			await this.pb.collection('timely_task').create({ id: task.id, ...data });
+			await this.pb.collection(C.TIMELY_TASK).create({ id: task.id, ...data });
 			this._knownTaskIds.add(task.id);
 		}
 	}
 
 	async deleteTask(id: string): Promise<void> {
-		await this.pb.collection('timely_task').delete(id);
+		await this.pb.collection(C.TIMELY_TASK).delete(id);
 		this._knownTaskIds.delete(id);
 	}
 
 	// ---- Invoices ----
 
 	async getAllInvoices(): Promise<InvoiceModel[]> {
-		const records = await this.pb.collection('timely_invoice').getFullList({
+		const records = await this.pb.collection(C.TIMELY_INVOICE).getFullList({
 			filter: `user="${this._authUserId}"`,
 			sort: '-created',
 			requestKey: null
@@ -131,7 +140,7 @@ export class PocketBaseService {
 		records.forEach(r => this._knownInvoiceIds.add(r.id));
 		const invoices: InvoiceModel[] = [];
 		for (const inv of records) {
-			const lines = await this.pb.collection('timely_invoice_line').getFullList({
+			const lines = await this.pb.collection(C.TIMELY_INVOICE_LINE).getFullList({
 				filter: `invoice="${inv.id}"`,
 				sort: 'lineNumber',
 				requestKey: null
@@ -143,9 +152,9 @@ export class PocketBaseService {
 
 	async getInvoiceById(id: string): Promise<InvoiceModel | null> {
 		try {
-			const inv = await this.pb.collection('timely_invoice').getOne(id);
+			const inv = await this.pb.collection(C.TIMELY_INVOICE).getOne(id);
 			this._knownInvoiceIds.add(inv.id);
-			const lines = await this.pb.collection('timely_invoice_line').getFullList({
+			const lines = await this.pb.collection(C.TIMELY_INVOICE_LINE).getFullList({
 				filter: `invoice="${id}"`,
 				sort: 'lineNumber',
 				requestKey: null
@@ -167,21 +176,21 @@ export class PocketBaseService {
 			footer: invoice.footerLines.join('\n')
 		};
 		if (this._knownInvoiceIds.has(invoice.id)) {
-			await this.pb.collection('timely_invoice').update(invoice.id, data);
+			await this.pb.collection(C.TIMELY_INVOICE).update(invoice.id, data);
 		} else {
-			await this.pb.collection('timely_invoice').create({ id: invoice.id, ...data });
+			await this.pb.collection(C.TIMELY_INVOICE).create({ id: invoice.id, ...data });
 			this._knownInvoiceIds.add(invoice.id);
 		}
 		// Replace lines: delete existing then recreate
-		const existingLines = await this.pb.collection('timely_invoice_line').getFullList({
+		const existingLines = await this.pb.collection(C.TIMELY_INVOICE_LINE).getFullList({
 			filter: `invoice="${invoice.id}"`,
 			requestKey: null
 		});
 		for (const line of existingLines) {
-			await this.pb.collection('timely_invoice_line').delete(line.id);
+			await this.pb.collection(C.TIMELY_INVOICE_LINE).delete(line.id);
 		}
 		for (const line of invoice.lines) {
-			await this.pb.collection('timely_invoice_line').create({
+			await this.pb.collection(C.TIMELY_INVOICE_LINE).create({
 				id: line.id,
 				invoice: invoice.id,
 				lineNumber: line.number,
@@ -195,21 +204,21 @@ export class PocketBaseService {
 	}
 
 	async deleteInvoice(id: string): Promise<void> {
-		const lines = await this.pb.collection('timely_invoice_line').getFullList({
+		const lines = await this.pb.collection(C.TIMELY_INVOICE_LINE).getFullList({
 			filter: `invoice="${id}"`,
 			requestKey: null
 		});
 		for (const line of lines) {
-			await this.pb.collection('timely_invoice_line').delete(line.id);
+			await this.pb.collection(C.TIMELY_INVOICE_LINE).delete(line.id);
 		}
-		await this.pb.collection('timely_invoice').delete(id);
+		await this.pb.collection(C.TIMELY_INVOICE).delete(id);
 		this._knownInvoiceIds.delete(id);
 	}
 
 	// ---- Settings (timely_user) ----
 
 	async getSettings(): Promise<SettingsModel> {
-		const record = await this.pb.collection('timely_user').getOne(this._timelyUserId);
+		const record = await this.pb.collection(C.TIMELY_USER).getOne(this._timelyUserId);
 		return {
 			label: (record['companyName'] as string) ?? undefined,
 			localeCode: (record['localeCode'] as string) ?? undefined,
@@ -229,7 +238,7 @@ export class PocketBaseService {
 		if (settings.logoData) {
 			localStorage.setItem('timely-logo', settings.logoData);
 		}
-		await this.pb.collection('timely_user').update(this._timelyUserId, {
+		await this.pb.collection(C.TIMELY_USER).update(this._timelyUserId, {
 			companyName: settings.label ?? '',
 			localeCode: settings.localeCode ?? '',
 			address: settings.address ?? '',

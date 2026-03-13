@@ -86,11 +86,11 @@ export class InvoiceViewModel {
 	}
 
 	public removeLineWithId(id: string): void {
-		this.lines = this.lines.filter(l => l.id != id);
+		this.lines = this.lines.filter(l => l.id !== id);
 	}
 
 	public removeLineWithExtRefId(extRefId: string) {
-		this.lines = this.lines.filter(l => l.extRefId != extRefId);
+		this.lines = this.lines.filter(l => l.extRefId !== extRefId);
 	}
 
 	public addLine(line?: InvoiceLineViewModel): string {

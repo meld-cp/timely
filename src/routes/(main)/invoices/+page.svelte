@@ -10,12 +10,10 @@
 	import { appController } from "$lib/services/Singletons";
 	import type { TaskModel } from "$lib/models/TaskModel";
 	import { Utils } from "$lib/services/Utils";
-
-	const DRAFT_KEY = 'timely-draft-invoice';
-	const draftInvoiceId = "draft";
+	import { DRAFT_INVOICE_KEY, DRAFT_INVOICE_ID } from "$lib/StorageKeys";
 
 	let workingInvoice: InvoiceViewModel = $state(buildNewDraftInvoice());
-	let isEditingDraftInvoice: boolean = $derived(workingInvoice.id == draftInvoiceId);
+	let isEditingDraftInvoice: boolean = $derived(workingInvoice.id === DRAFT_INVOICE_ID);
 	let workingInvoiceTitle: string = $derived.by(() => {
 		if (isEditingDraftInvoice) {
 			return "Draft Invoice";
@@ -26,6 +24,8 @@
 	let scratchPad: string = $state("");
 	let closedInvoices: InvoiceViewModel[] = $state([]);
 
+	let scratchPadSaveTimer: ReturnType<typeof setTimeout> | undefined;
+
 	onMount(async () => {
 		scratchPad = appController.getScratchPad("page-invoice-builder");
 		workingInvoice = loadDraftInvoice();
@@ -34,7 +34,7 @@
 	});
 
 	function loadDraftInvoice(): InvoiceViewModel {
-		const stored = localStorage.getItem(DRAFT_KEY);
+		const stored = localStorage.getItem(DRAFT_INVOICE_KEY);
 		if (stored) {
 			try {
 				return new InvoiceViewModel(JSON.parse(stored));
@@ -63,7 +63,7 @@
 	function buildNewDraftInvoice(): InvoiceViewModel {
 		const settings = appController.settings;
 		const result = new InvoiceViewModel();
-		result.id = draftInvoiceId;
+		result.id = DRAFT_INVOICE_ID;
 		result.headerLinesAsText = settings.defaultInvoiceHeader ?? "";
 		result.currencyCode = settings.defaultInvoiceCurrencyCode;
 		result.number = `${settings.nextInvoiceNumber}`;
@@ -72,12 +72,15 @@
 	}
 
 	function saveScratchPad() {
-		appController.setScratchPad("page-invoice-builder", scratchPad);
+		clearTimeout(scratchPadSaveTimer);
+		scratchPadSaveTimer = setTimeout(() => {
+			appController.setScratchPad("page-invoice-builder", scratchPad);
+		}, 1000);
 	}
 
 	async function fetchUninvoicedTasks(): Promise<TaskViewModel[]> {
 		const all = await appController.getTasks();
-		return all.filter(t => t.invoiceRefId.length == 0 && t.state == TaskState.Stopped);
+		return all.filter(t => t.invoiceRefId.length === 0 && t.state === TaskState.Stopped);
 	}
 
 	function buildTimeLogInvoiceLine(timeLog: TaskModel): InvoiceLineViewModel {
@@ -96,7 +99,7 @@
 	}
 
 	function saveDraftInvoice() {
-		localStorage.setItem(DRAFT_KEY, JSON.stringify(workingInvoice.getModel()));
+		localStorage.setItem(DRAFT_INVOICE_KEY, JSON.stringify(workingInvoice.getModel()));
 	}
 
 	async function onBuildInvoice(): Promise<void> {
@@ -109,8 +112,10 @@
 
 		appController.saveInvoice(newInvModel);
 
-		const attachedTaskIds = newInvModel.lines.map(l => l.extRefId).filter(id => id && id.length > 0);
-		const attachedTasks = uninvoicedTasks.filter(t => attachedTaskIds.includes(t.id));
+		const attachedTaskIds = new Set(
+			newInvModel.lines.map(l => l.extRefId).filter((id): id is string => !!id)
+		);
+		const attachedTasks = uninvoicedTasks.filter(t => attachedTaskIds.has(t.id));
 		for (const task of attachedTasks) {
 			task.invoiceRefId = newInvModel.id;
 			task.state = TaskState.Archived;
@@ -146,7 +151,7 @@
 	}
 
 	function allUninvoicedTimeHaveBeenAddedToWorkingInvoice(): boolean {
-		if (uninvoicedTasks.length == 0) {
+		if (uninvoicedTasks.length === 0) {
 			return false;
 		}
 		for (const task of uninvoicedTasks) {
@@ -210,7 +215,7 @@
 			<article class="time-list">
 				<header>Uninvoiced Time</header>
 
-				{#if uninvoicedTasks.length != 0}
+				{#if uninvoicedTasks.length !== 0}
 					{#if uninvoicedTasks.length > 1}
 						<label>
 							<input id="untagged-select-all" type="checkbox" bind:checked={

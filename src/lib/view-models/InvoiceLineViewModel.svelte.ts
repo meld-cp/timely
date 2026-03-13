@@ -15,7 +15,7 @@ export class InvoiceLineViewModel {
 	public total: number = $derived(this.quantity * this.unitCost);
 
 	public get isDescriptionOnlyLine(): boolean {
-		return this.quantity == 0;
+		return this.quantity === 0;
 	}
 
 	constructor(m?: InvoiceLineModel) {
