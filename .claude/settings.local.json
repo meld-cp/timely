@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(git checkout:*)",
-      "Bash(cd c:/Dev/timely && npx svelte-check --tsconfig ./tsconfig.json 2>&1 | grep -E \"ERROR|error\")"
+      "Bash(cd c:/Dev/timely && npx svelte-check --tsconfig ./tsconfig.json 2>&1 | grep -E \"ERROR|error\")",
+      "Bash(git add:*)"
     ]
   }
 }

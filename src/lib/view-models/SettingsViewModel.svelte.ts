@@ -14,9 +14,6 @@ export class SettingsViewModel{
 	public defaultInvoiceCurrencyCode:string = $state("USD");
 	public defaultInvoiceFooter?:string = $state();
 	public defaultHourlyRate:number = $state(0);
-	
-	public cloudSyncHost?:string = $state();
-	public cloudSyncUserId?:string = $state();
 
 	constructor( m?:SettingsModel ){
 		if (m){
@@ -37,10 +34,6 @@ export class SettingsViewModel{
 		this.defaultInvoiceCurrencyCode = m.defaultInvoiceCurrencyCode ?? "USD";
 		this.defaultInvoiceFooter = m.defaultInvoiceFooter;
 		this.defaultHourlyRate = m.defaultHourlyRate ?? 0;
-		
-		this.cloudSyncHost = m.cloudSyncHost;
-		this.cloudSyncUserId = m.cloudSyncUserId;
-		
 	}
 
 	public getModel(): SettingsModel {
@@ -57,9 +50,6 @@ export class SettingsViewModel{
 			defaultInvoiceCurrencyCode: this.defaultInvoiceCurrencyCode,
 			defaultInvoiceFooter: this.defaultInvoiceFooter,
 			defaultHourlyRate: this.defaultHourlyRate,
-
-			cloudSyncHost: this.cloudSyncHost,
-			cloudSyncUserId: this.cloudSyncUserId,
 		};
 	}
 }

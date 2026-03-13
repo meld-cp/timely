@@ -1,9 +1,8 @@
 import type { ApplicationData } from "$lib/models/ApplicationData";
-import type { IBackupService } from "./IBackupService";
 import { Utils } from "../Utils";
 
 
-export class LocalBackupService implements IBackupService {
+export class LocalBackupService {
 
 	public async backup(data: ApplicationData): Promise<void> {
 		const encodedData = this.encode(data);
