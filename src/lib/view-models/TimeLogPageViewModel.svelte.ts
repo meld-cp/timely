@@ -27,6 +27,12 @@ export class TimeLogPageViewModel implements ITaskController {
 	stop() {
 		if (this.intervalId) {
 			clearInterval(this.intervalId);
+			this.intervalId = undefined;
+		}
+		// Save current duration of all running tasks before stopping
+		for (const task of this.tasksRunning) {
+			task.recalculateDurationFromRunningSession();
+			this.saveTask(task);
 		}
 	}
 
@@ -91,11 +97,11 @@ export class TimeLogPageViewModel implements ITaskController {
 		this.saveTick++;
 		for (const task of this.tasksRunning) {
 			task.setDuration(task.duration + 1);
-			if (this.saveTick >= 60) {
+			if (this.saveTick >= 30) {
 				this.saveTask(task);
 			}
 		}
-		if (this.saveTick >= 60) {
+		if (this.saveTick >= 30) {
 			this.saveTick = 0;
 		}
 	}
