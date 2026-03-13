@@ -89,7 +89,8 @@ export class PocketBaseService {
 	async getAllTasks(): Promise<TaskModel[]> {
 		const records = await this.pb.collection('timely_task').getFullList({
 			filter: `user="${this._timelyUserId}"`,
-			sort: '-created'
+			sort: '-created',
+			requestKey: null
 		});
 		records.forEach(r => this._knownTaskIds.add(r.id));
 		return records.map((r) => this.pbToTaskModel(r));
@@ -124,14 +125,16 @@ export class PocketBaseService {
 	async getAllInvoices(): Promise<InvoiceModel[]> {
 		const records = await this.pb.collection('timely_invoice').getFullList({
 			filter: `user="${this._authUserId}"`,
-			sort: '-created'
+			sort: '-created',
+			requestKey: null
 		});
 		records.forEach(r => this._knownInvoiceIds.add(r.id));
 		const invoices: InvoiceModel[] = [];
 		for (const inv of records) {
 			const lines = await this.pb.collection('timely_invoice_line').getFullList({
 				filter: `invoice="${inv.id}"`,
-				sort: 'lineNumber'
+				sort: 'lineNumber',
+				requestKey: null
 			});
 			invoices.push(this.pbToInvoiceModel(inv, lines));
 		}
@@ -144,7 +147,8 @@ export class PocketBaseService {
 			this._knownInvoiceIds.add(inv.id);
 			const lines = await this.pb.collection('timely_invoice_line').getFullList({
 				filter: `invoice="${id}"`,
-				sort: 'lineNumber'
+				sort: 'lineNumber',
+				requestKey: null
 			});
 			return this.pbToInvoiceModel(inv, lines);
 		} catch {
@@ -170,7 +174,8 @@ export class PocketBaseService {
 		}
 		// Replace lines: delete existing then recreate
 		const existingLines = await this.pb.collection('timely_invoice_line').getFullList({
-			filter: `invoice="${invoice.id}"`
+			filter: `invoice="${invoice.id}"`,
+			requestKey: null
 		});
 		for (const line of existingLines) {
 			await this.pb.collection('timely_invoice_line').delete(line.id);
@@ -191,7 +196,8 @@ export class PocketBaseService {
 
 	async deleteInvoice(id: string): Promise<void> {
 		const lines = await this.pb.collection('timely_invoice_line').getFullList({
-			filter: `invoice="${id}"`
+			filter: `invoice="${id}"`,
+			requestKey: null
 		});
 		for (const line of lines) {
 			await this.pb.collection('timely_invoice_line').delete(line.id);
