@@ -16,7 +16,8 @@
 	let inv: InvoiceViewModel | null = $state(null);
 
 	let docTitle = $derived.by(() => {
-		return `${inv?.issueToLines.at(0)} - Invoice ${inv?.number}`;
+		const issueTo = inv?.issueToLines.at(0);
+		return issueTo ? `${issueTo} - Invoice ${inv?.number}` : `Invoice ${inv?.number}`;
 	});
 
 	const id = page.params.id;
