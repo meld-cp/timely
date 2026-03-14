@@ -12,12 +12,12 @@ const config = {
 			pages: 'out',
 			assets: 'out',
 			precompress: false,
-			strict: true,
+			strict: false,
 			fallback: 'index.html'
 		}),
 		paths: {
 			base: '/timely'
-		}
+		},
 	}
 };
 
