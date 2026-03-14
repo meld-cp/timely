@@ -251,7 +251,7 @@ export class PocketBaseService {
 			localeCode: (record['localeCode'] as string) ?? undefined,
 			address: (record['address'] as string) ?? undefined,
 			logoData,
-			scratchPads: { SCRATCH_PAD_INVOICE_BUILDER: (record['scratchPad'] as string) ?? '' },
+			scratchPads: { [SCRATCH_PAD_INVOICE_BUILDER]: (record['scratchPad'] as string) ?? '' },
 			nextInvoiceNumber: (record['nextInvoiceNumber'] as number) ?? 1000,
 			defaultInvoiceHeader: (record['defaultInvoiceHeader'] as string) ?? undefined,
 			defaultInvoiceCurrencyCode: (record['defaultInvoiceCurrencyCode'] as string) ?? undefined,

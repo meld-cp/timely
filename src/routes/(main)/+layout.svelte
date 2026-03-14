@@ -104,7 +104,7 @@
 <footer class="footer">
 	<hr>
 	<section>
-		Connected to PocketBase
+		Connected to PocketBase: <code>{pbService.pb.baseURL}</code> &nbsp;·&nbsp; <a href="{pbService.pb.baseURL}/_/" target="_blank" rel="noopener">Admin Panel</a>
 	</section>
 </footer>
 {:else}
@@ -115,11 +115,12 @@
 
 <style>
 	.footer{
-		z-index: -10000;
+		z-index: 1;
 		font-size: small;
 		width: 100%;
 		position: fixed;
 		bottom: 0;
+		background: var(--pico-background-color);
 
 		hr{
 			margin: 0;

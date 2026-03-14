@@ -7,19 +7,30 @@
 	import { Utils } from "$lib/services/Utils";
 	import { onMount } from "svelte";
 
-	let pbUrl = $derived(pbService.pb.baseURL);
-
 	const localBackupSvc = new LocalBackupService();
 
-	// ---- Backup ----
+	// ---- Stats / Backup ----
 
+	type AppData = Awaited<ReturnType<typeof appController.getAppData>>;
+	let appData = $state<AppData | undefined>(undefined);
 	let dataToBackupAsText = $state('');
 	let backupLoading = $state(false);
+
+	let stats = $derived.by(() => {
+		if (!appData) return undefined;
+		const tasks = appData.tasks;
+		const invoices = appData.invoices.filter(inv => inv.id !== DRAFT_INVOICE_ID);
+		const totalHours = tasks.reduce((s, t) => s + t.affectiveDurationHours, 0);
+		const invoicedTotal = invoices.reduce((s, inv) => s + inv.lines.reduce((ls, l) => ls + l.quantity * l.unitCost, 0), 0);
+		const currencyCode = appController.settings.defaultInvoiceCurrencyCode ?? 'USD';
+		const fmt = new Intl.NumberFormat(appController.settings.localeCode, { style: 'currency', currency: currencyCode });
+		return { tasks: tasks.length, invoices: invoices.length, totalHours, invoicedTotal: fmt.format(invoicedTotal) };
+	});
 
 	onMount(async () => {
 		backupLoading = true;
 		try {
-			const appData = await appController.getAppData();
+			appData = await appController.getAppData();
 			dataToBackupAsText = localBackupSvc.encode(appData);
 		} finally {
 			backupLoading = false;
@@ -171,12 +182,22 @@
 	}
 </script>
 
-<h2>PocketBase</h2>
+<h2>Data Summary</h2>
 
 <section>
 	<article>
-		<p>Server: <code>{pbUrl}</code></p>
-		<p><a href="{pbUrl}/_/" target="_blank" rel="noopener">Open PocketBase Admin Panel</a></p>
+		{#if backupLoading}
+			<p aria-busy="true">Loading...</p>
+		{:else if stats}
+			<table>
+				<tbody>
+					<tr><th>Tasks</th><td>{stats.tasks}</td></tr>
+					<tr><th>Total hours logged</th><td>{stats.totalHours.toFixed(2)} hrs</td></tr>
+					<tr class="divider"><th>Invoices</th><td>{stats.invoices}</td></tr>
+					<tr><th>Total invoiced</th><td>{stats.invoicedTotal}</td></tr>
+				</tbody>
+			</table>
+		{/if}
 	</article>
 </section>
 
@@ -287,6 +308,10 @@
 	}
 	table {
 		margin: 1rem 0;
+	}
+	tr.divider th, tr.divider td {
+		padding-top: 1rem;
+		border-top: 1px solid var(--pico-table-border-color);
 	}
 	th {
 		text-align: left;
