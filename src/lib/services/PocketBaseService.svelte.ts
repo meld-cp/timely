@@ -191,7 +191,7 @@ export class PocketBaseService {
 			requestKey: null
 		});
 		await Promise.all(existingLines.map(line =>
-			this.pb.collection(C.TIMELY_INVOICE_LINE).delete(line.id)
+			this.pb.collection(C.TIMELY_INVOICE_LINE).delete(line.id, { requestKey: null })
 		));
 		await Promise.all(invoice.lines.map(line =>
 			this.pb.collection(C.TIMELY_INVOICE_LINE).create({
@@ -203,7 +203,7 @@ export class PocketBaseService {
 				quantity: line.quantity,
 				unitCost: line.unitCost,
 				task: line.extRefId || null
-			})
+			}, { requestKey: null })
 		));
 	}
 
@@ -213,7 +213,7 @@ export class PocketBaseService {
 			filter: `user="${this._timelyUserId}"`,
 			requestKey: null
 		});
-		await Promise.all(tasks.map(t => this.pb.collection(C.TIMELY_TASK).delete(t.id)));
+		await Promise.all(tasks.map(t => this.pb.collection(C.TIMELY_TASK).delete(t.id, { requestKey: null })));
 		this._knownTaskIds.clear();
 
 		// Delete invoices (cascades to lines via deleteInvoice)
