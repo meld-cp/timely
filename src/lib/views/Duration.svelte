@@ -38,10 +38,8 @@
 <div class="c-main">
 	{#if onIncreaseDuration}
 	<div class="c-buttons">
-		{#if onIncreaseDuration}
-			<button class="outline" title="Add Time" onclick="{(ev) => onIncreaseDuration( true, ev.ctrlKey )}"><Icon icon={faPlus}/></button>
-			<button class="outline" title="Remove Time" onclick="{(ev) => onIncreaseDuration( false, ev.ctrlKey )}"><Icon icon={faMinus}/></button>
-		{/if}
+		<button class="outline" title="Add Time" onclick="{(ev) => onIncreaseDuration( true, ev.ctrlKey )}"><Icon icon={faPlus}/></button>
+		<button class="outline" title="Remove Time" onclick="{(ev) => onIncreaseDuration( false, ev.ctrlKey )}"><Icon icon={faMinus}/></button>
 	</div>
 	{/if}
 	<div class="affective">{affectiveDurationHours?.toFixed(2)}</div>

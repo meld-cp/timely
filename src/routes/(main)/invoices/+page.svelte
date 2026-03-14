@@ -239,7 +239,7 @@
 									}
 								}
 							}/>
-							{FormatDate.toLocalDatefromString(task.date, "en-NZ")} ({task.affectiveDurationHours.toFixed(2)} hrs) - {task.name}
+							{FormatDate.toLocalDateFromString(task.date, appController.settings.localeCode)} ({task.affectiveDurationHours.toFixed(2)} hrs) - {task.name}
 						</label>
 					</div>
 					{/each}

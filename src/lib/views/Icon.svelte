@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome'
-  	import { type IconDefinition } from '@fortawesome/free-solid-svg-icons'
+	import { type IconDefinition } from '@fortawesome/free-solid-svg-icons'
 	let{
 		icon,
 		onClick,
@@ -8,22 +8,21 @@
 		icon:IconDefinition,
 		onClick?:() => void
 	} = $props();
-
-	function handleClick(ev:Event){
-		ev.preventDefault();
-		if( onClick ){
-			onClick();
-		}
-	}
-
-
 </script>
 
 {#if onClick}
-<!-- svelte-ignore a11y_invalid_attribute -->
-<a href="" onclick="{handleClick}">
+<button class="icon-btn" onclick={onClick}>
 	<FontAwesomeIcon icon={icon} />
-</a>
+</button>
 {:else}
 <FontAwesomeIcon icon={icon} />
 {/if}
+
+<style>
+	.icon-btn {
+		all: unset;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+	}
+</style>

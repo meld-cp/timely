@@ -1,7 +1,7 @@
 <script lang="ts">
 	
 	import { FormatNumber } from "$lib/services/formatters/FormatNumber";
-	
+	import { appController } from "$lib/services/Singletons";
 	import type { InvoiceLineViewModel } from "$lib/view-models/InvoiceLineViewModel.svelte";
 	import type { InvoiceViewModel } from "$lib/view-models/InvoiceViewModel.svelte";
 	import InvoiceEditorLineView from "./InvoiceEditorLineView.svelte";
@@ -98,15 +98,15 @@
 					
 				</th>
 				<th colspan="2" style="text-align: right;">Subtotal:</th>
-				<th style="text-align: right;">{FormatNumber.currency( vm.subtotal, vm.currencyCode )}</th>
+				<th style="text-align: right;">{FormatNumber.currency( vm.subtotal, vm.currencyCode, appController.settings.localeCode )}</th>
 			</tr>
 			<tr>
 				<th colspan="2" style="text-align: right;">GST:</th>
-				<th style="text-align: right;">{FormatNumber.currency( vm.taxTotal, vm.currencyCode )}</th>
+				<th style="text-align: right;">{FormatNumber.currency( vm.taxTotal, vm.currencyCode, appController.settings.localeCode )}</th>
 			</tr>
 			<tr>
 				<th colspan="2" style="text-align: right;">Grand Total:</th>
-				<th style="text-align: right;">{FormatNumber.currency( vm.grandTotal, vm.currencyCode )}</th>
+				<th style="text-align: right;">{FormatNumber.currency( vm.grandTotal, vm.currencyCode, appController.settings.localeCode )}</th>
 			</tr>
 		</tfoot>
 	</table>

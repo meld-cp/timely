@@ -130,7 +130,7 @@
 									<td><a href="/view-invoice/{inv.id}/" target="_blank" rel="noopener">#{inv.number}</a></td>
 									<td>{inv.date}</td>
 									<td>{inv.issueToLines[0] ?? '—'}</td>
-									<td class="num">{FormatNumber.currency(inv.grandTotal, inv.currencyCode || 'USD')}</td>
+									<td class="num">{FormatNumber.currency(inv.grandTotal, inv.currencyCode || 'USD', appController.settings.localeCode)}</td>
 								</tr>
 							{/each}
 						</tbody>
