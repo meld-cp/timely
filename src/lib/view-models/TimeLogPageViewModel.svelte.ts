@@ -55,9 +55,17 @@ export class TimeLogPageViewModel implements ITaskController {
 	}
 
 	private buildPreviouslyUsedTasks(tasks: TaskViewModel[], limit: number = 20): string[] {
-		const sortedTasks = Utils.sortByProperties(tasks, ["date:desc", "name:asc"]).slice(0, limit);
-		const names = sortedTasks.map(t => t.name);
-		const uniqueNames = [...new Set(names)];
+		const sortedTasks = Utils.sortByProperties(tasks, ["date:desc", "name:asc"]);
+		const seen = new Set<string>();
+		const uniqueNames: string[] = [];
+		for (const t of sortedTasks) {
+			const key = t.name.trim().toLowerCase();
+			if (!seen.has(key)) {
+				seen.add(key);
+				uniqueNames.push(t.name.trim());
+				if (uniqueNames.length >= limit) break;
+			}
+		}
 		return uniqueNames;
 	}
 
@@ -76,8 +84,8 @@ export class TimeLogPageViewModel implements ITaskController {
 		const task = new TaskViewModel();
 		task.name = name;
 		this.startTask(task);
-		if (!this.previouslyUsedTasks.includes(name)) {
-			this.previouslyUsedTasks = [name, ...this.previouslyUsedTasks].slice(0, 20);
+		if (!this.previouslyUsedTasks.some(n => n.toLowerCase() === name.trim().toLowerCase())) {
+			this.previouslyUsedTasks = [name.trim(), ...this.previouslyUsedTasks].slice(0, 20);
 		}
 	}
 
