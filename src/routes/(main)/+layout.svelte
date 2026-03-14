@@ -31,6 +31,7 @@
 	let initialized = $state(false);
 
 	const menuItems: { label: string, url: string }[] = [
+		{ label: "Dashboard", url: resolve("/") },
 		{ label: "Time Log", url: resolve("/timelog/") },
 		{ label: "Invoice Builder", url: resolve("/invoices/") },
 		{ label: "Settings", url: resolve("/admin/settings/") },
