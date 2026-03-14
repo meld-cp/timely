@@ -58,7 +58,7 @@ export class ApplicationController {
 	}
 
 	public saveInvoice(model: InvoiceModel): void {
-		this.pbService.upsertInvoice(model).catch(e => console.error('saveInvoice failed:', e));
+		this.pbService.upsertInvoice(model).catch(e => console.error('saveInvoice failed:', e, JSON.stringify(e?.data)));
 	}
 
 	public deleteInvoice(id: string): void {

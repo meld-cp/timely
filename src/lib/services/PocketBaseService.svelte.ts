@@ -180,7 +180,15 @@ export class PocketBaseService {
 		if (this._knownInvoiceIds.has(invoice.id)) {
 			await this.pb.collection(C.TIMELY_INVOICE).update(invoice.id, data);
 		} else {
-			await this.pb.collection(C.TIMELY_INVOICE).create({ id: invoice.id, ...data });
+			try {
+				await this.pb.collection(C.TIMELY_INVOICE).update(invoice.id, data);
+			} catch (e: unknown) {
+				if ((e as { status?: number })?.status === 404) {
+					await this.pb.collection(C.TIMELY_INVOICE).create({ id: invoice.id, ...data });
+				} else {
+					throw e;
+				}
+			}
 			this._knownInvoiceIds.add(invoice.id);
 		}
 		// Replace lines: delete existing then recreate
