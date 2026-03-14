@@ -12,7 +12,7 @@
 	import { appController } from "$lib/services/Singletons";
 	import type { TaskModel } from "$lib/models/TaskModel";
 	import { Utils } from "$lib/services/Utils";
-	import { DRAFT_INVOICE_ID } from "$lib/StorageKeys";
+	import { DRAFT_INVOICE_ID, SCRATCH_PAD_INVOICE_BUILDER } from "$lib/StorageKeys";
 
 	let workingInvoice: InvoiceViewModel = $state(buildNewDraftInvoice());
 	let isEditingDraftInvoice: boolean = $derived(workingInvoice.id === DRAFT_INVOICE_ID);
@@ -31,11 +31,13 @@
 	let draftSaveTimer: ReturnType<typeof setTimeout> | undefined;
 
 	onMount(async () => {
-		scratchPad = appController.getScratchPad("page-invoice-builder");
+		scratchPad = appController.getScratchPad(SCRATCH_PAD_INVOICE_BUILDER);
 		workingInvoice = (await appController.getInvoiceById(DRAFT_INVOICE_ID)) ?? buildNewDraftInvoice();
 		saveDraftInvoice();
-		uninvoicedTasks = await fetchUninvoicedTasks();
-		closedInvoices = await fetchInvoices();
+		[uninvoicedTasks, closedInvoices] = await Promise.all([
+			fetchUninvoicedTasks(),
+			fetchInvoices(),
+		]);
 	});
 
 	async function fetchInvoices(): Promise<InvoiceViewModel[]> {
@@ -67,7 +69,7 @@
 	function saveScratchPad() {
 		clearTimeout(scratchPadSaveTimer);
 		scratchPadSaveTimer = setTimeout(() => {
-			appController.setScratchPad("page-invoice-builder", scratchPad);
+			appController.setScratchPad(SCRATCH_PAD_INVOICE_BUILDER, scratchPad);
 		}, 1000);
 	}
 

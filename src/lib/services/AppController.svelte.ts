@@ -66,8 +66,10 @@ export class ApplicationController {
 	}
 
 	public async getAppData(): Promise<ApplicationData> {
-		const tasks = await this.pbService.getAllTasks();
-		const invoices = await this.pbService.getAllInvoices();
+		const [tasks, invoices] = await Promise.all([
+			this.pbService.getAllTasks(),
+			this.pbService.getAllInvoices(),
+		]);
 		const settings = this.settings.getModel();
 		// Convert logo URL to data URL so backups are self-contained
 		if (settings.logoData?.startsWith('http')) {

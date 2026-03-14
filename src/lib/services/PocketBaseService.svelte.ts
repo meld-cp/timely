@@ -1,4 +1,5 @@
 import PocketBase from 'pocketbase';
+import { SCRATCH_PAD_INVOICE_BUILDER } from '$lib/StorageKeys';
 import type { InvoiceLineModel } from '$lib/models/InvoiceLineModel';
 import type { InvoiceModel } from '$lib/models/InvoiceModel';
 import type { TaskModel } from '$lib/models/TaskModel';
@@ -189,11 +190,11 @@ export class PocketBaseService {
 			filter: `invoice="${invoice.id}"`,
 			requestKey: null
 		});
-		for (const line of existingLines) {
-			await this.pb.collection(C.TIMELY_INVOICE_LINE).delete(line.id);
-		}
-		for (const line of invoice.lines) {
-			await this.pb.collection(C.TIMELY_INVOICE_LINE).create({
+		await Promise.all(existingLines.map(line =>
+			this.pb.collection(C.TIMELY_INVOICE_LINE).delete(line.id)
+		));
+		await Promise.all(invoice.lines.map(line =>
+			this.pb.collection(C.TIMELY_INVOICE_LINE).create({
 				id: line.id,
 				invoice: invoice.id,
 				lineNumber: line.number,
@@ -202,8 +203,8 @@ export class PocketBaseService {
 				quantity: line.quantity,
 				unitCost: line.unitCost,
 				task: line.extRefId || null
-			});
-		}
+			})
+		));
 	}
 
 	async deleteAllData(): Promise<void> {
@@ -212,9 +213,7 @@ export class PocketBaseService {
 			filter: `user="${this._timelyUserId}"`,
 			requestKey: null
 		});
-		for (const t of tasks) {
-			await this.pb.collection(C.TIMELY_TASK).delete(t.id);
-		}
+		await Promise.all(tasks.map(t => this.pb.collection(C.TIMELY_TASK).delete(t.id)));
 		this._knownTaskIds.clear();
 
 		// Delete invoices (cascades to lines via deleteInvoice)
@@ -252,7 +251,7 @@ export class PocketBaseService {
 			localeCode: (record['localeCode'] as string) ?? undefined,
 			address: (record['address'] as string) ?? undefined,
 			logoData,
-			scratchPads: { 'page-invoice-builder': (record['scratchPad'] as string) ?? '' },
+			scratchPads: { SCRATCH_PAD_INVOICE_BUILDER: (record['scratchPad'] as string) ?? '' },
 			nextInvoiceNumber: (record['nextInvoiceNumber'] as number) ?? 1000,
 			defaultInvoiceHeader: (record['defaultInvoiceHeader'] as string) ?? undefined,
 			defaultInvoiceCurrencyCode: (record['defaultInvoiceCurrencyCode'] as string) ?? undefined,
@@ -266,7 +265,7 @@ export class PocketBaseService {
 			companyName: settings.label ?? '',
 			localeCode: settings.localeCode ?? '',
 			address: settings.address ?? '',
-			scratchPad: settings.scratchPads?.['page-invoice-builder'] ?? '',
+			scratchPad: settings.scratchPads?.[SCRATCH_PAD_INVOICE_BUILDER] ?? '',
 			nextInvoiceNumber: settings.nextInvoiceNumber ?? 1000,
 			defaultInvoiceHeader: settings.defaultInvoiceHeader ?? '',
 			defaultInvoiceCurrencyCode: settings.defaultInvoiceCurrencyCode ?? '',
