@@ -152,18 +152,19 @@ export class PocketBaseService {
 	}
 
 	async getInvoiceById(id: string): Promise<InvoiceModel | null> {
-		try {
-			const inv = await this.pb.collection(C.TIMELY_INVOICE).getOne(id);
-			this._knownInvoiceIds.add(inv.id);
-			const lines = await this.pb.collection(C.TIMELY_INVOICE_LINE).getFullList({
-				filter: `invoice="${id}"`,
-				sort: 'lineNumber',
-				requestKey: null
-			});
-			return this.pbToInvoiceModel(inv, lines);
-		} catch {
-			return null;
-		}
+		const result = await this.pb.collection(C.TIMELY_INVOICE).getList(1, 1, {
+			filter: `id="${id}"`,
+			requestKey: null
+		});
+		if (result.items.length === 0) return null;
+		const inv = result.items[0];
+		this._knownInvoiceIds.add(inv.id);
+		const lines = await this.pb.collection(C.TIMELY_INVOICE_LINE).getFullList({
+			filter: `invoice="${id}"`,
+			sort: 'lineNumber',
+			requestKey: null
+		});
+		return this.pbToInvoiceModel(inv, lines);
 	}
 
 	async upsertInvoice(invoice: InvoiceModel): Promise<void> {
