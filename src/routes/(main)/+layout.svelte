@@ -33,8 +33,7 @@
 		{ label: "Time Log", url: "/timelog/" },
 		{ label: "Invoice Builder", url: "/invoices/" },
 		{ label: "Settings", url: "/admin/settings/" },
-		{ label: "Backup & Restore", url: "/admin/backup/" },
-		{ label: "Data", url: "/admin/data/" },
+		{ label: "Data Management", url: "/admin/backup/" },
 		{ label: "Roadmap", url: "/admin/roadmap/" },
 	];
 

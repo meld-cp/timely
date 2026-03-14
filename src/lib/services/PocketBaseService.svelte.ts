@@ -203,6 +203,27 @@ export class PocketBaseService {
 		}
 	}
 
+	async deleteAllData(): Promise<void> {
+		// Delete tasks first (they reference invoices)
+		const tasks = await this.pb.collection(C.TIMELY_TASK).getFullList({
+			filter: `user="${this._timelyUserId}"`,
+			requestKey: null
+		});
+		for (const t of tasks) {
+			await this.pb.collection(C.TIMELY_TASK).delete(t.id);
+		}
+		this._knownTaskIds.clear();
+
+		// Delete invoices (cascades to lines via deleteInvoice)
+		const invoices = await this.pb.collection(C.TIMELY_INVOICE).getFullList({
+			filter: `user="${this._authUserId}"`,
+			requestKey: null
+		});
+		for (const inv of invoices) {
+			await this.deleteInvoice(inv.id);
+		}
+	}
+
 	async deleteInvoice(id: string): Promise<void> {
 		const lines = await this.pb.collection(C.TIMELY_INVOICE_LINE).getFullList({
 			filter: `invoice="${id}"`,
