@@ -139,7 +139,7 @@ export class PocketBaseService {
 
 	async getAllInvoices(): Promise<InvoiceModel[]> {
 		const records = await this.pb.collection(C.TIMELY_INVOICE).getFullList({
-			filter: `user="${this._timelyUserId}"`,
+			filter: `timelyUser="${this._timelyUserId}"`,
 			sort: '-created',
 			requestKey: null
 		});
@@ -175,7 +175,7 @@ export class PocketBaseService {
 
 	async upsertInvoice(invoice: InvoiceModel): Promise<void> {
 		const data: Record<string, unknown> = {
-			user: this._timelyUserId,
+			timelyUser: this._timelyUserId,
 			invoiceDate: invoice.date,
 			currencyCode: invoice.currencyCode,
 			number: parseInt(invoice.number) || 0,
@@ -223,7 +223,7 @@ export class PocketBaseService {
 
 		// Delete invoices (cascades to lines via deleteInvoice)
 		const invoices = await this.pb.collection(C.TIMELY_INVOICE).getFullList({
-			filter: `user="${this._timelyUserId}"`,
+			filter: `timelyUser="${this._timelyUserId}"`,
 			requestKey: null
 		});
 		for (const inv of invoices) {
