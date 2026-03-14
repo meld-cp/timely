@@ -6,7 +6,7 @@ import type { TaskModel } from '$lib/models/TaskModel';
 import type { SettingsModel } from '$lib/models/SettingsModel';
 import { TaskState } from '$lib/models/TaskState';
 import { FormatDate } from './formatters/FormatDate';
-import { PB_URL_KEY, PB_EMAIL_KEY, DRAFT_INVOICE_ID } from '$lib/StorageKeys';
+import { PB_URL_KEY, PB_EMAIL_KEY } from '$lib/StorageKeys';
 
 const C = {
 	USERS: 'users',
@@ -40,6 +40,10 @@ export class PocketBaseService {
 
 	get timelyUserId(): string {
 		return this._timelyUserId;
+	}
+
+	get draftInvoiceId(): string {
+		return 'draft' + this._timelyUserId.substring(0, 10);
 	}
 
 	private async resolveTimelyUserId(authUserId: string): Promise<string> {
@@ -141,7 +145,7 @@ export class PocketBaseService {
 		records.forEach(r => this._knownInvoiceIds.add(r.id));
 		const invoices: InvoiceModel[] = [];
 		for (const inv of records) {
-			if (inv.id === DRAFT_INVOICE_ID) continue;
+			if (inv.id === this.draftInvoiceId) continue;
 			const lines = await this.pb.collection(C.TIMELY_INVOICE_LINE).getFullList({
 				filter: `invoice="${inv.id}"`,
 				sort: 'lineNumber',

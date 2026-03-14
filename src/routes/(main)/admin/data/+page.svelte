@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { LocalBackupService } from "$lib/services/backup-services/LocalBackupService";
 	import { appController, pbService } from "$lib/services/Singletons";
-	import { DRAFT_INVOICE_ID } from "$lib/StorageKeys";
 	import type { TaskModel } from "$lib/models/TaskModel";
 	import type { InvoiceModel } from "$lib/models/InvoiceModel";
 	import { Utils } from "$lib/services/Utils";
@@ -19,7 +18,7 @@
 	let stats = $derived.by(() => {
 		if (!appData) return undefined;
 		const tasks = appData.tasks;
-		const invoices = appData.invoices.filter(inv => inv.id !== DRAFT_INVOICE_ID);
+		const invoices = appData.invoices.filter(inv => !inv.id.startsWith('draft'));
 		const totalHours = tasks.reduce((s, t) => s + t.affectiveDurationHours, 0);
 		const invoicedTotal = invoices.reduce((s, inv) => s + inv.lines.reduce((ls, l) => ls + l.quantity * l.unitCost, 0), 0);
 		const currencyCode = appController.settings.defaultInvoiceCurrencyCode ?? 'USD';
@@ -86,7 +85,7 @@
 
 		try {
 			const { tasks, settings } = parsedData;
-			const invoices = parsedData.invoices.filter(inv => inv.id !== DRAFT_INVOICE_ID);
+			const invoices = parsedData.invoices.filter(inv => !inv.id.startsWith('draft'));
 
 			const taskIdMap = new Map<string, string>();
 			for (const t of tasks) taskIdMap.set(t.id, Utils.generateId());
@@ -238,7 +237,7 @@
 			<table>
 				<tbody>
 					<tr><th>Tasks</th><td>{parsedData.tasks.length}</td></tr>
-					<tr><th>Invoices</th><td>{parsedData.invoices.filter(inv => inv.id !== DRAFT_INVOICE_ID).length}</td></tr>
+					<tr><th>Invoices</th><td>{parsedData.invoices.filter(inv => !inv.id.startsWith('draft')).length}</td></tr>
 					<tr><th>Backup date</th><td>{new Date(parsedData.modified).toLocaleString()}</td></tr>
 					<tr><th>Label</th><td>{parsedData.settings?.label ?? '—'}</td></tr>
 				</tbody>

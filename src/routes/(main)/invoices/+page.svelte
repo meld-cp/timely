@@ -12,10 +12,10 @@
 	import { appController } from "$lib/services/Singletons";
 	import type { TaskModel } from "$lib/models/TaskModel";
 	import { Utils } from "$lib/services/Utils";
-	import { DRAFT_INVOICE_ID, SCRATCH_PAD_INVOICE_BUILDER } from "$lib/StorageKeys";
+	import { SCRATCH_PAD_INVOICE_BUILDER } from "$lib/StorageKeys";
 
 	let workingInvoice: InvoiceViewModel = $state(buildNewDraftInvoice());
-	let isEditingDraftInvoice: boolean = $derived(workingInvoice.id === DRAFT_INVOICE_ID);
+	let isEditingDraftInvoice: boolean = $derived(workingInvoice.id === appController.draftInvoiceId);
 	let workingInvoiceTitle: string = $derived.by(() => {
 		if (isEditingDraftInvoice) {
 			return "Draft Invoice";
@@ -32,7 +32,7 @@
 
 	onMount(async () => {
 		scratchPad = appController.getScratchPad(SCRATCH_PAD_INVOICE_BUILDER);
-		workingInvoice = (await appController.getInvoiceById(DRAFT_INVOICE_ID)) ?? buildNewDraftInvoice();
+		workingInvoice = (await appController.getInvoiceById(appController.draftInvoiceId)) ?? buildNewDraftInvoice();
 		saveDraftInvoice();
 		[uninvoicedTasks, closedInvoices] = await Promise.all([
 			fetchUninvoicedTasks(),
@@ -42,7 +42,7 @@
 
 	async function fetchInvoices(): Promise<InvoiceViewModel[]> {
 		const all = await appController.getInvoices();
-		return all.filter(inv => inv.id !== DRAFT_INVOICE_ID).sort((a, b) => {
+		return all.filter(inv => inv.id !== appController.draftInvoiceId).sort((a, b) => {
 			const aDate = new Date(a.date).valueOf();
 			const bDate = new Date(b.date).valueOf();
 			if (aDate > bDate) return -1;
@@ -58,7 +58,7 @@
 	function buildNewDraftInvoice(): InvoiceViewModel {
 		const settings = appController.settings;
 		const result = new InvoiceViewModel();
-		result.id = DRAFT_INVOICE_ID;
+		result.id = appController.draftInvoiceId;
 		result.headerLinesAsText = settings.defaultInvoiceHeader ?? "";
 		result.currencyCode = settings.defaultInvoiceCurrencyCode;
 		result.number = `${settings.nextInvoiceNumber}`;

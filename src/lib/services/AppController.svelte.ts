@@ -11,6 +11,10 @@ export class ApplicationController {
 
 	constructor(private pbService: PocketBaseService) {}
 
+	get draftInvoiceId(): string {
+		return this.pbService.draftInvoiceId;
+	}
+
 	async initialize(): Promise<void> {
 		const settingsModel = await this.pbService.getSettings();
 		this.settings = new SettingsViewModel(settingsModel);
