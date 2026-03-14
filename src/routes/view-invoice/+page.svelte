@@ -40,6 +40,9 @@
 </svelte:head>
 
 {#if inv}
+<div class="print-btn">
+	<button onclick={() => window.print()}>Save as PDF</button>
+</div>
 {#if watermark}
 	<div class="watermark">{watermark}</div>
 {/if}
@@ -188,8 +191,13 @@
 
 	#c-inv{
 		margin: 0;
+		padding-top: 3rem;
 		font-size: 0.4cm;
 		font-family: Arial, Helvetica, sans-serif
+	}
+
+	@media print {
+		#c-inv { padding-top: 0; }
 	}
 
 	#c-logo{
@@ -238,6 +246,19 @@
 
 	.tar{
 		text-align: right;
+	}
+
+	.print-btn {
+		position: fixed;
+		top: 1rem;
+		right: 1rem;
+		z-index: 20000;
+	}
+
+	@media print {
+		.print-btn { display: none; }
+		@page { size: A4; }
+		body { margin: 0; }
 	}
 
 	/* Layout */
