@@ -1,0 +1,1 @@
+import{L as a}from"./COUvXR6h.js";const e=!1,o=!0,t="always",r=Object.freeze(Object.defineProperty({__proto__:null,prerender:o,ssr:e,trailingSlash:t},Symbol.toStringTag,{value:"Module"}));export{a as component,r as universal};
