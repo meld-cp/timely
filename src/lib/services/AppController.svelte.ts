@@ -57,8 +57,8 @@ export class ApplicationController {
 		this.pbService.deleteTask(id).catch(e => console.error('deleteTask failed:', e));
 	}
 
-	public saveInvoice(model: InvoiceModel): void {
-		this.pbService.upsertInvoice(model).catch(e => console.error('saveInvoice failed:', e, JSON.stringify(e?.data)));
+	public saveInvoice(model: InvoiceModel): Promise<void> {
+		return this.pbService.upsertInvoice(model).catch(e => console.error('saveInvoice failed:', e, JSON.stringify(e?.data)));
 	}
 
 	public deleteInvoice(id: string): void {
@@ -68,11 +68,19 @@ export class ApplicationController {
 	public async getAppData(): Promise<ApplicationData> {
 		const tasks = await this.pbService.getAllTasks();
 		const invoices = await this.pbService.getAllInvoices();
-		return {
-			modified: Date.now(),
-			settings: this.settings.getModel(),
-			tasks,
-			invoices
-		};
+		const settings = this.settings.getModel();
+		// Convert logo URL to data URL so backups are self-contained
+		if (settings.logoData?.startsWith('http')) {
+			settings.logoData = await fetch(settings.logoData)
+				.then(r => r.blob())
+				.then(blob => new Promise<string>((resolve, reject) => {
+					const reader = new FileReader();
+					reader.onload = () => resolve(reader.result as string);
+					reader.onerror = reject;
+					reader.readAsDataURL(blob);
+				}))
+				.catch(() => settings.logoData);
+		}
+		return { modified: Date.now(), settings, tasks, invoices };
 	}
 }

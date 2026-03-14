@@ -132,13 +132,14 @@
 			// Import settings
 			if (settings) {
 				const current = appController.settings.getModel();
+				const maxImportedNumber = invoices.reduce((max, inv) => Math.max(max, parseInt(inv.number) || 0), 0);
 				await pbService.saveSettings({
 					...current,
 					logoData: settings.logoData ?? current.logoData,
 					label: settings.label ?? current.label,
 					localeCode: settings.localeCode ?? current.localeCode,
 					address: settings.address ?? current.address,
-					nextInvoiceNumber: settings.nextInvoiceNumber ?? current.nextInvoiceNumber,
+					nextInvoiceNumber: maxImportedNumber > 0 ? maxImportedNumber + 1 : (settings.nextInvoiceNumber ?? current.nextInvoiceNumber),
 					defaultInvoiceHeader: settings.defaultInvoiceHeader ?? current.defaultInvoiceHeader,
 					defaultInvoiceCurrencyCode: settings.defaultInvoiceCurrencyCode ?? current.defaultInvoiceCurrencyCode,
 					defaultInvoiceFooter: settings.defaultInvoiceFooter ?? current.defaultInvoiceFooter,

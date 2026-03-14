@@ -7,9 +7,7 @@
 	import { appController } from '$lib/services/Singletons';
 	import { pbService } from '$lib/services/Singletons';
 
-	const settings = appController.settings;
-
-	let logoSrc: string | undefined = $state(settings.logoData);
+	let logoSrc = $derived(appController.settings.logoData);
 
 	let inv: InvoiceViewModel | null = $state(null);
 
@@ -29,7 +27,6 @@
 			const ok = await pbService.initialize();
 			if (!ok) return;
 			await appController.initialize();
-			logoSrc = appController.settings.logoData;
 		}
 
 		if (id) {
@@ -54,7 +51,7 @@
 		</div>
 
 		<div id="c-address">
-			{#each (settings.address ?? "")?.split("\n") as line}
+			{#each (appController.settings.address ?? "")?.split("\n") as line}
 				{line}<br/>
 			{/each}
 		</div>
@@ -119,8 +116,8 @@
 					<td class="tal">{line.description}</td>
 					<td class="tar">{line.quantity}</td>
 					<td class="tac">{line.units}</td>
-					<td class="tar">{FormatNumber.currency(line.unitCost, inv.currencyCode, settings.localeCode)}</td>
-					<td class="tar">{FormatNumber.currency(line.total, inv.currencyCode, settings.localeCode)}</td>
+					<td class="tar">{FormatNumber.currency(line.unitCost, inv.currencyCode, appController.settings.localeCode)}</td>
+					<td class="tar">{FormatNumber.currency(line.total, inv.currencyCode, appController.settings.localeCode)}</td>
 					{/if}
 				</tr>
 				{/each}
@@ -128,15 +125,15 @@
 			<tfoot>
 				<tr>
 					<th class="tar" colspan="4">Subtotal:</th>
-					<th class="tar">{FormatNumber.currency(inv.subtotal, inv.currencyCode, settings.localeCode)}</th>
+					<th class="tar">{FormatNumber.currency(inv.subtotal, inv.currencyCode, appController.settings.localeCode)}</th>
 				</tr>
 				<tr>
 					<th class="tar" colspan="4">GST:</th>
-					<th class="tar">{FormatNumber.currency(inv.taxTotal, inv.currencyCode, settings.localeCode)}</th>
+					<th class="tar">{FormatNumber.currency(inv.taxTotal, inv.currencyCode, appController.settings.localeCode)}</th>
 				</tr>
 				<tr>
 					<th class="tar" colspan="4">Grand Total:</th>
-					<th class="tar">{FormatNumber.currency(inv.grandTotal, inv.currencyCode, settings.localeCode)}</th>
+					<th class="tar">{FormatNumber.currency(inv.grandTotal, inv.currencyCode, appController.settings.localeCode)}</th>
 				</tr>
 			</tfoot>
 		</table>

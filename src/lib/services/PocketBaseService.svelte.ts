@@ -180,15 +180,7 @@ export class PocketBaseService {
 		if (this._knownInvoiceIds.has(invoice.id)) {
 			await this.pb.collection(C.TIMELY_INVOICE).update(invoice.id, data);
 		} else {
-			try {
-				await this.pb.collection(C.TIMELY_INVOICE).update(invoice.id, data);
-			} catch (e: unknown) {
-				if ((e as { status?: number })?.status === 404) {
-					await this.pb.collection(C.TIMELY_INVOICE).create({ id: invoice.id, ...data });
-				} else {
-					throw e;
-				}
-			}
+			await this.pb.collection(C.TIMELY_INVOICE).create({ id: invoice.id, ...data });
 			this._knownInvoiceIds.add(invoice.id);
 		}
 		// Replace lines: delete existing then recreate
@@ -251,21 +243,9 @@ export class PocketBaseService {
 	async getSettings(): Promise<SettingsModel> {
 		const record = await this.pb.collection(C.TIMELY_USER).getOne(this._timelyUserId);
 		const logoFilename = record['logo'] as string;
-		let logoData: string | undefined;
-		if (logoFilename) {
-			try {
-				const url = this.pb.files.getURL(record as Parameters<typeof this.pb.files.getURL>[0], logoFilename);
-				const resp = await fetch(url);
-				const blob = await resp.blob();
-				logoData = await new Promise<string>((resolve) => {
-					const reader = new FileReader();
-					reader.onload = () => resolve(reader.result as string);
-					reader.readAsDataURL(blob);
-				});
-			} catch {
-				// logo fetch failed — leave undefined
-			}
-		}
+		const logoData = logoFilename
+			? this.pb.files.getURL(record as Parameters<typeof this.pb.files.getURL>[0], logoFilename)
+			: undefined;
 		return {
 			label: (record['companyName'] as string) ?? undefined,
 			localeCode: (record['localeCode'] as string) ?? undefined,

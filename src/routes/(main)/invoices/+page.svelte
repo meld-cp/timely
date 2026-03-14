@@ -25,6 +25,7 @@
 	let scratchPad: string = $state("");
 	let closedInvoices: InvoiceViewModel[] = $state([]);
 
+	let buildError: string = $state('');
 	let scratchPadSaveTimer: ReturnType<typeof setTimeout> | undefined;
 	let draftSaveTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -38,7 +39,7 @@
 
 	async function fetchInvoices(): Promise<InvoiceViewModel[]> {
 		const all = await appController.getInvoices();
-		return all.sort((a, b) => {
+		return all.filter(inv => inv.id !== DRAFT_INVOICE_ID).sort((a, b) => {
 			const aDate = new Date(a.date).valueOf();
 			const bDate = new Date(b.date).valueOf();
 			if (aDate > bDate) return -1;
@@ -84,9 +85,9 @@
 		return newLine;
 	}
 
-	function onViewDraftInvoice() {
-		saveDraftInvoice();
-		viewInvoice(workingInvoice.id, { watermark: "DRAFT" });
+	async function onPreviewInvoice() {
+		await flushWorkingInvoice();
+		viewInvoice(workingInvoice.id, isEditingDraftInvoice ? { watermark: "DRAFT" } : undefined);
 	}
 
 	function saveDraftInvoice() {
@@ -97,15 +98,32 @@
 		}, 800);
 	}
 
+	async function flushWorkingInvoice(): Promise<void> {
+		clearTimeout(draftSaveTimer);
+		draftSaveTimer = undefined;
+		await appController.saveInvoice(workingInvoice.getModel());
+	}
+
 	async function onBuildInvoice(): Promise<void> {
 		const newInvModel = workingInvoice.getModel();
 		const isDraftInvoice = isEditingDraftInvoice;
 
+		const duplicate = closedInvoices.find(inv => inv.number === newInvModel.number && inv.id !== newInvModel.id);
+		if (duplicate) {
+			buildError = `Invoice #${newInvModel.number} already exists. Change the invoice number before building.`;
+			return;
+		}
+		buildError = '';
+
+		if (isDraftInvoice) await flushWorkingInvoice();
+
 		if (isDraftInvoice) {
 			newInvModel.id = Utils.generateId();
+			// Generate fresh line IDs so they don't collide with the draft's lines still in PocketBase
+			newInvModel.lines = newInvModel.lines.map(l => ({ ...l, id: Utils.generateId() }));
 		}
 
-		appController.saveInvoice(newInvModel);
+		await appController.saveInvoice(newInvModel);
 
 		const attachedTaskIds = new Set(
 			newInvModel.lines.map(l => l.extRefId).filter((id): id is string => !!id)
@@ -191,18 +209,23 @@
 
 <div id="container">
 	<section id="row1">
-		<InvoiceEditorView
-			vm={workingInvoice}
-			title={workingInvoiceTitle}
-			canChangeNumber={isEditingDraftInvoice}
-			onChange={saveDraftInvoice}
-			onAddLine={onDraftInvoiceAddLine}
-			onRemoveLine={onDraftInvoiceRemoveLine}
-			onSortLines={onDraftInvoiceSortLines}
-			{onBuildInvoice}
-			onPreviewInvoice={onViewDraftInvoice}
-			onResetInvoice={resetWorkingInvoice}
-		/>
+		<div>
+			{#if buildError}
+				<p style="color: var(--pico-color-red-500);">{buildError}</p>
+			{/if}
+			<InvoiceEditorView
+				vm={workingInvoice}
+				title={workingInvoiceTitle}
+				canChangeNumber={isEditingDraftInvoice}
+				onChange={saveDraftInvoice}
+				onAddLine={onDraftInvoiceAddLine}
+				onRemoveLine={onDraftInvoiceRemoveLine}
+				onSortLines={onDraftInvoiceSortLines}
+				{onBuildInvoice}
+				onPreviewInvoice={onPreviewInvoice}
+				onResetInvoice={resetWorkingInvoice}
+			/>
+		</div>
 
 		<div class="c-col-2">
 
