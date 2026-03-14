@@ -241,11 +241,27 @@ export class PocketBaseService {
 
 	async getSettings(): Promise<SettingsModel> {
 		const record = await this.pb.collection(C.TIMELY_USER).getOne(this._timelyUserId);
+		const logoFilename = record['logo'] as string;
+		let logoData: string | undefined;
+		if (logoFilename) {
+			try {
+				const url = this.pb.files.getURL(record as Parameters<typeof this.pb.files.getURL>[0], logoFilename);
+				const resp = await fetch(url);
+				const blob = await resp.blob();
+				logoData = await new Promise<string>((resolve) => {
+					const reader = new FileReader();
+					reader.onload = () => resolve(reader.result as string);
+					reader.readAsDataURL(blob);
+				});
+			} catch {
+				// logo fetch failed — leave undefined
+			}
+		}
 		return {
 			label: (record['companyName'] as string) ?? undefined,
 			localeCode: (record['localeCode'] as string) ?? undefined,
 			address: (record['address'] as string) ?? undefined,
-			logoData: localStorage.getItem('timely-logo') ?? undefined,
+			logoData,
 			scratchPads: { 'page-invoice-builder': (record['scratchPad'] as string) ?? '' },
 			nextInvoiceNumber: (record['nextInvoiceNumber'] as number) ?? 1000,
 			defaultInvoiceHeader: (record['defaultInvoiceHeader'] as string) ?? undefined,
@@ -256,11 +272,7 @@ export class PocketBaseService {
 	}
 
 	async saveSettings(settings: SettingsModel): Promise<void> {
-		// Save logo to localStorage (PB logo field is a file upload - not handled here)
-		if (settings.logoData) {
-			localStorage.setItem('timely-logo', settings.logoData);
-		}
-		await this.pb.collection(C.TIMELY_USER).update(this._timelyUserId, {
+		const data: Record<string, unknown> = {
 			companyName: settings.label ?? '',
 			localeCode: settings.localeCode ?? '',
 			address: settings.address ?? '',
@@ -270,7 +282,20 @@ export class PocketBaseService {
 			defaultInvoiceCurrencyCode: settings.defaultInvoiceCurrencyCode ?? '',
 			defaultInvoiceFooter: settings.defaultInvoiceFooter ?? '',
 			defaultHourlyRate: settings.defaultHourlyRate ?? 0
-		});
+		};
+		if (settings.logoData?.startsWith('data:')) {
+			data['logo'] = this.dataURLToFile(settings.logoData, 'logo');
+		}
+		await this.pb.collection(C.TIMELY_USER).update(this._timelyUserId, data);
+	}
+
+	private dataURLToFile(dataUrl: string, filename: string): File {
+		const [header, base64] = dataUrl.split(',');
+		const mime = header.match(/:(.*?);/)?.[1] ?? 'image/png';
+		const bytes = atob(base64);
+		const arr = new Uint8Array(bytes.length);
+		for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+		return new File([arr], filename, { type: mime });
 	}
 
 	// ---- Converters ----
