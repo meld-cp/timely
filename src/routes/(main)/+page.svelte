@@ -37,6 +37,15 @@
 
 	onDestroy(() => clearInterval(interval));
 
+	function togglePauseResume(task: TaskViewModel) {
+		if (task.state === TaskState.Running) {
+			task.pause();
+		} else {
+			task.start();
+		}
+		appController.saveTask(task.getModel());
+	}
+
 	const activeTasks = $derived(tasks.filter(t => t.state === TaskState.Running || t.state === TaskState.Paused));
 	const uninvoicedTasks = $derived(tasks.filter(t => t.state !== TaskState.Archived && !t.invoiceRefId));
 	const uninvoicedLiveHours = $derived(
@@ -75,7 +84,11 @@
 										{task.name}
 									</td>
 									<td class="num">{fmtDuration(liveDuration(task, now))}</td>
-									<td class="muted">{task.state}</td>
+									<td>
+										<button class="outline secondary toggle-btn" onclick={() => togglePauseResume(task)}>
+											{task.state === TaskState.Running ? 'Pause' : 'Resume'}
+										</button>
+									</td>
 								</tr>
 							{/each}
 						</tbody>
@@ -177,6 +190,11 @@
 		font-size: 2rem;
 		font-weight: bold;
 		margin: 0.25rem 0;
+	}
+	.toggle-btn {
+		font-size: 0.75em;
+		padding: 0.1em 0.6em;
+		margin: 0;
 	}
 	.state-dot {
 		display: inline-block;
