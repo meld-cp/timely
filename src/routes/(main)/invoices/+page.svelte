@@ -115,12 +115,16 @@
 		}
 		buildError = '';
 
-		if (isDraftInvoice) await flushWorkingInvoice();
-
 		if (isDraftInvoice) {
 			newInvModel.id = Utils.generateId();
-			// Generate fresh line IDs so they don't collide with the draft's lines still in PocketBase
 			newInvModel.lines = newInvModel.lines.map(l => ({ ...l, id: Utils.generateId() }));
+			// Advance draft to the next number and flush to PocketBase BEFORE creating the
+			// real invoice, so the draft no longer holds the current number (PB unique constraint).
+			appController.incrementNextInvoiceNumber();
+			resetWorkingInvoice();
+			await flushWorkingInvoice();
+		} else {
+			await flushWorkingInvoice();
 		}
 
 		await appController.saveInvoice(newInvModel);
@@ -135,14 +139,8 @@
 			appController.saveTask(task.getModel());
 		}
 
-		if (isDraftInvoice) {
-			appController.incrementNextInvoiceNumber();
-		}
-
 		closedInvoices = await fetchInvoices();
 		uninvoicedTasks = await fetchUninvoicedTasks();
-
-		resetWorkingInvoice();
 		viewInvoice(newInvModel.id);
 	}
 
