@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+
 	import { onMount } from 'svelte';
 	import { pbService } from '$lib/services/Singletons';
 	import { appController } from '$lib/services/Singletons';
@@ -21,7 +22,7 @@
 			const ok = await pbService.initialize();
 			if (ok) {
 				await appController.initialize();
-				goto('/timelog/');
+				goto(base + '/timelog/');
 				return;
 			}
 			loading = false;
@@ -35,7 +36,7 @@
 		try {
 			await pbService.login(url.trim(), email.trim(), password);
 			await appController.initialize();
-			goto('/timelog/');
+			goto(base + '/timelog/');
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Login failed';
 		} finally {

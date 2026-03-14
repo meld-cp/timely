@@ -45,18 +45,18 @@
 
 	async function onSignOut() {
 		pbService.logout();
-		goto('/login/');
+		goto(base + '/login/');
 	}
 
 	onMount(async () => {
 		if (!pbService.pb.authStore.isValid) {
-			goto('/login/');
+			goto(base + '/login/');
 			return;
 		}
 		if (!pbService.isInitialized) {
 			const ok = await pbService.initialize();
 			if (!ok) {
-				goto('/login/');
+				goto(base + '/login/');
 				return;
 			}
 			await appController.initialize();
