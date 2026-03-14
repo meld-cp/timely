@@ -26,10 +26,12 @@
 	let closedInvoices: InvoiceViewModel[] = $state([]);
 
 	let scratchPadSaveTimer: ReturnType<typeof setTimeout> | undefined;
+	let draftSaveTimer: ReturnType<typeof setTimeout> | undefined;
 
 	onMount(async () => {
 		scratchPad = appController.getScratchPad("page-invoice-builder");
 		workingInvoice = (await appController.getInvoiceById(DRAFT_INVOICE_ID)) ?? buildNewDraftInvoice();
+		saveDraftInvoice();
 		uninvoicedTasks = await fetchUninvoicedTasks();
 		closedInvoices = await fetchInvoices();
 	});
@@ -88,7 +90,11 @@
 	}
 
 	function saveDraftInvoice() {
-		appController.saveInvoice(workingInvoice.getModel());
+		if (!isEditingDraftInvoice) return;
+		clearTimeout(draftSaveTimer);
+		draftSaveTimer = setTimeout(() => {
+			appController.saveInvoice(workingInvoice.getModel());
+		}, 800);
 	}
 
 	async function onBuildInvoice(): Promise<void> {
@@ -157,6 +163,7 @@
 				workingInvoice.removeLineWithExtRefId(task.id);
 			}
 		}
+		saveDraftInvoice();
 	}
 
 	function onDraftInvoiceAddLine() {
@@ -224,6 +231,7 @@
 									} else {
 										workingInvoice.removeLineWithExtRefId(task.id);
 									}
+									saveDraftInvoice();
 								}
 							}/>
 							{FormatDate.toLocalDateFromString(task.date, appController.settings.localeCode)} ({task.affectiveDurationHours.toFixed(2)} hrs) - {task.name}
