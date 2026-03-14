@@ -114,6 +114,7 @@ export class PocketBaseService {
 		const data: Record<string, unknown> = {
 			user: this._timelyUserId,
 			state: task.state,
+			date: task.date,
 			name: task.name,
 			duration: task.duration,
 			affectiveDurationHours: task.affectiveDurationHours,
@@ -297,7 +298,7 @@ export class PocketBaseService {
 		return {
 			id: r['id'] as string,
 			state: r['state'] as TaskState,
-			date: (r['created'] as string)?.substring(0, 10) ?? FormatDate.toInputDateValue(new Date()),
+			date: (r['date'] as string)?.substring(0, 10) ?? (r['created'] as string)?.substring(0, 10) ?? FormatDate.toInputDateValue(new Date()),
 			name: r['name'] as string,
 			duration: (r['duration'] as number) ?? 0,
 			affectiveDurationHours: (r['affectiveDurationHours'] as number) ?? 0,
