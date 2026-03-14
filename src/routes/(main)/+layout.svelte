@@ -34,7 +34,6 @@
 		{ label: "Invoice Builder", url: "/invoices/" },
 		{ label: "Settings", url: "/admin/settings/" },
 		{ label: "Data Management", url: "/admin/backup/" },
-		{ label: "Roadmap", url: "/admin/roadmap/" },
 	];
 
 	let menuOpen = $state(false);
