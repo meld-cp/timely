@@ -135,11 +135,9 @@
 	}
 
 	function viewInvoice(id: string, options?: { watermark?: string }) {
-		let url = `/view-invoice/${id}/`;
-		if (options?.watermark) {
-			url += `${options.watermark}/`;
-		}
-		window.open(resolve(url), `inv-${id}`);
+		const params = new URLSearchParams({ id });
+		if (options?.watermark) params.set('watermark', options.watermark);
+		window.open(resolve(`/view-invoice/?${params}`), `inv-${id}`);
 	}
 
 	async function editInvoice(id: string) {

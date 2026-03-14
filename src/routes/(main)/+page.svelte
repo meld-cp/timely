@@ -141,7 +141,7 @@
 						<tbody>
 							{#each openInvoices.slice(0, 5) as inv}
 								<tr>
-									<td><a href={resolve(`/view-invoice/${inv.id}/`)} target="_blank" rel="noopener">#{inv.number}</a></td>
+									<td><a href={resolve(`/view-invoice/?id=${inv.id}`)} target="_blank" rel="noopener">#{inv.number}</a></td>
 									<td>{inv.date}</td>
 									<td>{inv.issueToLines[0] ?? '—'}</td>
 									<td class="num">{FormatNumber.currency(inv.grandTotal, inv.currencyCode || 'USD', appController.settings.localeCode)}</td>
