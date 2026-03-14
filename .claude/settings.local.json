@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cd c:/Dev/timely && npx svelte-check --tsconfig ./tsconfig.json 2>&1 | grep -E \"ERROR|error\")"
+      "Bash(cd c:/Dev/timely && npx svelte-check --tsconfig ./tsconfig.json 2>&1 | grep -E \"ERROR|error\")",
+      "Bash(grep:*)"
     ]
   },
   "prefersReducedMotion": false
