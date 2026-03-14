@@ -11,7 +11,7 @@
 	import { appController } from "$lib/services/Singletons";
 	import type { TaskModel } from "$lib/models/TaskModel";
 	import { Utils } from "$lib/services/Utils";
-	import { DRAFT_INVOICE_KEY, DRAFT_INVOICE_ID } from "$lib/StorageKeys";
+	import { DRAFT_INVOICE_ID } from "$lib/StorageKeys";
 
 	let workingInvoice: InvoiceViewModel = $state(buildNewDraftInvoice());
 	let isEditingDraftInvoice: boolean = $derived(workingInvoice.id === DRAFT_INVOICE_ID);
@@ -29,22 +29,10 @@
 
 	onMount(async () => {
 		scratchPad = appController.getScratchPad("page-invoice-builder");
-		workingInvoice = loadDraftInvoice();
+		workingInvoice = (await appController.getInvoiceById(DRAFT_INVOICE_ID)) ?? buildNewDraftInvoice();
 		uninvoicedTasks = await fetchUninvoicedTasks();
 		closedInvoices = await fetchInvoices();
 	});
-
-	function loadDraftInvoice(): InvoiceViewModel {
-		const stored = localStorage.getItem(DRAFT_INVOICE_KEY);
-		if (stored) {
-			try {
-				return new InvoiceViewModel(JSON.parse(stored));
-			} catch {
-				// fall through
-			}
-		}
-		return buildNewDraftInvoice();
-	}
 
 	async function fetchInvoices(): Promise<InvoiceViewModel[]> {
 		const all = await appController.getInvoices();
@@ -100,7 +88,7 @@
 	}
 
 	function saveDraftInvoice() {
-		localStorage.setItem(DRAFT_INVOICE_KEY, JSON.stringify(workingInvoice.getModel()));
+		appController.saveInvoice(workingInvoice.getModel());
 	}
 
 	async function onBuildInvoice(): Promise<void> {

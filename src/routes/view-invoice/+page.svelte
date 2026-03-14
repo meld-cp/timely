@@ -6,7 +6,6 @@
 	import { InvoiceViewModel } from "$lib/view-models/InvoiceViewModel.svelte";
 	import { appController } from '$lib/services/Singletons';
 	import { pbService } from '$lib/services/Singletons';
-	import { DRAFT_INVOICE_KEY, DRAFT_INVOICE_ID } from '$lib/StorageKeys';
 
 	const settings = appController.settings;
 
@@ -33,12 +32,7 @@
 			logoSrc = appController.settings.logoData;
 		}
 
-		if (id === DRAFT_INVOICE_ID) {
-			const stored = localStorage.getItem(DRAFT_INVOICE_KEY);
-			if (stored) {
-				inv = new InvoiceViewModel(JSON.parse(stored));
-			}
-		} else if (id) {
+		if (id) {
 			inv = await appController.getInvoiceById(id);
 		}
 	});
