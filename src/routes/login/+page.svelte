@@ -22,7 +22,7 @@
 			const ok = await pbService.initialize();
 			if (ok) {
 				await appController.initialize();
-				goto(resolve('/timelog/'));
+				goto(resolve('/'));
 				return;
 			}
 			loading = false;
@@ -36,7 +36,7 @@
 		try {
 			await pbService.login(url.trim(), email.trim(), password);
 			await appController.initialize();
-			goto(resolve('/timelog/'));
+			goto(resolve('/'));
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Login failed';
 		} finally {
