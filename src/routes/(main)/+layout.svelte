@@ -1,6 +1,6 @@
 <svelte:head>
-	<link rel="stylesheet" href="/pico-main/css/pico.min.css">
-	<link rel="stylesheet" href="/pico-main/css/pico.colors.min.css">
+	<link rel="stylesheet" href="{base}/pico-main/css/pico.min.css">
+	<link rel="stylesheet" href="{base}/pico-main/css/pico.colors.min.css">
 	<style>
 		* {
 			scrollbar-width: auto;
@@ -21,6 +21,7 @@
 
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { appController } from '$lib/services/Singletons';
 	import { pbService } from '$lib/services/Singletons';

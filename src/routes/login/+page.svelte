@@ -1,10 +1,6 @@
-<svelte:head>
-	<link rel="stylesheet" href="/pico-main/css/pico.min.css">
-	<link rel="stylesheet" href="/pico-main/css/pico.colors.min.css">
-</svelte:head>
-
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { pbService } from '$lib/services/Singletons';
 	import { appController } from '$lib/services/Singletons';
@@ -47,6 +43,11 @@
 		}
 	}
 </script>
+
+<svelte:head>
+	<link rel="stylesheet" href="{base}/pico-main/css/pico.min.css">
+	<link rel="stylesheet" href="{base}/pico-main/css/pico.colors.min.css">
+</svelte:head>
 
 <main class="container" style="max-width: 400px; margin-top: 4rem;">
 	<article>
