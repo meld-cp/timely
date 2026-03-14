@@ -41,7 +41,7 @@
 
 {#if inv}
 <div class="print-btn">
-	<button onclick={() => window.print()}>Save as PDF</button>
+	<button onclick={() => window.print()}>Print</button>
 </div>
 {#if watermark}
 	<div class="watermark">{watermark}</div>
