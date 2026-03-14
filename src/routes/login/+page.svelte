@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 
 	import { onMount } from 'svelte';
 	import { pbService } from '$lib/services/Singletons';
@@ -22,7 +22,7 @@
 			const ok = await pbService.initialize();
 			if (ok) {
 				await appController.initialize();
-				goto(base + '/timelog/');
+				goto(resolve('/timelog/'));
 				return;
 			}
 			loading = false;
@@ -36,7 +36,7 @@
 		try {
 			await pbService.login(url.trim(), email.trim(), password);
 			await appController.initialize();
-			goto(base + '/timelog/');
+			goto(resolve('/timelog/'));
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Login failed';
 		} finally {
@@ -46,8 +46,8 @@
 </script>
 
 <svelte:head>
-	<link rel="stylesheet" href="{base}/pico-main/css/pico.min.css">
-	<link rel="stylesheet" href="{base}/pico-main/css/pico.colors.min.css">
+	<link rel="stylesheet" href={resolve('/pico-main/css/pico.min.css')}>
+	<link rel="stylesheet" href={resolve('/pico-main/css/pico.colors.min.css')}>
 </svelte:head>
 
 <main class="container" style="max-width: 400px; margin-top: 4rem;">
