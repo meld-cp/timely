@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { resolve } from '$app/paths';
 	import { appController } from '$lib/services/Singletons';
 	import { TaskState } from '$lib/models/TaskState';
 	import { FormatNumber } from '$lib/services/formatters/FormatNumber';
@@ -94,7 +95,7 @@
 						</tbody>
 					</table>
 				{/if}
-				<a href="/timelog/">Go to Time Log</a>
+				<a href={resolve("/timelog/")}>Go to Time Log</a>
 			</article>
 		</section>
 
@@ -118,7 +119,7 @@
 						</tbody>
 					</table>
 				{/if}
-				<a href="/invoices/">Go to Invoice Builder</a>
+				<a href={resolve("/invoices/")}>Go to Invoice Builder</a>
 			</article>
 		</section>
 
@@ -140,7 +141,7 @@
 						<tbody>
 							{#each openInvoices.slice(0, 5) as inv}
 								<tr>
-									<td><a href="/view-invoice/{inv.id}/" target="_blank" rel="noopener">#{inv.number}</a></td>
+									<td><a href={resolve(`/view-invoice/${inv.id}/`)} target="_blank" rel="noopener">#{inv.number}</a></td>
 									<td>{inv.date}</td>
 									<td>{inv.issueToLines[0] ?? '—'}</td>
 									<td class="num">{FormatNumber.currency(inv.grandTotal, inv.currencyCode || 'USD', appController.settings.localeCode)}</td>
@@ -149,7 +150,7 @@
 						</tbody>
 					</table>
 				{/if}
-				<a href="/invoices/">Go to Invoice Builder</a>
+				<a href={resolve("/invoices/")}>Go to Invoice Builder</a>
 			</article>
 		</section>
 	</div>

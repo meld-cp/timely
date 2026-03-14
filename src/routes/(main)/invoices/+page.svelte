@@ -2,6 +2,7 @@
 	import InvoiceEditorView from "$lib/views/invoice-editor/InvoiceEditorView.svelte";
 	import { TaskState } from "$lib/models/TaskState";
 	import { onMount } from "svelte";
+	import { resolve } from "$app/paths";
 
 	import { InvoiceLineViewModel } from "$lib/view-models/InvoiceLineViewModel.svelte";
 	import { InvoiceViewModel } from "$lib/view-models/InvoiceViewModel.svelte";
@@ -134,11 +135,11 @@
 	}
 
 	function viewInvoice(id: string, options?: { watermark?: string }) {
-		let url = `/view-invoice/${id}`;
+		let url = `/view-invoice/${id}/`;
 		if (options?.watermark) {
-			url += `/${options.watermark}`;
+			url += `${options.watermark}/`;
 		}
-		window.open(url, `inv-${id}`);
+		window.open(resolve(url), `inv-${id}`);
 	}
 
 	async function editInvoice(id: string) {

@@ -31,10 +31,10 @@
 	let initialized = $state(false);
 
 	const menuItems: { label: string, url: string }[] = [
-		{ label: "Time Log", url: "/timelog/" },
-		{ label: "Invoice Builder", url: "/invoices/" },
-		{ label: "Settings", url: "/admin/settings/" },
-		{ label: "Data Management", url: "/admin/backup/" },
+		{ label: "Time Log", url: resolve("/timelog/") },
+		{ label: "Invoice Builder", url: resolve("/invoices/") },
+		{ label: "Settings", url: resolve("/admin/settings/") },
+		{ label: "Data Management", url: resolve("/admin/backup/") },
 	];
 
 	let menuOpen = $state(false);
@@ -70,7 +70,7 @@
 	<ul>
 		<li>
 			<strong style="letter-spacing: 0.3rem;">
-				<a class="app-name-link" href="/">[Timely]</a><br/>
+				<a class="app-name-link" href={resolve("/")}>[Timely]</a><br/>
 				{#if appController.settings.label}
 					<small><strong>{appController.settings.label}</strong></small>
 				{/if}
