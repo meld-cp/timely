@@ -168,6 +168,7 @@ export class PocketBaseService {
 	async upsertInvoice(invoice: InvoiceModel): Promise<void> {
 		const data: Record<string, unknown> = {
 			user: this._authUserId,
+			invoiceDate: invoice.date,
 			currencyCode: invoice.currencyCode,
 			number: parseInt(invoice.number) || 0,
 			orderRef: invoice.orderRef,
@@ -300,7 +301,9 @@ export class PocketBaseService {
 			currencyCode: (inv['currencyCode'] as string) ?? 'USD',
 			number: String(inv['number'] ?? ''),
 			date:
-				(inv['created'] as string)?.substring(0, 10) ?? FormatDate.toInputDateValue(new Date()),
+				(inv['invoiceDate'] as string)?.substring(0, 10) ??
+				(inv['created'] as string)?.substring(0, 10) ??
+				FormatDate.toInputDateValue(new Date()),
 			orderRef: (inv['orderRef'] as string) ?? '',
 			headerLines: header ? header.split('\n') : [],
 			issueToLines: issueTo ? issueTo.split('\n') : [],
