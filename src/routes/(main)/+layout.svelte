@@ -104,7 +104,7 @@
 <footer class="footer">
 	<hr>
 	<section>
-		Connected to PocketBase: <code>{pbService.pb.baseURL}</code> &nbsp;·&nbsp; <a href="{pbService.pb.baseURL}/_/" target="_blank" rel="noopener">Admin Panel</a> &nbsp;·&nbsp; Built: {new Date(__BUILD_TIME__).toLocaleString()}
+		Connected to PocketBase: <code>{pbService.pb.baseURL}</code> &nbsp;·&nbsp; <a href="{pbService.pb.baseURL}/_/" target="_blank" rel="noopener">Admin Panel</a> &nbsp;·&nbsp; Built: {new Date(__BUILD_TIME__).toLocaleString(appController.settings.localeCode)}
 	</section>
 </footer>
 {:else}

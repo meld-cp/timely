@@ -238,7 +238,7 @@
 				<tbody>
 					<tr><th>Tasks</th><td>{parsedData.tasks.length}</td></tr>
 					<tr><th>Invoices</th><td>{parsedData.invoices.filter(inv => !inv.id.startsWith('draft')).length}</td></tr>
-					<tr><th>Backup date</th><td>{new Date(parsedData.modified).toLocaleString()}</td></tr>
+					<tr><th>Backup date</th><td>{new Date(parsedData.modified).toLocaleString(appController.settings.localeCode)}</td></tr>
 					<tr><th>Label</th><td>{parsedData.settings?.label ?? '—'}</td></tr>
 				</tbody>
 			</table>
