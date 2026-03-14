@@ -183,10 +183,6 @@
 		text-align: right;
 		white-space: nowrap;
 	}
-	.muted {
-		color: var(--pico-muted-color);
-		font-size: 0.85em;
-	}
 	.big-number {
 		font-size: 2rem;
 		font-weight: bold;
