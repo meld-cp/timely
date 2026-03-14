@@ -3,9 +3,9 @@
 	import { resolve } from '$app/paths';
 	import { appController } from '$lib/services/Singletons';
 	import { TaskState } from '$lib/models/TaskState';
-	import { FormatNumber } from '$lib/services/formatters/FormatNumber';
 	import type { TaskViewModel } from '$lib/view-models/TaskViewModel.svelte';
 	import type { InvoiceViewModel } from '$lib/view-models/InvoiceViewModel.svelte';
+	import RecentInvoicesView from '$lib/views/RecentInvoicesView.svelte';
 
 	function fmtDuration(seconds: number): string {
 		const h = Math.floor(Math.abs(seconds) / 3600);
@@ -126,30 +126,11 @@
 		<section class="full-width">
 			<article>
 				<h3>Recent Invoices</h3>
-				{#if openInvoices.length === 0}
-					<p style="color: var(--pico-muted-color);">No invoices yet.</p>
-				{:else}
-					<table>
-						<thead>
-							<tr>
-								<th>Invoice</th>
-								<th>Date</th>
-								<th>Client</th>
-								<th class="num">Total</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each openInvoices.slice(0, 5) as inv}
-								<tr>
-									<td><a href={resolve(`/view-invoice/?id=${inv.id}`)} target="_blank" rel="noopener">#{inv.number}</a></td>
-									<td>{inv.date}</td>
-									<td>{inv.issueToLines[0] ?? '—'}</td>
-									<td class="num">{FormatNumber.currency(inv.grandTotal, inv.currencyCode || 'USD', appController.settings.localeCode)}</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				{/if}
+				<RecentInvoicesView
+					invoices={openInvoices}
+					pageSize={5}
+					onView={(id) => window.open(resolve(`/view-invoice/?id=${id}`), `inv-${id}`)}
+				/>
 				<a href={resolve("/invoices/")}>Go to Invoice Builder</a>
 			</article>
 		</section>

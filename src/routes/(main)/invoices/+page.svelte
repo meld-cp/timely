@@ -1,5 +1,6 @@
 <script lang="ts">
 	import InvoiceEditorView from "$lib/views/invoice-editor/InvoiceEditorView.svelte";
+	import RecentInvoicesView from "$lib/views/RecentInvoicesView.svelte";
 	import { TaskState } from "$lib/models/TaskState";
 	import { onMount } from "svelte";
 	import { resolve } from "$app/paths";
@@ -273,16 +274,13 @@
 
 	<section id="row2">
 		<article>
-			<details>
-				<summary>Closed Invoices ({closedInvoices.length})</summary>
-				{#each closedInvoices as inv}
-				<article>
-					{inv.number}
-					<a href="##" onclick="{(ev) => { ev.preventDefault(); viewInvoice(inv.id);}}">View</a>
-					<a href="##" onclick="{(ev) => { ev.preventDefault(); editInvoice(inv.id);}}">Edit</a>
-				</article>
-				{/each}
-			</details>
+			<h3>Recent Invoices</h3>
+			<RecentInvoicesView
+				invoices={closedInvoices}
+				pageSize={10}
+				onView={(id) => viewInvoice(id)}
+				onEdit={(id) => editInvoice(id)}
+			/>
 		</article>
 	</section>
 </div>
