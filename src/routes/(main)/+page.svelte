@@ -47,7 +47,11 @@
 			return sum + (increments * 15) / 60;
 		}, 0)
 	);
-	const openInvoices = $derived(invoices.filter(inv => inv.lines.length > 0));
+	const openInvoices = $derived(
+		invoices
+			.filter(inv => inv.lines.length > 0)
+			.sort((a, b) => b.date.localeCompare(a.date) || parseInt(b.number) - parseInt(a.number))
+	);
 </script>
 
 <h2>Dashboard</h2>
