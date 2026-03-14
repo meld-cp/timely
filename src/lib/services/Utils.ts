@@ -4,6 +4,17 @@ type SortProperty = string;
 
 export class Utils {
 
+	/**
+	 * Generates a PocketBase-compatible record ID: 15 lowercase alphanumeric characters.
+	 */
+	public static generateId(): string {
+		const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+		const bytes = new Uint8Array(15);
+		crypto.getRandomValues(bytes);
+		return Array.from(bytes, b => chars[b % chars.length]).join('');
+	}
+
+
 	public static async convertFileToDataURL(file: File) : Promise<string> {
 		return new Promise((resolve, reject) => {
 			const reader = new FileReader();

@@ -16,7 +16,7 @@
 		taskController:ITaskController,
 	} = $props();
 
-	const isReadOnly = vm.state == "Archived";
+	const isReadOnly = $derived(vm.state === TaskState.Archived);
 
 	const taskAction1:TaskActionModel = {
 		icon: ( task ) => {

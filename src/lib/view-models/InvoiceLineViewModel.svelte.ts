@@ -1,8 +1,9 @@
 import type { InvoiceLineModel } from "$lib/models/InvoiceLineModel";
+import { Utils } from "$lib/services/Utils";
 
 
 export class InvoiceLineViewModel {
-	public id = $state(crypto.randomUUID().toString());
+	public id = $state(Utils.generateId());
 	public extRefId: string | undefined = $state();
 	public number: number = $state(0);
 	public description: string = $state("");
@@ -14,7 +15,7 @@ export class InvoiceLineViewModel {
 	public total: number = $derived(this.quantity * this.unitCost);
 
 	public get isDescriptionOnlyLine(): boolean {
-		return this.quantity == 0;
+		return this.quantity === 0;
 	}
 
 	constructor(m?: InvoiceLineModel) {

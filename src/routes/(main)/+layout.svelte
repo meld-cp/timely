@@ -12,48 +12,59 @@
 		::-webkit-scrollbar-thumb {
 			background: var(--pico-form-element-active-border-color);
 		}
-		
+
 		::-webkit-scrollbar-track {
 			background: var(--pico-form-element-border-color);
-			/* background: var(--pico-form-element-selected-background-color); */
 		}
 	</style>
 </svelte:head>
 
 <script lang="ts">
-    import { appController } from '$lib/services/Singletons';
-	
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { appController } from '$lib/services/Singletons';
+	import { pbService } from '$lib/services/Singletons';
+
 	let { children } = $props();
 
-	const memuItems:{ label:string, url:string }[] = [
-		{ label:"Time Log", url:"/timelog/" },
-		{ label:"Invoice Builder", url:"/invoices/" },
-		{ label:"Settings", url:"/admin/settings/" },
-		{ label:"Backup & Restore", url:"/admin/backup/" },
-		{ label:"Data", url:"/admin/data/" },
-		{ label:"Roadmap", url:"/admin/roadmap/" },
-	]
-	
+	let initialized = $state(false);
 
-	let elMenu:HTMLElement|undefined = $state();
+	const menuItems: { label: string, url: string }[] = [
+		{ label: "Time Log", url: "/timelog/" },
+		{ label: "Invoice Builder", url: "/invoices/" },
+		{ label: "Settings", url: "/admin/settings/" },
+		{ label: "Data Management", url: "/admin/backup/" },
+	];
 
-	function onMenuItemClick(){
-		elMenu?.attributes.removeNamedItem("open")
+	let menuOpen = $state(false);
+
+	function onMenuItemClick() {
+		menuOpen = false;
 	}
 
-	let backingUpData = $state( false);
+	async function onSignOut() {
+		pbService.logout();
+		goto('/login/');
+	}
 
-	async function onBackupData(){
-		backingUpData = true;
-		try{
-			await appController.backupData("auto");
-		}finally{
-			backingUpData = false;
+	onMount(async () => {
+		if (!pbService.pb.authStore.isValid) {
+			goto('/login/');
+			return;
 		}
-	}
-
+		if (!pbService.isInitialized) {
+			const ok = await pbService.initialize();
+			if (!ok) {
+				goto('/login/');
+				return;
+			}
+			await appController.initialize();
+		}
+		initialized = true;
+	});
 </script>
 
+{#if initialized}
 <nav class="container">
 	<ul>
 		<li>
@@ -62,33 +73,27 @@
 				{#if appController.settings.label}
 					<small><strong>{appController.settings.label}</strong></small>
 				{/if}
-			</strong> 
+			</strong>
 		</li>
 	</ul>
 	<ul>
 		<li>
-			<button
-				class="outline"
-				onclick="{onBackupData}"
-				aria-busy="{backingUpData}"
-				disabled="{backingUpData}"
-			>Backup Data</button>
+			<button class="outline secondary" onclick={onSignOut}>Sign Out</button>
 		</li>
 		<li>
-			<details class="dropdown" bind:this={elMenu}>
+			<details class="dropdown" bind:open={menuOpen}>
 				<summary style="width: 18ch;">Menu</summary>
 				<ul>
-					{#each memuItems as mi}
+					{#each menuItems as mi}
 						<li>
 							<a href="{mi.url}" onclick="{onMenuItemClick}">{mi.label}</a>
 						</li>
 					{/each}
-
 				</ul>
 			</details>
 		</li>
 	</ul>
-  </nav>
+</nav>
 
 <div class="container" style:padding-bottom="10rem">
 	{@render children()}
@@ -97,9 +102,14 @@
 <footer class="footer">
 	<hr>
 	<section>
-		Data Version: {appController.dataModifiedTimestamp}
+		Connected to PocketBase
 	</section>
 </footer>
+{:else}
+<div class="container" style="margin-top: 4rem; text-align: center;">
+	<p aria-busy="true">Loading...</p>
+</div>
+{/if}
 
 <style>
 	.footer{

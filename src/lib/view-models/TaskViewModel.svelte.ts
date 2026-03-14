@@ -2,9 +2,10 @@ import type { TaskModel } from "$lib/models/TaskModel";
 import { TaskState } from "$lib/models/TaskState";
 import { FormatDate } from "$lib/services/formatters/FormatDate";
 import { appController } from "$lib/services/Singletons";
+import { Utils } from "$lib/services/Utils";
 
 export class TaskViewModel {
-	id: string = $state(crypto.randomUUID());
+	id: string = $state(Utils.generateId());
 	state: TaskState = $state(TaskState.Stopped);
 	date: string = $state(FormatDate.toInputDateValue(new Date()));
 	name: string = $state("");
@@ -18,7 +19,7 @@ export class TaskViewModel {
 		return this.tags.join(" ");
 	}
 	set tagsAsText(txt: string) {
-		this.tags = txt.trim().split(" ");
+		this.tags = txt.trim().split(/\s+/).filter(t => t.length > 0);
 	}
 
 	constructor(m?: TaskModel) {
@@ -54,11 +55,11 @@ export class TaskViewModel {
 	}
 
 	public save() {
-		appController.taskRepo.set(this.id, this.getModel());
+		appController.saveTask(this.getModel());
 	}
 
 	public pause() {
-		if (this.state != TaskState.Running) {
+		if (this.state !== TaskState.Running) {
 			return;
 		}
 		this.state = TaskState.Paused;
@@ -67,7 +68,7 @@ export class TaskViewModel {
 
 	public start() {
 		this.state = TaskState.Running;
-		this.timeRunStarted = Date.now();
+		this.timeRunStarted = Date.now() - (this.duration * 1000);
 	}
 
 	public stop() {
@@ -81,10 +82,8 @@ export class TaskViewModel {
 	}
 
 	public incrementDuration(incrementMinutes: number) {
-		if (this.state == TaskState.Running) {
-			// inc session start time
+		if (this.state === TaskState.Running) {
 			const currentSessionStartTime = (this.timeRunStarted ?? Date.now());
-			//const dt = new Date( currentSessionStartTime );
 			const incMs = incrementMinutes * 60 * 1000;
 			const newSessionTime = currentSessionStartTime - incMs;
 			this.timeRunStarted = newSessionTime;
@@ -95,7 +94,7 @@ export class TaskViewModel {
 	}
 
 	public recalculateDurationFromRunningSession() {
-		if (this.state != TaskState.Running) {
+		if (this.state !== TaskState.Running) {
 			return;
 		}
 		const sessionStartTime = (this.timeRunStarted ?? Date.now());

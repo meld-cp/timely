@@ -12,7 +12,7 @@ export class FormatDate {
 		return result;
 	}
 
-	static toLocalDatefromString(dateString: string, locale?: string): string {
+	static toLocalDateFromString(dateString: string, locale?: string): string {
 		const date = new Date(dateString);
 		return FormatDate.toLocalDate(date, locale)
 	}
