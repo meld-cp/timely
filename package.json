@@ -8,7 +8,9 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"deploy": "robocopy out \\\\0nas.ptr2.me\\Docker\\PocketBase\\public\\timely /MIR /NFL /NDL /NJH /NJS & exit 0",
+		"ship": "npm run build && npm run deploy"
 	},
 	"devDependencies": {
 		"@fortawesome/fontawesome-svg-core": "^6.7.2",
